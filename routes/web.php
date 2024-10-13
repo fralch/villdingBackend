@@ -14,17 +14,17 @@ use App\Http\Controllers\User\UserController;
 |
 */
 
-Route::get('/', function () {
+Route::get('/endpoint', function () {
     return view('welcome');
 });
 
-Route::post('/user_create', [UserController::class, 'create']);
+Route::post('/user/create', [UserController::class, 'create']);
 
-Route::post('/user_login', [UserController::class, 'login']);
+Route::post('/user/login', [UserController::class, 'login']);
 
 Route::get('/user/getSession', [UserController::class, 'getSession']);
 
-Route::get('/user_all', [UserController::class, 'all']);
+Route::get('/endpoint/user/all', [UserController::class, 'all']);
 
 Route::get('/user/{id}', [UserController::class, 'show']);
 
