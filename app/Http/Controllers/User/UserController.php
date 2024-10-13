@@ -40,7 +40,10 @@ class UserController extends Controller
         ]);
 
 
-        return   response->json($user, 201);
+        return   response([
+            'message' => 'User created successfully',
+            'user' => $user
+        ]);
     }
 
     public function login(Request $request)
