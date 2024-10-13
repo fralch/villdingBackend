@@ -18,13 +18,13 @@ Route::get('/endpoint', function () {
     return view('welcome');
 });
 
-Route::post('/user/create', [UserController::class, 'create']);
+Route::post('/endpoint/user/create', [UserController::class, 'create']);
 
-Route::post('/user/login', [UserController::class, 'login']);
+Route::post('/endpoint/user/login', [UserController::class, 'login']);
 
-Route::get('/user/getSession', [UserController::class, 'getSession']);
+Route::get('/endpoint/user/getSession', [UserController::class, 'getSession']);
 
 Route::get('/endpoint/user/all', [UserController::class, 'all']);
 
-Route::get('/user/{id}', [UserController::class, 'show']);
+Route::get('/endpoint/user/{id}', [UserController::class, 'show']);
 
