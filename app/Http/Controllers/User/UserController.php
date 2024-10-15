@@ -73,6 +73,22 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function emailExists(Request $request)  {
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            return response([
+                'message' => 'User already exists',
+                'user' => $user
+            ], 200);
+        } else {
+            return response([
+                'message' => 'User does not exist'
+            ], 200);
+        }
+        
+    }
     /**
      * Método para obtener la sesión del usuario.
      */

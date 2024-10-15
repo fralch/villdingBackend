@@ -22,6 +22,8 @@ Route::post('/endpoint/user/create', [UserController::class, 'create']);
 
 Route::post('/endpoint/user/login', [UserController::class, 'login']);
 
+Route::post('/endpoint/user/email_exists', [UserController::class, 'emailExists']);
+
 Route::get('/endpoint/user/getSession', [UserController::class, 'getSession']);
 
 Route::get('/endpoint/user/all', [UserController::class, 'all']);
