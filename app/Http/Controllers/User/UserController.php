@@ -19,42 +19,34 @@ class UserController extends Controller
     /**
      * Método para iniciar sesión y crear la sesión del usuario.
      */
-    public function create(Request $request): Response
-{
-    // Validar los datos de entrada
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'last_name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'], // Asegúrate de que 'users' sea el nombre correcto de la tabla
-        'password' => ['required', 'string', 'min:8'],
-        'profile_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // Validación para la imagen (opcional)
-    ]);
+    public function create(Request $request)
+    {
+        
+        // Procesar la imagen si se proporciona
+        $profileImagePath = null;
+        if ($request->hasFile('uri')) {
+            $image = $request->file('uri');
+            $profileImagePath = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/profile'), $profileImagePath); // Guardar la imagen en public/images/profile
+        }
 
-    // Procesar la imagen si se proporciona
-    $profileImagePath = null;
-    if ($request->hasFile('profile_image')) {
-        $image = $request->file('profile_image');
-        $profileImagePath = time() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('images/profile'), $profileImagePath); // Guardar la imagen en public/images/profile
+        // Crear el usuario
+        $user = User::create([
+            'name' => $request->name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'password' => Hash::make($request->input('password')),
+            'is_paid_user' => 0,
+            'role' => $request->input('role', 'user'), // Valor por defecto es 'user' si no se pasa
+            'uri' => $profileImagePath  ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
+        ]);
+
+        // Retornar la respuesta con los datos del usuario
+        return response([
+            'message' => 'User created successfully',
+            'user' => $user
+        ], 201);
     }
-
-    // Crear el usuario
-    $user = User::create([
-        'name' => $request->name,
-        'last_name' => $request->last_name,
-        'email' => $request->email,
-        'password' => Hash::make($request->input('password')),
-        'is_paid_user' => 0,
-        'role' => $request->input('role', 'user'), // Valor por defecto es 'user' si no se pasa
-        'uri' => $profileImagePath || '', // Almacena la ruta de la imagen si existe
-    ]);
-
-    // Retornar la respuesta con los datos del usuario
-    return response([
-        'message' => 'User created successfully',
-        'user' => $user
-    ], 201);
-}
     public function login(Request $request)
     {
         // Validar los datos de entrada
@@ -131,9 +123,32 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $id = $request->input('id');
+        
+        // Procesar la imagen si se proporciona
+        $profileImagePath = null;
+        if ($request->hasFile('uri') == 1 ) {
+            $image = $request->file('uri');
+            $profileImagePath = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/profile'), $profileImagePath); // Guardar la imagen en public/images/profile
+        }
+        
+        // update the specified resource in storage.
+        $user = User::where('id', $id)->update([
+            'name' => $request->name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'uri' =>$profileImagePath ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
+        ]);
+        return $profileImagePath;
+        
+        // Retornar la respuesta con los datos del usuario
+        return response([
+            'message' => 'User updated successfully',
+            'user' => $user
+        ], 201);
     }
 
     /**

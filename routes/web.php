@@ -20,6 +20,8 @@ Route::get('/endpoint', function () {
 
 Route::post('/endpoint/user/create', [UserController::class, 'create']);
 
+Route::post('/endpoint/user/update', [UserController::class, 'update']);
+
 Route::post('/endpoint/user/login', [UserController::class, 'login']);
 
 Route::post('/endpoint/user/email_exists', [UserController::class, 'emailExists']);
