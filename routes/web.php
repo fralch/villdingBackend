@@ -13,6 +13,20 @@ use App\Http\Controllers\User\UserController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/endpoint/images/profile/{filename}', function ($filename) {
+    $path = public_path('images/profile/' . $filename);
+
+    if (!File::exists($path)) {
+        abort(404);
+    }
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    return response($file, 200)->header("Content-Type", $type);
+});
+
+
 
 Route::get('/endpoint', function () {
     return view('welcome');
