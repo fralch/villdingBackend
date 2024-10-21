@@ -125,7 +125,7 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        
+        $id = $request->input('id');
         // Procesar la imagen si se proporciona
         $profileImagePath = null;
         if ($request->hasFile('uri') == 1 ) {
@@ -135,7 +135,7 @@ class UserController extends Controller
         }
         
         // update the specified resource in storage.
-        $user = User::where('email', $request->email)->update([
+        $user = User::where('id', $id)->update([
             'name' => $request->name,
             'last_name' => $request->last_name,
             'email' => $request->email,
