@@ -141,7 +141,6 @@ class UserController extends Controller
             'email' => $request->email,
             'uri' =>$profileImagePath ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
         ]);
-        return $profileImagePath;
         
         // Retornar la respuesta con los datos del usuario
         return response([
