@@ -24,10 +24,26 @@ class UserController extends Controller
         
         // Procesar la imagen si se proporciona
         $profileImagePath = null;
+
         if ($request->hasFile('uri')) {
             $image = $request->file('uri');
+
+            // Ruta temporal del archivo subido
+            $rutaTemporal = $image->getPathname();
+            
+            // Nombre de la imagen con marca de tiempo para evitar conflictos de nombres
             $profileImagePath = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/profile'), $profileImagePath); // Guardar la imagen en public/images/profile
+            
+            // Ruta de destino donde se guardará la imagen
+            $rutaDestino = public_path('images/profile') . '/' . $profileImagePath;
+            
+            // Usar move_uploaded_file para mover el archivo desde la ubicación temporal a la ubicación final
+            if (move_uploaded_file($rutaTemporal, $rutaDestino)) {
+                // Imagen movida exitosamente
+            } else {
+                // Manejar error en caso de que no se pueda mover el archivo
+                return response()->json(['error' => 'Error al mover el archivo.'], 500);
+            }
         }
 
         // Crear el usuario
