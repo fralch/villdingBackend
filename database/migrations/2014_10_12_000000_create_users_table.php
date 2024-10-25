@@ -21,6 +21,9 @@ return new class extends Migration
             $table->boolean('is_paid_user');
             $table->string('role');
             $table->string('password');
+            $table->integer('edad')->nullable(); 
+            $table->string('telefono')->nullable();
+            $table->string('genero')->nullable();
             $table->timestamps();
         });
     }

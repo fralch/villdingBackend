@@ -51,6 +51,9 @@ class UserController extends Controller
             'name' => $request->name,
             'last_name' => $request->last_name,
             'email' => $request->email,
+            'edad' => $request->edad,
+            'genero' => $request->genero,
+            'telefono' => $request->telefono,
             'password' => Hash::make($request->input('password')),
             'is_paid_user' => 0,
             'role' => $request->input('role', 'user'), // Valor por defecto es 'user' si no se pasa
