@@ -159,8 +159,6 @@ class UserController extends Controller
             'last_name' => $request->last_name,
             'email' => $request->email,
             'uri' =>$profileImagePath ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
-            'genero' => $request->genero,
-            'edad' => $request->edad,
             'telefono' => $request->telefono
         ]);
         
