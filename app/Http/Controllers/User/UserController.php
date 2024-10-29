@@ -145,23 +145,29 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $id = $request->input('id');
+    
         // Procesar la imagen si se proporciona
         $profileImagePath = null;
-        if ($request->hasFile('uri') == 1 ) {
+        if ($request->hasFile('uri')) {
             $image = $request->file('uri');
             $profileImagePath = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images/profile'), $profileImagePath); // Guardar la imagen en public/images/profile
         }
-        
-        // update the specified resource in storage.
-        $user = User::where('id', $id)->update([
+    
+        // Construir el arreglo de actualización solo con los campos que existen en el Request
+        $dataToUpdate = array_filter([
             'name' => $request->name,
             'last_name' => $request->last_name,
             'email' => $request->email,
-            'uri' =>$profileImagePath ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
-            'telefono' => $request->telefono
-        ]);
-        
+            'uri' => $profileImagePath ? $profileImagePath : '', // Almacena la ruta de la imagen si existe
+            'telefono' => $request->telefono,
+        ], function ($value) {
+            return $value !== null;
+        });
+    
+        // Actualizar solo los campos que existen en $dataToUpdate
+        $user = User::where('id', $id)->update($dataToUpdate);
+    
         // Retornar la respuesta con los datos del usuario
         return response([
             'message' => 'User updated successfully',
