@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\UserCodeController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -45,4 +47,10 @@ Route::get('/endpoint/user/getSession', [UserController::class, 'getSession']);
 Route::get('/endpoint/user/all', [UserController::class, 'all']);
 
 Route::get('/endpoint/user/{id}', [UserController::class, 'show']);
+
+Route::post('/endpoint/user/generate-code', [UserCodeController::class, 'generateCode']);
+
+Route::post('/endpoint/user/verify-code', [UserCodeController::class, 'verifyCode']);
+
+Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']);
 
