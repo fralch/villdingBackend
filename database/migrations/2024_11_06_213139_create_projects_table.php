@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps(); // Campos created_at y updated_at
 
             $table->foreignId('project_type_id')->constrained('project_types')->onDelete('cascade');
-            $table->foreignId('project_subtype_id')->constrained('project_subtypes')->onDelete('cascade');
+            $table->foreignId('project_subtype_id')->constrained('project_subtypes')->onDelete('cascade')->nullable();
 
         });
     }

@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\UserCodeController;
+use App\Http\Controllers\Projects\ProjectController;
+use App\Http\Controllers\Projects\ProjectSubtypeController;
+use App\Http\Controllers\Projects\ProjectTypeController;
 
 
 /*
@@ -53,4 +56,15 @@ Route::post('/endpoint/user/generate-code', [UserCodeController::class, 'generat
 Route::post('/endpoint/user/verify-code', [UserCodeController::class, 'verifyCode']);
 
 Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']);
+
+Route::post('/endpoint/project/type/store', [ProjectTypeController::class, 'store']);
+
+Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class, 'store']);
+
+Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
+
+
+
+
+
 
