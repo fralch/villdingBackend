@@ -57,10 +57,13 @@ Route::post('/endpoint/user/verify-code', [UserCodeController::class, 'verifyCod
 
 Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']);
 
+Route::get('/endpoint/project/types', [ProjectTypeController::class, 'all']);
 Route::post('/endpoint/project/type/store', [ProjectTypeController::class, 'store']);
 
+Route::get('/endpoint/project/subtypes', [ProjectSubtypeController::class, 'all']);
 Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class, 'store']);
 
+Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 
 

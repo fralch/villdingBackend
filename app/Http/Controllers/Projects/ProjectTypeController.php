@@ -11,7 +11,7 @@ class ProjectTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function all()
     {
          // Obtiene todos los tipos de proyecto y los retorna
          $projectTypes = ProjectType::all();

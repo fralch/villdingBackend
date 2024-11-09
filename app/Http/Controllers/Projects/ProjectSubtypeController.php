@@ -11,7 +11,7 @@ class ProjectSubtypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function all()
     {
         // Obtiene todos los subtipos de proyecto y los retorna
         $projectSubtypes = ProjectSubtype::all();
