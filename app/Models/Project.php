@@ -35,4 +35,12 @@ class Project extends Model
     {
         return $this->belongsTo(ProjectSubtype::class, 'project_subtype_id');
     }
+
+    /**
+     * Relación de muchos a muchos con el modelo User.
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'project_user');
+    }
 }

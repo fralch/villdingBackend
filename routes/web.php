@@ -66,6 +66,9 @@ Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class,
 Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 
+//attachProject
+Route::post('/endpoint/project/attach', [UserController::class, 'attachProject']);
+
 
 
 

@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /public/images/profile/*
+/public/images/projects/*
 /vendor
 .env
 .env.backup

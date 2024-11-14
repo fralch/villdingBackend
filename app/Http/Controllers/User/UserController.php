@@ -175,6 +175,25 @@ class UserController extends Controller
         ], 201);
     }
 
+    public function attachProject(Request $request)
+    {
+        // Validar que los IDs de usuario y proyecto están presentes en la solicitud
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'project_id' => 'required|exists:projects,id',
+        ]);
+
+        // Obtener el usuario y agregar el proyecto
+        $user = User::findOrFail($request->user_id);
+        $user->projects()->attach($request->project_id);
+
+        return response([
+            'message' => 'Project successfully linked to user',
+            'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
+        ], 200);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      */
