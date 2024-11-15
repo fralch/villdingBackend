@@ -24,12 +24,9 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         // Procesar la imagen si se proporciona
         $imagePath = null;
-        $user_id = $request->user_id;
-
         if ($request->hasFile('uri')) {
             $image = $request->file('uri');
             $imagePath = time() . '.' . $image->getClientOriginalExtension();
@@ -48,16 +45,7 @@ class ProjectController extends Controller
                 'project_subtype_id' => $request->project_subtype_id                
             ]);
 
-            // Agregar el proyecto al usuario
-            $user = User::findOrFail($user_id);
-            $user->projects()->attach($project->id);
-            
-
-            return response()->json([
-                'message' => 'Project created and linked to user successfully',
-                'project' => $project,
-                'user' => $user->load('projects'), // Mostrar la relación actualizada
-            ], 201);
+            return response()->json($project, 201);
     }
 
     /**
