@@ -67,7 +67,14 @@ Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 
 //attachProject
-Route::post('/endpoint/project/attach', [UserController::class, 'attachProject']);
+Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']);
+
+Route::post('/endpoint/project/check-attachment', [ProjectController::class, 'checkAttachmentProjectUser']);
+
+Route::post('/endpoint/user/check-attachment', [UserController::class, 'checkAttachmentUserProject']);
+
+
+
 
 
 

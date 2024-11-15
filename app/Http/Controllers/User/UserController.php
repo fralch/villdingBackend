@@ -175,23 +175,7 @@ class UserController extends Controller
         ], 201);
     }
 
-    public function attachProject(Request $request)
-    {
-        // Validar que los IDs de usuario y proyecto están presentes en la solicitud
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'project_id' => 'required|exists:projects,id',
-        ]);
-
-        // Obtener el usuario y agregar el proyecto
-        $user = User::findOrFail($request->user_id);
-        $user->projects()->attach($request->project_id);
-
-        return response([
-            'message' => 'Project successfully linked to user',
-            'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
-        ], 200);
-    }
+    
 
 
     /**
@@ -200,5 +184,15 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    // check attachment user on project
+    public function checkAttachmentUserProject(Request $request)
+    {
+        $user_id = $request->input('user_id');
+    
+        $user = User::find($user_id); // Usuario con ID 1
+        $projects = $user->projects; // Proyectos vinculados al usuario
+        return response()->json($projects);
     }
 }

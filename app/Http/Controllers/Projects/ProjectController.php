@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Projects;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\User;
 
 class ProjectController extends Controller
 {
@@ -27,6 +28,8 @@ class ProjectController extends Controller
     {
         // Procesar la imagen si se proporciona
         $imagePath = null;
+        $user_id = $request->user_id;
+
         if ($request->hasFile('uri')) {
             $image = $request->file('uri');
             $imagePath = time() . '.' . $image->getClientOriginalExtension();
@@ -45,7 +48,16 @@ class ProjectController extends Controller
                 'project_subtype_id' => $request->project_subtype_id                
             ]);
 
-            return response()->json($project, 201);
+            // Agregar el proyecto al usuario
+            $user = User::findOrFail($user_id);
+            $user->projects()->attach($project->id);
+            
+
+            return response()->json([
+                'message' => 'Project created and linked to user successfully',
+                'project' => $project,
+                'user' => $user->load('projects'), // Mostrar la relación actualizada
+            ], 201);
     }
 
     /**
@@ -83,5 +95,32 @@ class ProjectController extends Controller
           $project->delete();
   
           return response()->json(['message' => 'Proyecto eliminado correctamente']);
+    }
+
+
+    public function attachProject(Request $request)
+    {
+        // Validar que los IDs de usuario y proyecto están presentes en la solicitud
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'project_id' => 'required|exists:projects,id',
+        ]);
+
+        // Obtener el usuario y agregar el proyecto
+        $user = User::findOrFail($request->user_id);
+        $user->projects()->attach($request->project_id);
+
+        return response([
+            'message' => 'Project successfully linked to user',
+            'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
+        ], 200);
+    }
+
+    public function checkAttachmentProjectUser(Request $request)
+    {   
+        $project_id = $request->project_id; 
+        $project = Project::find($project_id); // Proyecto con ID 1
+        $users = $project->users; // Usuarios vinculados al proyecto
+        return response()->json($users);
     }
 }
