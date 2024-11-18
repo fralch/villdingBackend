@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\User;
+use App\Models\Project;
+use App\Models\ProjectUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -191,8 +193,8 @@ class UserController extends Controller
     {
         $user_id = $request->input('user_id');
     
-        $user = User::find($user_id); // Usuario con ID 1
-        $projects = $user->projects; // Proyectos vinculados al usuario
-        return response()->json($projects);
+        $projects = ProjectUse::where('user_id', $user_id)->get();
+    
+        return response()->json(['projects' => $projects], 200);
     }
 }
