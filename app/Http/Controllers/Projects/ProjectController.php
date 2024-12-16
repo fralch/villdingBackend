@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Projects;
-
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
@@ -38,6 +39,7 @@ class ProjectController extends Controller
                 'name' => $request->name,
                 'location' => $request->location,
                 'company' => $request->company,
+                'code' =>  Str::random(10),
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'uri' => $imagePath ? $imagePath : '',

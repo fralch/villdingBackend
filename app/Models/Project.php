@@ -13,6 +13,7 @@ class Project extends Model
         'name',
         'location',
         'company',
+        'code',
         'start_date',
         'end_date',
         'uri',

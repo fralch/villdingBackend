@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name'); // Nombre del proyecto
             $table->string('location'); // Ubicación del proyecto
             $table->string('company'); // Nombre de la compañía
+            $table->string('code'); // Código del proyecto
             $table->date('start_date'); // Fecha de inicio
             $table->date('end_date'); // Fecha de finalización
             $table->string('uri')->nullable(); // Campo opcional de URI
