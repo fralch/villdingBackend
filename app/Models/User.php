@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'uri',
         'is_paid_user',
+        'user_code',
         'role',
         'password',
         'edad',

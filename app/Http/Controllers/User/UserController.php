@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectUser;
@@ -58,6 +59,7 @@ class UserController extends Controller
             'telefono' => $request->telefono,
             'password' => Hash::make($request->input('password')),
             'is_paid_user' => 0,
+            'user_code' => Str::random(10),
             'role' => $request->input('role', 'user'), // Valor por defecto es 'user' si no se pasa
             'uri' => $profileImagePath  ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
         ]);

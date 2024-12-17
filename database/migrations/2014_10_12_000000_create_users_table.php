@@ -19,6 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('uri')->nullable();
             $table->boolean('is_paid_user');
+            $table->string('user_code')->nullable();
             $table->string('role');
             $table->string('password');
             $table->integer('edad')->nullable(); 
