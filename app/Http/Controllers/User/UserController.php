@@ -88,12 +88,22 @@ class UserController extends Controller
             ], 200);
         }
 
+        // Obtener el tamaño de la imagen de perfil si existe
+        $profileImageSize = null;
+        if ($user->uri) {
+            $imagePath = public_path('images/profile/' . $user->uri);
+            if (file_exists($imagePath)) {
+                $profileImageSize = filesize($imagePath); // Obtener el tamaño del archivo en bytes
+            }
+        }
+
         // Guardar la sesión del usuario
         session(['user' => $user]);
 
         return response([
             'message' => 'Login successful',
-            'user' => $user
+            'user' => $user,
+            'profile_image_size' => $profileImageSize, // Devolver el tamaño de la imagen
         ], 200);
     }
 
