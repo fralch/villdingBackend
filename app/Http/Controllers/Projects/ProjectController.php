@@ -90,12 +90,7 @@ class ProjectController extends Controller
 
     public function attachProject(Request $request)
     {
-        // Validar que los IDs de usuario y proyecto están presentes en la solicitud
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'project_id' => 'required|exists:projects,id',
-        ]);
-
+      
         // Obtener el usuario y agregar el proyecto
         $user = User::findOrFail($request->user_id);
         $user->projects()->attach($request->project_id);
