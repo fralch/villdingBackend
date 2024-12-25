@@ -114,6 +114,32 @@ class ProjectController extends Controller
         }
     }
 
+    /// desvincular un proyecto de un usuario
+    public function detachProject(Request $request) 
+    {
+        try {
+            // Validar que los IDs de usuario y proyecto están presentes en la solicitud
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'project_id' => 'required|exists:projects,id',
+            ]);
+
+            // Obtener el usuario y eliminar el proyecto
+            $user = User::findOrFail($validatedData['user_id']);
+            $user->projects()->detach($validatedData['project_id']);
+
+            return response()->json([
+                'message' => 'Project successfully unlinked from user',
+                'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+    }
+
     public function checkAttachmentProjectUser(Request $request)
     {   
         $project_id = $request->project_id; 
