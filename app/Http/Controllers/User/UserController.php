@@ -208,13 +208,13 @@ class UserController extends Controller
         //
     }
 
-    // check attachment user on project
+    // check attachment user on project: significa que se verifica si un usuario está vinculado a un proyecto específico 
     public function checkAttachmentUserProject(Request $request)
     {
         $user_id = $request->input('user_id');
     
         $user = User::find($user_id); // Usuario con ID 1
-        $projects = $user->projects; // Proyectos vinculados al usuario
+        $projects = $user->projects->unique(); // Proyectos vinculados al usuario sin duplicados
         return response()->json($projects);
     }
 }
