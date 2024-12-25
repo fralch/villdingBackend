@@ -81,7 +81,9 @@ Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 
 //attachProject
-Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']);
+Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']); // vincular proyecto a usuario
+
+Route::post('/endpoint/project/detach', [ProjectController::class, 'detachProject']); // desvincular proyecto a usuario
 
 Route::post('/endpoint/project/check-attachment', [ProjectController::class, 'checkAttachmentProjectUser']);
 
