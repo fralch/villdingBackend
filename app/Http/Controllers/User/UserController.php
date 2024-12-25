@@ -70,6 +70,14 @@ class UserController extends Controller
             'user' => $user
         ], 201);
     }
+    // buscar usuario por user_code
+    public function searchUserByCode(Request $request)
+    {
+        $user_code = $request->user_code;
+        $user = User::where('user_code', $user_code)->first();
+        return response()->json($user);
+    }
+
     public function login(Request $request)
     {
         // Validar los datos de entrada

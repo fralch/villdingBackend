@@ -62,6 +62,9 @@ Route::get('/endpoint/user/all', [UserController::class, 'all']);
 
 Route::get('/endpoint/user/{id}', [UserController::class, 'show']);
 
+
+Route::get('/endpoint/user/user_code', [UserController::class, 'searchUserByCode']); 
+
 Route::post('/endpoint/user/generate-code', [UserCodeController::class, 'generateCode']);
 
 Route::post('/endpoint/user/verify-code', [UserCodeController::class, 'verifyCode']);

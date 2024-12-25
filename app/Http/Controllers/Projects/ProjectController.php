@@ -88,22 +88,30 @@ class ProjectController extends Controller
     }
 
 
-    public function attachProject(Request $request)
+    // attachProject se encarga de vincular un proyecto a un usuario
+    public function attachProject(Request $request) 
     {
-        // Validar que los IDs de usuario y proyecto están presentes en la solicitud
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'project_id' => 'required|exists:projects,id',
-        ]);
+        try {
+            // Validar que los IDs de usuario y proyecto están presentes en la solicitud
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'project_id' => 'required|exists:projects,id',
+            ]);
 
-        // Obtener el usuario y agregar el proyecto
-        $user = User::findOrFail($request->user_id);
-        $user->projects()->attach($request->project_id);
+            // Obtener el usuario y agregar el proyecto
+            $user = User::findOrFail($validatedData['user_id']);
+            $user->projects()->attach($validatedData['project_id']);
 
-        return response([
-            'message' => 'Project successfully linked to user',
-            'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
-        ], 200);
+            return response()->json([
+                'message' => 'Project successfully linked to user',
+                'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
     }
 
     public function checkAttachmentProjectUser(Request $request)
