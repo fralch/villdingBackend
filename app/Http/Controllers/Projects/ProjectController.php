@@ -144,7 +144,7 @@ class ProjectController extends Controller
     {   
         $project_id = $request->project_id; 
         $project = Project::find($project_id); // Proyecto con ID 1
-        $users = $project->users; // Usuarios vinculados al proyecto
+        $users = $project->users->unique(); // Usuarios vinculados al proyecto sin duplicados
         return response()->json($users);
     }
 }
