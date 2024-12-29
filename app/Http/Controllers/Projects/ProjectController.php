@@ -32,22 +32,22 @@ class ProjectController extends Controller
             $image = $request->file('uri');
             $imagePath = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images/projects'), $imagePath);
-
         }
-            // Crear el proyecto
-            $project = Project::create([
-                'name' => $request->name,
-                'location' => $request->location,
-                'company' => $request->company,
-                'code' =>  Str::random(10),
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
-                'uri' => $imagePath ? $imagePath : '',
-                'project_type_id' => $request->project_type_id,
-                'project_subtype_id' => $request->project_subtype_id                
-            ]);
 
-            return response()->json($project, 201);
+        // Crear el proyecto
+        $project = Project::create([
+            'name' => $request->name,
+            'location' => $request->location,
+            'company' => $request->company,
+            'code' => Str::random(10),
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'uri' => $imagePath ? $imagePath : 'https://www.ajcproyectos.com/wp/wp-content/uploads/2018/12/Ingeniera-de-proyectos-y-construccion.jpg',
+            'project_type_id' => $request->project_type_id,
+            'project_subtype_id' => $request->project_subtype_id,
+        ]);
+
+        return response()->json($project, 201);
     }
 
     /**
@@ -179,6 +179,12 @@ class ProjectController extends Controller
                 'project' => [
                     'id' => $project->id,
                     'name' => $project->name,
+                    'location' => $project->location,
+                    'company' => $project->company,
+                    'code' => $project->code,
+                    'start_date' => $project->start_date,
+                    'end_date' => $project->end_date,
+                    'uri' => $project->uri,
                 ],
                 'users' => $users,
             ], 200);
