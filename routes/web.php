@@ -91,8 +91,9 @@ Route::post('/endpoint/user/check-attachment', [UserController::class, 'checkAtt
 
 
 // make user admin 
-
 Route::post('/endpoint/user/makeadmin', [UserController::class, 'makeAdmin']);
+// remove user admin
+Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']);
 
 
 
