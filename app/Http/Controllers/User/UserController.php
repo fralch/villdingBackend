@@ -324,6 +324,39 @@ class UserController extends Controller
               ], 422);
          }
     }
+
+    // quitar al usuario de administrador 
+    public function removeAdmin(Request $request)
+    {
+         try {
+              // Validar los datos de entrada
+              $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'project_id' => 'required|exists:projects,id',
+              ]);
+    
+              // Buscar la relación entre el usuario y el proyecto
+              $projectUser = ProjectUser::where('user_id', $validatedData['user_id'])
+                ->where('project_id', $validatedData['project_id'])
+                ->first();
+    
+              if (!$projectUser) {
+                return response()->json(['message' => 'User is not attached to the project'], 404);
+              }
+    
+              // Actualizar el campo "is_admin" a null
+              $projectUser->is_admin = null;
+              $projectUser->save();
+    
+              return response()->json(['message' => 'User is no longer an admin of the project'], 200);
+         } catch (\Illuminate\Validation\ValidationException $e) {
+              return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+              ], 422);
+         }
+    }
+
    
 
 }
