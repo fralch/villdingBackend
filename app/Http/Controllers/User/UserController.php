@@ -240,13 +240,46 @@ class UserController extends Controller
         //
     }
 
-    // check attachment user on project: significa que se verifica si un usuario está vinculado a un proyecto específico 
-    public function checkAttachmentUserProject(Request $request)
-    {
-        $user_id = $request->input('user_id');
-    
-        $user = User::find($user_id); // Usuario con ID 1
-        $projects = $user->projects->unique(); // Proyectos vinculados al usuario sin duplicados
-        return response()->json($projects);
+   // check attachment user on project: verifica los proyectos vinculados a un usuario específico
+public function checkAttachmentUserProject(Request $request)
+{
+    try {
+        // Validar que el ID del usuario esté presente y exista
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        // Obtener el usuario con los proyectos vinculados
+        $user = User::with(['projects' => function ($query) {
+            $query->select('projects.id', 'projects.name', 'project_user.is_admin'); // Seleccionar campos relevantes
+        }])->find($validatedData['user_id']);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // Formatear los datos
+        $projects = $user->projects->map(function ($project) {
+            return [
+                'id' => $project->id,
+                'name' => $project->name,
+                'is_admin' => $project->pivot->is_admin, // Extraer el valor del pivote
+            ];
+        });
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            'projects' => $projects,
+        ], 200);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation failed',
+            'errors' => $e->errors(),
+        ], 422);
     }
+}
+
 }

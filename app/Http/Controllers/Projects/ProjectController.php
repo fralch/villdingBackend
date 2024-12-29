@@ -146,10 +146,45 @@ class ProjectController extends Controller
     }
 
     public function checkAttachmentProjectUser(Request $request)
-    {   
-        $project_id = $request->project_id; 
-        $project = Project::find($project_id); // Proyecto con ID 1
-        $users = $project->users->unique(); // Usuarios vinculados al proyecto sin duplicados
-        return response()->json($users);
+    {
+        try {
+            // Validar que el ID del proyecto esté presente y exista
+            $validatedData = $request->validate([
+                'project_id' => 'required|exists:projects,id',
+            ]);
+    
+            // Obtener el proyecto con los usuarios vinculados
+            $project = Project::with(['users' => function ($query) {
+                $query->select('users.id', 'users.name', 'users.email', 'project_user.is_admin'); // Seleccionar campos relevantes
+            }])->find($validatedData['project_id']);
+    
+            if (!$project) {
+                return response()->json(['message' => 'Project not found'], 404);
+            }
+    
+            // Formatear los datos
+            $users = $project->users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'is_admin' => $user->pivot->is_admin, // Extraer el valor del pivote
+                ];
+            });
+    
+            return response()->json([
+                'project' => [
+                    'id' => $project->id,
+                    'name' => $project->name,
+                ],
+                'users' => $users,
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
     }
+    
 }
