@@ -39,7 +39,7 @@ class ProjectController extends Controller
                 'name' => $request->name,
                 'location' => $request->location,
                 'company' => $request->company,
-                'code' =>  Str::random(10),
+                'code' =>  $this->generateUserCode(),
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'uri' => $imagePath ? $imagePath : '',
@@ -49,6 +49,27 @@ class ProjectController extends Controller
 
             return response()->json($project, 201);
     }
+
+     /**
+     * Genera un código de usuario con 7 caracteres: una letra mayúscula seguida de 6 números.
+     */
+    private function generateUserCode()
+    {
+        // Generar una letra mayúscula aleatoria
+        $letter = chr(random_int(65, 90)); // ASCII de A-Z es 65-90
+
+        // Generar 6 números aleatorios
+        $numbers = '';
+        for ($i = 0; $i < 6; $i++) {
+            $numbers .= random_int(0, 9);
+        }
+
+        // Combinar la letra y los números
+        $code = $letter . $numbers;
+
+        return $code;
+    }
+
 
     /**
      * Display the specified resource.
