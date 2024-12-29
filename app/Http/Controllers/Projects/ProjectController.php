@@ -96,12 +96,17 @@ class ProjectController extends Controller
             $validatedData = $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'project_id' => 'required|exists:projects,id',
+                'is_admin' => 'nullable|boolean', // Validar el campo adicional
             ]);
-
-            // Obtener el usuario y agregar el proyecto
+    
+            // Obtener el usuario
             $user = User::findOrFail($validatedData['user_id']);
-            $user->projects()->attach($validatedData['project_id']);
-
+    
+            // Asociar el proyecto con datos adicionales
+            $user->projects()->attach($validatedData['project_id'], [
+                'is_admin' => $validatedData['is_admin'] ?? false, // Usar false si no se envía
+            ]);
+    
             return response()->json([
                 'message' => 'Project successfully linked to user',
                 'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
