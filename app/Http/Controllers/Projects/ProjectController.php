@@ -155,7 +155,7 @@ class ProjectController extends Controller
     
             // Obtener el proyecto con los usuarios vinculados
             $project = Project::with(['users' => function ($query) {
-                $query->select('users.id', 'users.name', 'users.email', 'project_user.is_admin'); // Seleccionar campos relevantes
+                $query->select('users.id', 'users.name', 'users.email', 'users.uri' , 'users.user_code', 'project_user.is_admin'); // Seleccionar campos relevantes
             }])->find($validatedData['project_id']);
     
             if (!$project) {

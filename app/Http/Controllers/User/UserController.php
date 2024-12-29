@@ -281,6 +281,7 @@ class UserController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'user_code' => $user->user_code,
+                    'uri' => $user->uri, 
                ],
                'projects' => $projects,
            ], 200);
