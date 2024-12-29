@@ -59,7 +59,7 @@ class UserController extends Controller
             'telefono' => $request->telefono,
             'password' => Hash::make($request->input('password')),
             'is_paid_user' => 0,
-            'user_code' => Str::random(10),
+            'user_code' =>  $this->generateUniqueUserCode(),
             'role' => $request->input('role', 'user'), // Valor por defecto es 'user' si no se pasa
             'uri' => $profileImagePath  ? $profileImagePath : '' , // Almacena la ruta de la imagen si existe
         ]);
@@ -70,6 +70,38 @@ class UserController extends Controller
             'user' => $user
         ], 201);
     }
+     /**
+     * Genera un código de usuario único con 7 caracteres: una letra mayúscula seguida de 6 números.
+     */
+    private function generateUniqueUserCode()
+    {
+        do {
+            $code = $this->generateUserCode();
+        } while (User::where('user_code', $code)->exists());
+
+        return $code;
+    }
+
+    /**
+     * Genera un código de usuario con 7 caracteres: una letra mayúscula seguida de 6 números.
+     */
+    private function generateUserCode()
+    {
+        // Generar una letra mayúscula aleatoria
+        $letter = chr(random_int(65, 90)); // ASCII de A-Z es 65-90
+
+        // Generar 6 números aleatorios
+        $numbers = '';
+        for ($i = 0; $i < 6; $i++) {
+            $numbers .= random_int(0, 9);
+        }
+
+        // Combinar la letra y los números
+        $code = $letter . $numbers;
+
+        return $code;
+    }
+
     // buscar usuario por user_code
     public function searchUserByCode(Request $request)
     {
