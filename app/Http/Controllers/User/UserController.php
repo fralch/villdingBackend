@@ -345,7 +345,7 @@ class UserController extends Controller
               }
     
               // Actualizar el campo "is_admin" a null
-              $projectUser->is_admin = null;
+              $projectUser->is_admin = 0;
               $projectUser->save();
     
               return response()->json(['message' => 'User is no longer an admin of the project'], 200);
