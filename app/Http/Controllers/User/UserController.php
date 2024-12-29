@@ -241,45 +241,56 @@ class UserController extends Controller
     }
 
    // check attachment user on project: verifica los proyectos vinculados a un usuario específico
-public function checkAttachmentUserProject(Request $request)
-{
-    try {
-        // Validar que el ID del usuario esté presente y exista
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
-
-        // Obtener el usuario con los proyectos vinculados
-        $user = User::with(['projects' => function ($query) {
-            $query->select('projects.id', 'projects.name', 'project_user.is_admin'); // Seleccionar campos relevantes
-        }])->find($validatedData['user_id']);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        // Formatear los datos
-        $projects = $user->projects->map(function ($project) {
-            return [
-                'id' => $project->id,
-                'name' => $project->name,
-                'is_admin' => $project->pivot->is_admin, // Extraer el valor del pivote
-            ];
-        });
-
-        return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-            ],
-            'projects' => $projects,
-        ], 200);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'message' => 'Validation failed',
-            'errors' => $e->errors(),
-        ], 422);
-    }
-}
+   public function checkAttachmentUserProject(Request $request)
+   {
+       try {
+           // Validar que el ID del usuario esté presente y exista
+           $validatedData = $request->validate([
+               'user_id' => 'required|exists:users,id',
+           ]);
+   
+           // Obtener el usuario con todos los datos de los proyectos vinculados
+           $user = User::with(['projects' => function ($query) {
+               $query->select('projects.*', 'project_user.is_admin'); // Seleccionar todos los campos de "projects" + "is_admin"
+           }])->find($validatedData['user_id']);
+   
+           if (!$user) {
+               return response()->json(['message' => 'User not found'], 404);
+           }
+   
+           // Mapear los proyectos para incluir los datos completos y el pivote
+           $projects = $user->projects->map(function ($project) {
+               return [
+                   'id' => $project->id,
+                   'name' => $project->name,
+                   'location' => $project->location,
+                   'company' => $project->company,
+                   'code' => $project->code,
+                   'start_date' => $project->start_date,
+                   'end_date' => $project->end_date,
+                   'uri' => $project->uri,
+                   'project_type_id' => $project->project_type_id,
+                   'project_subtype_id' => $project->project_subtype_id,
+                   'is_admin' => $project->pivot->is_admin, // Agregar el valor del pivote
+               ];
+           });
+   
+           return response()->json([
+               'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'user_code' => $user->user_code,
+               ],
+               'projects' => $projects,
+           ], 200);
+       } catch (\Illuminate\Validation\ValidationException $e) {
+           return response()->json([
+               'message' => 'Validation failed',
+               'errors' => $e->errors(),
+           ], 422);
+       }
+   }
+   
 
 }

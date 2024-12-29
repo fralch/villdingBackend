@@ -168,7 +168,10 @@ class ProjectController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'uri' => $user->uri, 
+                    'user_code' => $user->user_code, 
                     'is_admin' => $user->pivot->is_admin, // Extraer el valor del pivote
+
                 ];
             });
     
