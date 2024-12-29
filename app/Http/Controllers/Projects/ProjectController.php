@@ -89,8 +89,7 @@ class ProjectController extends Controller
 
 
     // attachProject se encarga de vincular un proyecto a un usuario
-    public function attachProject(Request $request) 
-    {
+    public function attachProject(Request $request){
         try {
             // Validar que los IDs de usuario y proyecto están presentes en la solicitud
             $validatedData = $request->validate([
@@ -98,15 +97,15 @@ class ProjectController extends Controller
                 'project_id' => 'required|exists:projects,id',
                 'is_admin' => 'nullable|boolean', // Validar el campo adicional
             ]);
-    
+
             // Obtener el usuario
             $user = User::findOrFail($validatedData['user_id']);
-    
+
             // Asociar el proyecto con datos adicionales
             $user->projects()->attach($validatedData['project_id'], [
                 'is_admin' => $validatedData['is_admin'] ?? false, // Usar false si no se envía
             ]);
-    
+
             return response()->json([
                 'message' => 'Project successfully linked to user',
                 'user' => $user->load('projects'), // Cargar los proyectos para mostrar la relación actualizada
@@ -118,6 +117,7 @@ class ProjectController extends Controller
             ], 422);
         }
     }
+
 
     /// desvincular un proyecto de un usuario
     public function detachProject(Request $request) 
