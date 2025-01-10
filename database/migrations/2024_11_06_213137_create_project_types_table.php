@@ -16,6 +16,19 @@ return new class extends Migration
             $table->string('name')->unique(); // Nombre del tipo de proyecto, como 'Residencial', 'Comercial', etc.
             $table->timestamps();
         });
+         
+        // Insertar datos en la tabla project_types
+          $now = Carbon::now();
+
+          DB::table('project_types')->insert([
+              ['name' => 'Residencial', 'created_at' => $now, 'updated_at' => $now],
+              ['name' => 'Comercial', 'created_at' => $now, 'updated_at' => $now],
+              ['name' => 'Industrial', 'created_at' => $now, 'updated_at' => $now],
+              ['name' => 'Infraestructura', 'created_at' => $now, 'updated_at' => $now],
+              ['name' => 'Institucional', 'created_at' => $now, 'updated_at' => $now],
+              ['name' => 'Renovación y remodelación', 'created_at' => $now, 'updated_at' => $now],
+              ['name' => 'Proyectos de paisajismo y diseño urbano', 'created_at' => $now, 'updated_at' => $now],
+          ]);
     }
 
     /**

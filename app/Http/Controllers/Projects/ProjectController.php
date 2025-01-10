@@ -44,7 +44,7 @@ class ProjectController extends Controller
             'end_date' => $request->end_date,
             'uri' => $imagePath ? $imagePath : 'https://www.ajcproyectos.com/wp/wp-content/uploads/2018/12/Ingeniera-de-proyectos-y-construccion.jpg',
             'project_type_id' => $request->project_type_id,
-            'project_subtype_id' => $request->project_subtype_id,
+            'project_subtype_id' => $request->project_subtype_id ?? null,
         ]);
 
         return response()->json($project, 201);
