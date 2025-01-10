@@ -77,8 +77,12 @@ Route::post('/endpoint/project/type/store', [ProjectTypeController::class, 'stor
 Route::get('/endpoint/project/subtypes', [ProjectSubtypeController::class, 'all']);
 Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class, 'store']);
 
+// Projects
 Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
+
+// Projects entities
+Route::post('/endpoint/project/entities/create', [ProjectController::class, 'createProjectEntities']);
 
 //attachProject
 Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']); // vincular proyecto a usuario
@@ -94,6 +98,7 @@ Route::post('/endpoint/user/check-attachment', [UserController::class, 'checkAtt
 Route::post('/endpoint/user/makeadmin', [UserController::class, 'makeAdmin']);
 // remove user admin
 Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']);
+
 
 
 

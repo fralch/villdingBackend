@@ -70,6 +70,7 @@ class ProjectController extends Controller
                 'numero_semana' => $i + 1,
                 'fecha_inicio' => $fechaInicioSemana,
                 'fecha_fin' => $fechaFinSemana,
+                
             ]);
 
             // Crear los días de la semana
@@ -79,22 +80,7 @@ class ProjectController extends Controller
                     'semana_id' => $semana->id,
                     'fecha' => $fechaDia,
                 ]);
-
-                // Crear seguimientos y actividades para cada día
-                $seguimiento = Seguimiento::create([
-                    'dia_id' => $dia->id,
-                    'titulo' => 'Seguimiento del día ' . ($j + 1),
-                    'descripcion' => 'Descripción del seguimiento del día ' . ($j + 1),
-                ]);
-
-                Actividad::create([
-                    'seguimiento_id' => $seguimiento->id,
-                    'titulo' => 'Actividad del día ' . ($j + 1),
-                    'descripcion' => 'Descripción de la actividad del día ' . ($j + 1),
-                    'hora_inicio' => '09:00:00',
-                    'hora_fin' => '17:00:00',
-                    'estado' => 'pendiente',
-                ]);
+                
 
                 $fechaDia->addDay();
             }
