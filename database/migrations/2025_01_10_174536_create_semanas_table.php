@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('semanas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('proyecto_id')->constrained('proyectos')->onDelete('cascade');
+            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->integer('numero_semana');
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
