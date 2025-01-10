@@ -17,6 +17,8 @@ return new class extends Migration
             $table->integer('numero_semana');
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
+            $table->string('nombre')->nullable();
+            $table->string('descripcion')->nullable();
             $table->timestamps();
         });
     }

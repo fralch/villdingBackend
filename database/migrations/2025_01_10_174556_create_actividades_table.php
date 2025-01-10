@@ -18,7 +18,8 @@ return new class extends Migration
             $table->text('descripcion');
             $table->time('hora_inicio');
             $table->time('hora_fin');
-            $table->string('estado')->default('pendiente');
+            $table->boolean('es_activo')->default(true)->nullable();
+            $table->string('estado')->default('pendiente')->nullable();
             $table->timestamps();
         });
     }
