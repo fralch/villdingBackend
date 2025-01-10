@@ -53,24 +53,20 @@ class ProjectController extends Controller
      /**
      * Create semanas, dias, seguimientos and actividades desde una ruta post .
      */
-    protected function createProjectEntities( $project, $startDate, $endDate, $numeroSemanas )
-    {
-        // Calcular la duración de cada semana
+    protected function createProjectEntities( $project, $startDate, $endDate, $numeroSemanas ){
         $fechaInicio = Carbon::parse($startDate);
         $fechaFin = Carbon::parse($endDate);
-        $duracionSemana = $fechaFin->diffInDays($fechaInicio) / $numeroSemanas;
 
         // Crear las semanas
         for ($i = 0; $i < $numeroSemanas; $i++) {
-            $fechaInicioSemana = $fechaInicio->copy()->addDays($i * $duracionSemana);
-            $fechaFinSemana = $fechaInicioSemana->copy()->addDays($duracionSemana - 1);
+            $fechaInicioSemana = $fechaInicio->copy()->addWeeks($i);
+            $fechaFinSemana = $fechaInicioSemana->copy()->addDays(6);
 
             $semana = Semana::create([
                 'proyecto_id' => $project->id,
                 'numero_semana' => $i + 1,
                 'fecha_inicio' => $fechaInicioSemana,
                 'fecha_fin' => $fechaFinSemana,
-                
             ]);
 
             // Crear los días de la semana
@@ -80,12 +76,12 @@ class ProjectController extends Controller
                     'semana_id' => $semana->id,
                     'fecha' => $fechaDia,
                 ]);
-                
 
                 $fechaDia->addDay();
             }
         }
     }
+
 
 
     /**
