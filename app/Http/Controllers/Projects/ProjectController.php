@@ -3,10 +3,18 @@
 namespace App\Http\Controllers\Projects;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Carbon; 
 
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\ProjectUser;
+use App\Models\ProjectType;
+use App\Models\ProjectSubtype;
+use App\Models\Semana;
+use App\Models\Dia;
+use App\Models\Seguimiento;
+use App\Models\Actividad;
 
 class ProjectController extends Controller
 {
