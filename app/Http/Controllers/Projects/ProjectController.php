@@ -78,7 +78,7 @@ class ProjectController extends Controller
             $fechaFinSemana = $fechaInicioSemana->copy()->addDays(6);
 
             $semana = Semana::create([
-                'proyect_id' => $project_id,
+                'project_id' => $project_id,
                 'numero_semana' => $i + 1,
                 'fecha_inicio' => $fechaInicioSemana,
                 'fecha_fin' => $fechaFinSemana,
