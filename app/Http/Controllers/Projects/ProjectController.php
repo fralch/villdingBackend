@@ -53,7 +53,7 @@ class ProjectController extends Controller
      /**
      * Create semanas, dias, seguimientos and actividades desde una ruta post .
      */
-    protected function createProjectEntities( Request $request )
+    public function createProjectEntities( Request $request )
     {
         // Obtener los datos de la solicitud
         $project_id = $request->project_id;
