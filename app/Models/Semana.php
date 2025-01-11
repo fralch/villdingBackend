@@ -9,9 +9,9 @@ class Semana extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['proyecto_id', 'numero_semana', 'fecha_inicio', 'fecha_fin', 'nombre', 'descripcion'];
+    protected $fillable = ['project_id', 'numero_semana', 'fecha_inicio', 'fecha_fin', 'nombre', 'descripcion'];
 
-    public function proyecto()
+    public function project()
     {
         return $this->belongsTo(Project::class);
     }
