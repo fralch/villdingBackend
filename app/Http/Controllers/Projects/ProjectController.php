@@ -82,6 +82,17 @@ class ProjectController extends Controller
                 'start_date' => $fechaInicioSemana,
                 'end_date' => $fechaFinSemana,  
             ]);
+
+            // Crear los días de la semana
+            for ($j = 0; $j < 7; $j++) {
+                $fechaInicioDia = $fechaInicioSemana->copy()->addDays($j);
+                $fechaFinDia = $fechaInicioDia->copy()->addDays(1);
+
+                Day::create([
+                    'week_id' => $semana->id,
+                    'date' => $fechaInicioDia,
+                ]);
+            }
         }
     }
 
