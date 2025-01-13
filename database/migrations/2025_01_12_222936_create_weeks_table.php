@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dias', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('semana_id')->constrained('semanas')->onDelete('cascade');
-            $table->date('fecha');
+        $table->bigIncrements('id');
+            $table->unsignedBigInteger('project_id');
+            $table->date('start_date'); // Fecha de inicio de la semana
+            $table->date('end_date'); // Fecha de finalización de la semana
             $table->timestamps();
-        });
+
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
     }
 
     /**
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dias');
+        Schema::dropIfExists('weeks');
     }
 };

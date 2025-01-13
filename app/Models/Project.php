@@ -46,4 +46,37 @@ class Project extends Model
                     ->withPivot('is_admin')
                     ->withTimestamps();
     }
+
+    /**
+     * Relación con el modelo Day.
+     */
+    public function days()
+    {
+        return $this->hasMany(Day::class);
+    }
+
+    /**
+     * Relación con el modelo Activity.
+     */
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
+    /**
+     * Relación con el modelo Tracking.
+     */
+    public function trackings()
+    {
+        return $this->hasMany(Tracking::class);
+    }
+
+    /**
+     * Relación con el modelo Week.
+     */
+    public function weeks()
+    {
+        return $this->hasMany(Week::class);
+    }
+    
 }
