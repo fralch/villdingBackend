@@ -8,15 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Week extends Model
 {
     use HasFactory;
+    
+    protected $table = 'weeks';
     protected $fillable = [
         'project_id',
-        'user_id',
-        'title',
-        'description',
-        'date',
-        'status'
+        'start_date',
+        'end_date'
     ];
-
+    
     /**
      * Relación con el modelo Project.
      */

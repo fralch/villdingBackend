@@ -9,6 +9,20 @@ class Day extends Model
 {
     use HasFactory;
 
+    /*
+    Schema::create('days', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('tracking_id');
+            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('week_id');
+            $table->date('date'); // Fecha del día
+            $table->timestamps();
+
+            $table->foreign('tracking_id')->references('id')->on('trackings')->onDelete('cascade');
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
+            $table->foreign('week_id')->references('id')->on('weeks')->onDelete('cascade');
+        });
+     */
     protected $fillable = [
         'tracking_id',
         'project_id',

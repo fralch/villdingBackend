@@ -11,10 +11,10 @@ use App\Models\User;
 use App\Models\ProjectUser;
 use App\Models\ProjectType;
 use App\Models\ProjectSubtype;
-use App\Models\Semana;
-use App\Models\Dia;
-use App\Models\Seguimiento;
-use App\Models\Actividad;
+use App\Models\Week;
+use App\Models\Day;
+use App\Models\Tracking;
+use App\Models\Activity;
 
 class ProjectController extends Controller
 {
@@ -73,27 +73,15 @@ class ProjectController extends Controller
         $fechaFin = Carbon::parse($endDate);
 
         // Crear las semanas
-        for ($i = 0; $i < $numeroSemanas; $i++) {
+       for ($i = 0; $i < $numeroSemanas; $i++) {
             $fechaInicioSemana = $fechaInicio->copy()->addWeeks($i);
             $fechaFinSemana = $fechaInicioSemana->copy()->addDays(6);
 
-            $semana = Semana::create([
+            $semana = Week::create([
                 'project_id' => $project_id,
-                'numero_semana' => $i + 1,
-                'fecha_inicio' => $fechaInicioSemana,
-                'fecha_fin' => $fechaFinSemana,
+                'start_date' => $fechaInicioSemana,
+                'end_date' => $fechaFinSemana,  
             ]);
-
-            // Crear los días de la semana
-            $fechaDia = $fechaInicioSemana->copy();
-            for ($j = 0; $j < 7; $j++) {
-                $dia = Dia::create([
-                    'semana_id' => $semana->id,
-                    'fecha' => $fechaDia,
-                ]);
-
-                $fechaDia->addDay();
-            }
         }
     }
 

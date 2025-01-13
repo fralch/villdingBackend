@@ -8,6 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 class Activity extends Model
 {
     use HasFactory;
+    /*
+      Schema::create('activities', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('day_id');
+            $table->unsignedBigInteger('project_id');  
+            $table->unsignedBigInteger('user_id');
+            $table->string('name'); // Nombre de la actividad
+            $table->text('description')->nullable(); // Descripción de la actividad
+            $table->time('hour_start');
+            $table->time('hour_end');
+            $table->string('status')->default('pendiente');    //pendiente, en progreso, finalizado
+            $table->string('icon')->nullable();
+            $table->timestamps();
+
+            $table->foreign('day_id')->references('id')->on('days')->onDelete('cascade');
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        });
+     */
 
     protected $fillable = [
         'day_id',
