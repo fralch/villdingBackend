@@ -6,7 +6,7 @@ use App\Http\Controllers\User\UserCodeController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\ProjectSubtypeController;
 use App\Http\Controllers\Projects\ProjectTypeController;
-
+use App\Http\Controllers\Trackings\TrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,6 +101,15 @@ Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']
 
 
 
+// Trackings
+
+Route::get('/trackings', [TrackingController::class, 'trackingAll']);
+Route::get('/trackings/{week_id}/{project_id}', [TrackingController::class, 'trackingByWeekByProject']);
+Route::get('/trackings/{week_id}/{project_id}/{user_id}', [TrackingController::class, 'trackingByWeekByProjectByUser']);
+Route::get('/weeks/{project_id}/', [TrackingController::class, 'getWeeksByProject']);
+Route::get('/weeks/{week_id}/', [TrackingController::class, 'getDaysByWeek']);
+Route::get('/days/{project_id}', [TrackingController::class, 'getDaysByProject']);
+Route::post('/trackings', [TrackingController::class, 'createTracking']);
 
 
 
