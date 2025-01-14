@@ -24,6 +24,11 @@ class TrackingController extends Controller
         return response()->json($trackings);
     }
 
+    public function trackingByWeekByProjectByUser($week_id, $project_id, $user_id){
+        $trackings = Tracking::where('week_id', $week_id)->where('project_id', $project_id)->where('user_id', $user_id)->get();
+        return response()->json($trackings);
+    }
+
 
     
    
