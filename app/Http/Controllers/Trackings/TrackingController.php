@@ -30,6 +30,25 @@ class TrackingController extends Controller
     }
 
 
+    // obtener semanas de un proyecto
+    public function getWeeksByProject($project_id){
+        $weeks = Week::where('project_id', $project_id)->get();
+        return response()->json($weeks);
+    }
+
+    // obtener dias de una semana
+    public function getDaysByWeek($week_id){
+        $days = Day::where('week_id', $week_id)->get();
+        return response()->json($days);
+    }
+
+    // obtener dias de un proyecto
+    public function getDaysByProject($project_id){
+        $days = Day::where('project_id', $project_id)->get();
+        return response()->json($days);
+    }
+    
+
     
    
 
