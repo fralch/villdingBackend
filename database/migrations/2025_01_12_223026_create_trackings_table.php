@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('title'); 
             $table->string('description')->nullable();
-            $table->date('date')->default(now());   
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
             $table->boolean('status')->default(true); // Estado del seguimiento
             $table->timestamps();
 

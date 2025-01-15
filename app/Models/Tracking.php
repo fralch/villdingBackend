@@ -16,7 +16,8 @@ class Tracking extends Model
         'user_id',
         'title',
         'description',
-        'date',
+        'date_start',
+        'date_end',
         'status'
     ];
 

@@ -71,7 +71,7 @@ class TrackingController extends Controller
                 'user_id' => $user_id,
                 'title' => $title,
                 'description' => $description,
-                'date' => now(),
+                'date_start' => now()
             ]);
         }
         return response()->json(['message' => 'Tracking creado correctamente']);
