@@ -58,7 +58,7 @@ class TrackingController extends Controller
         $project_id = $request->project_id;
         $user_id = $request->user_id;
         $title = $request->title;
-        $description = $request->description;
+        $description = $request->description ?? null;
 
         // obtener las semanas de un proyecto
         $weeks = Week::where('project_id', $project_id)->get();
