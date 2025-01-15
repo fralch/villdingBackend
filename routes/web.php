@@ -102,13 +102,19 @@ Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']
 
 
 // Trackings
-
+// obtener todos los trackings
 Route::get('/endpoint/trackings', [TrackingController::class, 'trackingAll']);
+// obtener trackings por semana y proyecto
 Route::get('/endpoint/trackings_week/{week_id}/{project_id}', [TrackingController::class, 'trackingByWeekByProject']);
+// obtener trackings por semana, proyecto y usuario
 Route::get('/endpoint/trackings_week_user/{week_id}/{project_id}/{user_id}', [TrackingController::class, 'trackingByWeekByProjectByUser']);
+// obtener semanas de un proyecto
 Route::get('/endpoint/weeks/{project_id}/', [TrackingController::class, 'getWeeksByProject']);
+// obtener dias de una semana
 Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDaysByWeek']);
+// obtener dias de un proyecto
 Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
+// crear tracking
 Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTracking']);
 
 
