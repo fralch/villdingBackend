@@ -83,6 +83,7 @@ Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 
 // Projects entities
 Route::post('/endpoint/project/entities/create', [ProjectController::class, 'createProjectEntities']);
+Route::get('/endpoint/project/entities/check/{project_id}', [ProjectController::class, 'checkProjectEntities']);
 
 //attachProject
 Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']); // vincular proyecto a usuario

@@ -97,6 +97,20 @@ class ProjectController extends Controller
         }
     }
 
+    // comprobar si se creo las semanas y dias de un proyecto
+    public function checkProjectEntities(Request $request){
+        $project_id = $request->project_id;
+        $semanas = Week::where('project_id', $project_id)->get();
+        $dias = Day::where('project_id', $project_id)->get();
+    
+        if($semanas->isEmpty() && $dias->isEmpty()){
+            return response()->json(['created' => false], 200);
+        }
+    
+        return response()->json(['created' => true], 200);
+    }
+    
+
 
 
     /**
