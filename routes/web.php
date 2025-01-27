@@ -104,6 +104,8 @@ Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']
 // Trackings
 // obtener todos los trackings
 Route::get('/endpoint/trackings', [TrackingController::class, 'trackingAll']);
+// obtener trackings por proyecto
+Route::get('/endpoint/trackings_project/{project_id}', [TrackingController::class, 'trackingByProject']);
 // obtener trackings por semana y proyecto
 Route::get('/endpoint/trackings_week/{week_id}/{project_id}', [TrackingController::class, 'trackingByWeekByProject']);
 // obtener trackings por semana, proyecto y usuario
