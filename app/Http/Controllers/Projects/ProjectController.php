@@ -61,32 +61,37 @@ class ProjectController extends Controller
      /**
      * Create semanas, dias, seguimientos and actividades desde una ruta post .
      */
-    public function createProjectEntities( Request $request )
-    {
+    public function createProjectEntities(Request $request){
         // Obtener los datos de la solicitud
         $project_id = $request->project_id;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
         $numeroSemanas = $request->numero_semanas;
 
+        // Comprobar si ya se crearon las semanas
+        $weeks = Week::where('project_id', $project_id)->get();
+        if (!$weeks->isEmpty()) {
+            // Retornar semanas creadas si ya existen
+            return response()->json($weeks);
+        }
+
         $fechaInicio = Carbon::parse($startDate);
         $fechaFin = Carbon::parse($endDate);
 
         // Crear las semanas
-       for ($i = 0; $i < $numeroSemanas; $i++) {
+        for ($i = 0; $i < $numeroSemanas; $i++) {
             $fechaInicioSemana = $fechaInicio->copy()->addWeeks($i);
             $fechaFinSemana = $fechaInicioSemana->copy()->addDays(6);
 
             $semana = Week::create([
                 'project_id' => $project_id,
                 'start_date' => $fechaInicioSemana,
-                'end_date' => $fechaFinSemana,  
+                'end_date' => $fechaFinSemana,
             ]);
 
             // Crear los días de la semana
             for ($j = 0; $j < 7; $j++) {
                 $fechaInicioDia = $fechaInicioSemana->copy()->addDays($j);
-                $fechaFinDia = $fechaInicioDia->copy()->addDays(1);
 
                 Day::create([
                     'project_id' => $project_id,
@@ -95,7 +100,12 @@ class ProjectController extends Controller
                 ]);
             }
         }
+
+        // Retornar satisfactoriamente
+        return response()->json(['message' => 'Semanas y días creados correctamente']);
     }
+    
+    
 
 
 
