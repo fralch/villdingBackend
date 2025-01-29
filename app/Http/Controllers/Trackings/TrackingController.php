@@ -59,27 +59,36 @@ class TrackingController extends Controller
 
     // crear tracking
     public function createTracking(Request $request){
-        
-        $project_id = $request->project_id;
-        $user_id = $request->user_id;
-        $title = $request->title;
-        $description = $request->description ?? null;
+        try {
+            $project_id = $request->project_id;
+            $user_id = $request->user_id;
+            $title = $request->title;
+            $description = $request->description ?? null;
 
-        // obtener las semanas de un proyecto
-        $weeks = Week::where('project_id', $project_id)->get();
+            // Obtener las semanas de un proyecto
+            $weeks = Week::where('project_id', $project_id)->get();
 
-        // crear los trackings de las semanas
-        foreach($weeks as $week){
-            Tracking::create([
-                'week_id' => $week->id,
-                'project_id' => $project_id,
-                'user_id' => $user_id,
-                'title' => $title,
-                'description' => $description,
-                'date_start' => now()
-            ]);
+            // Crear los trackings de las semanas
+            foreach ($weeks as $week) {
+                Tracking::create([
+                    'week_id' => $week->id,
+                    'project_id' => $project_id,
+                    'user_id' => $user_id,
+                    'title' => $title,
+                    'description' => $description,
+                    'date_start' => now()
+                ]);
+            }
+
+            return response()->json(['message' => 'Tracking creado correctamente'], 200);
+
+        } catch (\Exception $e) {
+            // Capturar cualquier excepción y devolver un mensaje de error
+            return response()->json([
+                'message' => 'Error al crear el tracking',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        return response()->json(['message' => 'Tracking creado correctamente']);
     }
 }
 
