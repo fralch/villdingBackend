@@ -254,5 +254,14 @@ class ProjectController extends Controller
             ], 422);
         }
     }
+
+    function checkProjectEntities(Request $request)  {
+        $project_id = $request->project_id;
+        $weeks = Week::where('project_id', $project_id)->get();
+        if (!$weeks->isEmpty()) {
+            // Retornar semanas creadas si ya existen
+            return response()->json($weeks);
+        }
+    }
     
 }
