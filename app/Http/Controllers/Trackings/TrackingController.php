@@ -109,6 +109,41 @@ class TrackingController extends Controller
             ], 500);
         }
     }
+
+    /* 
+     public function createTracking(Request $request){
+        try {
+            $project_id = $request->project_id;
+            $user_id = $request->user_id;
+            $title = $request->title;
+            $description = $request->description ?? null;
+
+            // Obtener las semanas de un proyecto
+            $weeks = Week::where('project_id', $project_id)->get();
+
+            // Crear los trackings de las semanas
+            foreach ($weeks as $week) {
+                Tracking::create([
+                    'week_id' => $week->id,
+                    'project_id' => $project_id,
+                    'user_id' => $user_id,
+                    'title' => $title,
+                    'description' => $description,
+                    'date_start' => now()
+                ]);
+            }
+
+            return response()->json(['message' => 'Tracking creado correctamente'], 200);
+
+        } catch (\Exception $e) {
+            // Capturar cualquier excepción y devolver un mensaje de error
+            return response()->json([
+                'message' => 'Error al crear el tracking',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    */
 }
 
 
