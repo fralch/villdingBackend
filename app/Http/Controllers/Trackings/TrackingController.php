@@ -25,8 +25,12 @@ class TrackingController extends Controller
     }
 
     public function trackingByProject($project_id){
-        $trackings = Tracking::where('project_id', $project_id)->get();
-        return response()->json($trackings);
+        // Obtener las semanas con sus trackings asociados
+        $weeks = Week::where('project_id', $project_id)
+                     ->with('trackings') // Asegúrate de que la relación esté definida en el modelo Week
+                     ->get();
+    
+        return response()->json($weeks);
     }
 
     public function trackingByWeekByProjectByUser($week_id, $project_id, $user_id){
