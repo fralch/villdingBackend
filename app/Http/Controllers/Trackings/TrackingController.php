@@ -63,31 +63,46 @@ class TrackingController extends Controller
 
     // crear tracking
     public function createTracking(Request $request){
+        DB::beginTransaction();
         try {
+            $request->validate([
+                'project_id' => 'required|exists:projects,id',
+                'user_id' => 'required|exists:users,id',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
+    
             $project_id = $request->project_id;
             $user_id = $request->user_id;
             $title = $request->title;
             $description = $request->description ?? null;
-
-            // Obtener las semanas de un proyecto
-            $weeks = Week::where('project_id', $project_id)->get();
-
-            // Crear los trackings de las semanas
+    
+            // Obtener las semanas de un proyecto que no tienen trackings
+            $weeks = Week::where('project_id', $project_id)
+                         ->whereDoesntHave('trackings')
+                         ->get();
+    
+            $trackings = [];
             foreach ($weeks as $week) {
-                Tracking::create([
+                $tracking = Tracking::create([
                     'week_id' => $week->id,
                     'project_id' => $project_id,
                     'user_id' => $user_id,
                     'title' => $title,
                     'description' => $description,
-                    'date_start' => now()
+                    'date_start' => $week->start_date // Asumiendo que `start_date` es un campo de la semana
                 ]);
+                $trackings[] = $tracking;
             }
-
-            return response()->json(['message' => 'Tracking creado correctamente'], 200);
-
+    
+            DB::commit();
+            return response()->json([
+                'message' => 'Trackings creados correctamente',
+                'trackings' => $trackings
+            ], 200);
+    
         } catch (\Exception $e) {
-            // Capturar cualquier excepción y devolver un mensaje de error
+            DB::rollBack();
             return response()->json([
                 'message' => 'Error al crear el tracking',
                 'error' => $e->getMessage()
