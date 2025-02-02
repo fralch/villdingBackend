@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Trackings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Importar la clase DB
 use App\Models\Tracking;
 use App\Models\Day;
 use App\Models\Week;
