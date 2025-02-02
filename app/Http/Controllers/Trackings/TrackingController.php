@@ -62,9 +62,10 @@ class TrackingController extends Controller
    
 
     // crear tracking
-    public function createTracking(Request $request){
+    public function createTracking(Request $request) {
         DB::beginTransaction();
         try {
+            // Validar los datos de entrada
             $request->validate([
                 'project_id' => 'required|exists:projects,id',
                 'user_id' => 'required|exists:users,id',
@@ -77,22 +78,28 @@ class TrackingController extends Controller
             $title = $request->title;
             $description = $request->description ?? null;
     
-            // Obtener las semanas de un proyecto que no tienen trackings
-            $weeks = Week::where('project_id', $project_id)
-                         ->whereDoesntHave('trackings')
-                         ->get();
+            // Obtener todas las semanas del proyecto
+            $weeks = Week::where('project_id', $project_id)->get();
     
             $trackings = [];
             foreach ($weeks as $week) {
-                $tracking = Tracking::create([
-                    'week_id' => $week->id,
-                    'project_id' => $project_id,
-                    'user_id' => $user_id,
-                    'title' => $title,
-                    'description' => $description,
-                    'date_start' => $week->start_date // Asumiendo que `start_date` es un campo de la semana
-                ]);
-                $trackings[] = $tracking;
+                // Verificar si ya existe un tracking para esta semana
+                $existingTracking = Tracking::where('week_id', $week->id)
+                                            ->where('project_id', $project_id)
+                                            ->first();
+    
+                // Si no existe, crear un nuevo tracking
+                if (!$existingTracking) {
+                    $tracking = Tracking::create([
+                        'week_id' => $week->id,
+                        'project_id' => $project_id,
+                        'user_id' => $user_id,
+                        'title' => $title,
+                        'description' => $description,
+                        'date_start' => $week->start_date // Usar la fecha de inicio de la semana
+                    ]);
+                    $trackings[] = $tracking;
+                }
             }
     
             DB::commit();
