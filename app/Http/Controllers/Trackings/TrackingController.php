@@ -73,70 +73,73 @@ class TrackingController extends Controller
    
 
     // crear tracking
-    public function createTracking(Request $request) {
+    public function createTracking(Request $request)
+    {
         DB::beginTransaction();
         try {
             // Validar los datos de entrada
-            $request->validate([
-                'project_id' => 'required|exists:projects,id',
-                'user_id' => 'required|exists:users,id',
-                'title' => 'required|string|max:255',
+            $validatedData = $request->validate([
+                'project_id'  => 'required|exists:projects,id',
+                'user_id'     => 'required|exists:users,id',
+                'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
             ]);
-    
-            $project_id = $request->project_id;
-            $user_id = $request->user_id;
-            $title = $request->title;
-            $description = $request->description ?? null;
-    
+
+            $project_id  = $validatedData['project_id'];
+            $user_id     = $validatedData['user_id'];
+            $title       = $validatedData['title'];
+            $description = $validatedData['description'] ?? null;
+
             // Obtener todas las semanas del proyecto
             $weeks = Week::where('project_id', $project_id)->get();
-    
+
             if ($weeks->isEmpty()) {
                 return response()->json([
-                    'message' => 'El proyecto no tiene semanas registradas.',
+                    'message'   => 'El proyecto no tiene semanas registradas.',
                     'trackings' => []
                 ], 400);
             }
-    
+
             // Obtener IDs de semanas que ya tienen trackings para este usuario
             $existingWeekIds = Tracking::where('project_id', $project_id)
                 ->where('user_id', $user_id)
                 ->pluck('week_id')
                 ->toArray();
-    
+
             $trackings = [];
             foreach ($weeks as $week) {
+                // Crear tracking solo si no existe para la semana actual
                 if (!in_array($week->id, $existingWeekIds)) {
                     $tracking = Tracking::create([
-                        'week_id' => $week->id,
-                        'project_id' => $project_id,
-                        'user_id' => $user_id,
-                        'title' => $title,
+                        'week_id'     => $week->id,
+                        'project_id'  => $project_id,
+                        'user_id'     => $user_id,
+                        'title'       => $title,
                         'description' => $description,
-                        'date_start' => $week->start_date, // Asegúrate de que la semana tenga este campo
-                        'date_end' => $week->end_date, // Campo opcional
-                        'status' => true // Estado activo por defecto
+                        // Se omiten 'date_start' y 'date_end'
+                        'status'      => true
                     ]);
                     $trackings[] = $tracking;
                 }
             }
-    
+
             DB::commit();
-    
+
             return response()->json([
-                'message' => 'Trackings creados exitosamente.',
+                'message'   => 'Trackings creados exitosamente.',
                 'trackings' => $trackings
             ], 200);
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error al crear trackings: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Error al crear trackings',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
+
 }
 
 
