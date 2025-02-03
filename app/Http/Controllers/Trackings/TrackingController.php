@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Trackings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Importar la clase DB
 use App\Models\Tracking;
 use App\Models\Day;
 use App\Models\Week;
@@ -15,9 +14,8 @@ use App\Models\Activity;
 
 class TrackingController extends Controller
 {
-    public function trackingAll()
-    {
-        $trackings = Tracking::with(['week', 'project'])->get();
+    public function trackingAll(){
+        $trackings = Tracking::all();
         return response()->json($trackings);
     }
 
@@ -35,41 +33,31 @@ class TrackingController extends Controller
         return response()->json($weeks);
     }
 
-    public function trackingByWeekByProjectByUser($week_id, $project_id, $user_id)
-    {
-        $trackings = Tracking::where('week_id', $week_id)
-                             ->where('project_id', $project_id)
-                             ->where('user_id', $user_id)
-                             ->with(['week', 'project', 'user']) // Cargar relaciones adicionales
-                             ->get();
+    public function trackingByWeekByProjectByUser($week_id, $project_id, $user_id){
+        $trackings = Tracking::where('week_id', $week_id)->where('project_id', $project_id)->where('user_id', $user_id)->get();
         return response()->json($trackings);
     }
 
 
-    public function getWeeksByProject($project_id)
-    {
-        $weeks = Week::where('project_id', $project_id)
-                    ->with('trackings') // Cargar trackings si es necesario
-                    ->get();
+    // obtener semanas de un proyecto
+    public function getWeeksByProject($project_id){
+        $weeks = Week::where('project_id', $project_id)->get();
         return response()->json($weeks);
     }
 
-    public function getDaysByWeek($week_id)
-    {
-        $days = Day::where('week_id', $week_id)
-                ->with('tracking') // Cargar tracking si es necesario
-                ->get();
+    // obtener dias de una semana
+    public function getDaysByWeek($week_id){
+        $days = Day::where('week_id', $week_id)->get();
         return response()->json($days);
     }
 
-    public function getDaysByProject($project_id)
-    {
-        $days = Day::where('project_id', $project_id)
-                ->with(['week', 'tracking']) // Cargar semana y tracking si es necesario
-                ->get();
+    // obtener dias de un proyecto
+    public function getDaysByProject($project_id){
+        $days = Day::where('project_id', $project_id)->get();
         return response()->json($days);
     }
     
+
    
 
     // crear tracking
