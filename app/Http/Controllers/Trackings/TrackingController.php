@@ -61,7 +61,6 @@ class TrackingController extends Controller
 
    
 
-    // crear tracking
     public function createTracking(Request $request)
     {
         DB::beginTransaction();
@@ -73,52 +72,43 @@ class TrackingController extends Controller
                 'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
             ]);
-
+    
             $project_id  = $validatedData['project_id'];
             $user_id     = $validatedData['user_id'];
             $title       = $validatedData['title'];
             $description = $validatedData['description'] ?? null;
-
+    
             // Obtener todas las semanas del proyecto
             $weeks = Week::where('project_id', $project_id)->get();
-
+    
             if ($weeks->isEmpty()) {
                 return response()->json([
                     'message'   => 'El proyecto no tiene semanas registradas.',
                     'trackings' => []
                 ], 400);
             }
-
-            // Obtener IDs de semanas que ya tienen trackings para este usuario
-            $existingWeekIds = Tracking::where('project_id', $project_id)
-                ->where('user_id', $user_id)
-                ->pluck('week_id')
-                ->toArray();
-
+    
             $trackings = [];
             foreach ($weeks as $week) {
-                // Crear tracking solo si no existe para la semana actual
-                if (!in_array($week->id, $existingWeekIds)) {
-                    $tracking = Tracking::create([
-                        'week_id'     => $week->id,
-                        'project_id'  => $project_id,
-                        'user_id'     => $user_id,
-                        'title'       => $title,
-                        'description' => $description,
-                        // Se omiten 'date_start' y 'date_end'
-                        'status'      => true
-                    ]);
-                    $trackings[] = $tracking;
-                }
+                // Crear tracking para cada semana sin verificar existencias previas
+                $tracking = Tracking::create([
+                    'week_id'     => $week->id,
+                    'project_id'  => $project_id,
+                    'user_id'     => $user_id,
+                    'title'       => $title,
+                    'description' => $description,
+                    'status'      => true
+                ]);
+                $trackings[] = $tracking;
             }
-
+    
             DB::commit();
-
+    
             return response()->json([
                 'message'   => 'Trackings creados exitosamente.',
                 'trackings' => $trackings
             ], 200);
-
+    
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al crear trackings: ' . $e->getMessage());
