@@ -89,7 +89,7 @@ class TrackingController extends Controller
             $title = $request->title;
             $description = $request->description ?? null;
     
-            // Obtener todas las semanas del proyecto con sus fechas
+            // Obtener todas las semanas del proyecto
             $weeks = Week::where('project_id', $project_id)->get();
     
             if ($weeks->isEmpty()) {
@@ -99,27 +99,26 @@ class TrackingController extends Controller
                 ], 400);
             }
     
-            // Obtener semanas sin trackings existentes
-            $existingTrackings = Tracking::whereIn('week_id', $weeks->pluck('id'))
-                ->where('project_id', $project_id)
+            // Obtener IDs de semanas que ya tienen trackings para este usuario
+            $existingWeekIds = Tracking::where('project_id', $project_id)
                 ->where('user_id', $user_id)
                 ->pluck('week_id')
                 ->toArray();
     
-            $createdTrackings = [];
+            $trackings = [];
             foreach ($weeks as $week) {
-                if (!in_array($week->id, $existingTrackings)) {
+                if (!in_array($week->id, $existingWeekIds)) {
                     $tracking = Tracking::create([
                         'week_id' => $week->id,
                         'project_id' => $project_id,
                         'user_id' => $user_id,
                         'title' => $title,
                         'description' => $description,
-                        'date_start' => $week->start_date,
-                        'date_end' => $week->end_date, // Opcional: usar end_date de la semana
-                        'status' => 1 // Estado por defecto
+                        'date_start' => $week->start_date, // Asegúrate de que la semana tenga este campo
+                        'date_end' => $week->end_date, // Campo opcional
+                        'status' => true // Estado activo por defecto
                     ]);
-                    $createdTrackings[] = $tracking;
+                    $trackings[] = $tracking;
                 }
             }
     
@@ -127,7 +126,7 @@ class TrackingController extends Controller
     
             return response()->json([
                 'message' => 'Trackings creados exitosamente.',
-                'trackings' => $createdTrackings
+                'trackings' => $trackings
             ], 200);
     
         } catch (\Exception $e) {
