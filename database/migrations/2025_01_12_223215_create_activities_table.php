@@ -18,10 +18,13 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('name'); // Nombre de la actividad
             $table->text('description')->nullable(); // Descripción de la actividad
+            $table->string('location')->nullable(); // Ubicación de la actividad
             $table->time('hour_start');
             $table->time('hour_end');
-            $table->string('status')->default('pendiente');    //pendiente, en progreso, finalizado
-            $table->string('icon')->nullable();
+            $table->string('status')->default('pendiente'); // pendiente, en progreso, finalizado
+            $table->string('icon')->nullable(); // Icono relacionado con la actividad
+            $table->string('image')->nullable(); // Imagen asociada a la actividad
+            $table->text('comments')->nullable(); // Comentarios opcionales
             $table->timestamps();
 
             $table->foreign('day_id')->references('id')->on('days')->onDelete('cascade');

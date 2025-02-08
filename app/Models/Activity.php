@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Activity extends Model
 {
     use HasFactory;
-   
 
     protected $fillable = [
         'day_id',
@@ -16,10 +15,13 @@ class Activity extends Model
         'user_id',
         'name',
         'description',
+        'location',  // Nuevo campo
         'hour_start',
         'hour_end',
         'status',
-        'icon'
+        'icon',
+        'image',     // Nuevo campo
+        'comments'   // Nuevo campo
     ];
 
     /**
@@ -61,6 +63,4 @@ class Activity extends Model
     {
         return $this->hasMany(Week::class);
     }
-    
-
 }
