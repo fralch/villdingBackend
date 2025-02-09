@@ -21,12 +21,7 @@ class ActivityController extends Controller
         return response()->json($activities);
     }
 
-    public function activityByWeekByProject($week_id, $project_id)
-    {
-        $activities = Activity::where('week_id', $week_id)->where('project_id', $project_id)->get();
-        return response()->json($activities);
-    }
-
+   
     public function activityByProject($project_id)
     {
         // Obtener las semanas con sus actividades asociadas
@@ -35,6 +30,16 @@ class ActivityController extends Controller
                      ->get();
 
         return response()->json($weeks);
+    }
+
+    // obtener actividades por dia enlazadas a una semana y proyecto
+    public function activityByWeekByProject($week_id, $project_id){
+             // Obtener los días de la semana de un proyecto
+        $days = Day::where('week_id', $week_id)->where('project_id', $project_id)->get();
+
+        // Obtener las actividades asociadas a cada día
+        $activities = Activity::whereIn('day_id', $days->pluck('id'))->get();   
+        return response()->json($activities);
     }
 
     public function createActivity(Request $request)
