@@ -37,87 +37,72 @@ class ActivityController extends Controller
         return response()->json($weeks);
     }
 
-    // Crear actividades para un proyecto específico
-    public function createActivity(Request $request)
+   // Crear actividades para un proyecto específico
+   public function createActivity(Request $request)
+   {
+       DB::beginTransaction();
+       try {
+           // Validar los datos de entrada
+           $validatedData = $request->validate([
+               'project_id' => 'required|exists:projects,id',
+               'tracking_id' => 'required|exists:trackings,id',
+               'user_id' => 'required|exists:users,id',
+               'name' => 'required|string|max:255',
+               'description' => 'nullable|string',
+               'location' => 'nullable|string',
+               'hour_start' => 'required|date_format:H:i|before:hour_end',
+               'hour_end' => 'required|date_format:H:i|after:hour_start',
+               'status' => 'required|string|max:255',
+               'icon' => 'nullable|string',
+               'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+               'comments' => 'nullable|string',
+           ]);
+   
+           // Procesar la imagen si se proporciona
+           $imagePath = $this->processImage($request);
+   
+           // Obtener los IDs de los días del proyecto
+           $daysIds = Day::where('project_id', $validatedData['project_id'])->pluck('id')->toArray();
+   
+           // Generar el array de actividades
+           $activities = array_map(function ($dayId) use ($validatedData, $imagePath) {
+               return array_merge($validatedData, [
+                   'day_id' => $dayId,
+                   'image' => $imagePath,
+                   'created_at' => now(),
+                   'updated_at' => now(),
+               ]);
+           }, $daysIds);
+   
+           // Insertar todas las actividades en una sola consulta
+           Activity::insert($activities);
+   
+           DB::commit();
+   
+           return response()->json([
+               'message' => 'Actividades creadas exitosamente para el proyecto.',
+               'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : null,
+           ], 200);
+       } catch (\Exception $e) {
+           DB::rollBack();
+           \Log::error('Error al crear actividades: ' . $e->getMessage());
+           return response()->json([
+               'message' => 'Error al crear actividades',
+               'error' => $e->getMessage()
+           ], 500);
+       }
+   }
+
+    // Método para procesar la imagen
+    private function processImage(Request $request)
     {
-        DB::beginTransaction();
-        try {
-            // Validar los datos de entrada
-            $validatedData = $request->validate([
-                'project_id' => 'required|exists:projects,id',
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'hour_start' => 'required|date_format:H:i',
-                'hour_end' => 'required|date_format:H:i',
-                'status' => 'required|string|max:255',
-                'icon' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validar imagen
-            ]);
-
-            $projectId = $validatedData['project_id'];
-            $name = $validatedData['name'];
-            $description = $validatedData['description'] ?? null;
-            $hourStart = $validatedData['hour_start'];
-            $hourEnd = $validatedData['hour_end'];
-            $status = $validatedData['status'];
-            $icon = $validatedData['icon'] ?? null;
-            $imagePath = null;
-
-            // Procesar la imagen si se proporciona
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imagePath = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/activities'), $imagePath);
-            }
-
-            // Obtener todas las semanas del proyecto
-            $weeks = Week::where('project_id', $projectId)->get();
-
-            foreach ($weeks as $week) {
-                // Obtener los días de la semana
-                $days = $week->days;
-
-                foreach ($days as $day) {
-                    // Obtener los trackings asociados al proyecto y la semana
-                    $trackings = Tracking::where('project_id', $projectId)
-                                        ->where('week_id', $week->id)
-                                        ->get();
-
-                    foreach ($trackings as $tracking) {
-                        // Crear una actividad para cada tracking en el día
-                        $activity = new Activity([
-                            'day_id' => $day->id,
-                            'project_id' => $projectId,
-                            'user_id' => $tracking->user_id,
-                            'name' => $name,
-                            'description' => $description,
-                            'hour_start' => $hourStart,
-                            'hour_end' => $hourEnd,
-                            'status' => $status,
-                            'icon' => $icon,
-                            'image' => $imagePath, // Guardar la ruta de la imagen
-                        ]);
-
-                        // Guardar la actividad en la base de datos
-                        $activity->save();
-                    }
-                }
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Actividades creadas exitosamente para el proyecto.',
-                'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : null,
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Error al crear actividades: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al crear actividades',
-                'error' => $e->getMessage()
-            ], 500);
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imagePath = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/activities'), $imagePath);
+            return $imagePath;
         }
+        return null;
     }
 
 }
