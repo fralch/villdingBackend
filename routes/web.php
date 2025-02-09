@@ -7,6 +7,7 @@ use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\ProjectSubtypeController;
 use App\Http\Controllers\Projects\ProjectTypeController;
 use App\Http\Controllers\Trackings\TrackingController;
+use App\Http\Controllers\Trackings\ActivityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -119,7 +120,8 @@ Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDay
 Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
 // crear tracking
 Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTracking']);
-
+// crear actividades
+Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
 
 
 
