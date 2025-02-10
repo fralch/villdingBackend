@@ -60,12 +60,12 @@ class ActivityController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
             ]);
-    
+            
             // Procesar la imagen si se proporciona
             $imagePath = $this->processImage($request);
     
-            // Obtener los IDs de los días del proyecto
-            $daysIds = Day::where('project_id', $validatedData['project_id'])->pluck('id')->toArray();
+            // Obtener los IDs de los días del proyecto de la semana
+            $daysIds = Day::where('week_id', $request->week_id)->pluck('id')->toArray();
     
             // Generar el array de actividades
             $activities = array_map(function ($dayId) use ($validatedData, $imagePath) {
