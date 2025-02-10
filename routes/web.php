@@ -123,8 +123,8 @@ Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTra
 // crear actividades
 Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
 Route::get('/endpoint/activities/all', [ActivityController::class, 'activityAll']);
-Route::get('/endpoint/activities/{project_id}', [ActivityController::class, 'activityByProject']);
-Route::get('/endpoint/activities/{week_id}/{project_id}', [ActivityController::class, 'activityByWeekByProject']);
+Route::get('/endpoint/activities/project/{project_id}', [ActivityController::class, 'activityByProject']);
+Route::get('/endpoint/activities/week_project/{week_id}/{project_id}', [ActivityController::class, 'activityByWeekByProject']);
 
 
 
