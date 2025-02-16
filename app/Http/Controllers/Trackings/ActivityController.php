@@ -32,65 +32,46 @@ class ActivityController extends Controller
         return response()->json($weeks);
     }
 
-    // obtener actividades por dia enlazadas a una semana y proyecto
-    public function activityByWeekByProject($week_id, $project_id){
-             // Obtener los días de la semana de un proyecto
-        $days = Day::where('week_id', $week_id)->where('project_id', $project_id)->get();
-
-        // Obtener las actividades asociadas a cada día
-        $activities = Activity::whereIn('day_id', $days->pluck('id'))->get();   
-        return response()->json($activities);
-    }
-
     public function createActivity(Request $request)
     {
         DB::beginTransaction();
         try {
-            // Validar los datos de entrada (sin tracking_id)
+            // Validar los datos de entrada
             $validatedData = $request->validate([
                 'project_id' => 'required|exists:projects,id',
-                'user_id' => 'required|exists:users,id',
+                'tracking_id' => 'required|exists:trackings,id', // Añadido tracking_id
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'location' => 'nullable|string',
-                'hour_start' => 'required|date_format:H:i|before:hour_end',
-                'hour_end' => 'required|date_format:H:i|after:hour_start',
-                'status' => 'required|string|max:255',
+                'horas' => 'nullable|string',
+                'status' => 'nullable|string',
                 'icon' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
             ]);
-            
+    
             // Procesar la imagen si se proporciona
             $imagePath = $this->processImage($request);
     
-            // Obtener los IDs de los días del proyecto de la semana
-            $daysIds = Day::where('week_id', $request->week_id)->pluck('id')->toArray();
-    
-            // Generar el array de actividades
-            $activities = array_map(function ($dayId) use ($validatedData, $imagePath) {
-                return array_merge($validatedData, [
-                    'day_id' => $dayId,
-                    'image' => $imagePath,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }, $daysIds);
-    
-            // Insertar todas las actividades en una sola consulta
-            Activity::insert($activities);
+            // Crear la actividad
+            $activity = Activity::create(array_merge($validatedData, [
+                'image' => $imagePath,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
     
             DB::commit();
     
             return response()->json([
-                'message' => 'Actividades creadas exitosamente para el proyecto.',
+                'message' => 'Actividad creada exitosamente para el proyecto.',
+                'activity' => $activity,
                 'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : null,
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error al crear actividades: ' . $e->getMessage());
+            \Log::error('Error al crear actividad: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error al crear actividades',
+                'message' => 'Error al crear actividad',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -107,5 +88,6 @@ class ActivityController extends Controller
         }
         return null;
     }
+    
 
 }

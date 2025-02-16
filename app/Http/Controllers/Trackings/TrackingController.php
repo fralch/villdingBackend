@@ -12,55 +12,25 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\Activity;
 
-
 class TrackingController extends Controller
 {
-    public function trackingAll(){
+    public function trackingAll()
+    {
         $trackings = Tracking::all();
         return response()->json($trackings);
     }
 
-    public function trackingByWeekByProject($week_id, $project_id){
-        $trackings = Tracking::where('week_id', $week_id)->where('project_id', $project_id)->get();
-        return response()->json($trackings);
-    }
-
-    public function trackingByProject($project_id){
+    public function trackingByProject($project_id)
+    {
         // Obtener las semanas con sus trackings asociados
         $weeks = Week::where('project_id', $project_id)
                      ->with('trackings') // Asegúrate de que la relación esté definida en el modelo Week
                      ->get();
-    
+
         return response()->json($weeks);
     }
-
-    public function trackingByWeekByProjectByUser($week_id, $project_id, $user_id){
-        $trackings = Tracking::where('week_id', $week_id)->where('project_id', $project_id)->where('user_id', $user_id)->get();
-        return response()->json($trackings);
-    }
-
-
-    // obtener semanas de un proyecto
-    public function getWeeksByProject($project_id){
-        $weeks = Week::where('project_id', $project_id)->get();
-        return response()->json($weeks);
-    }
-
-    // obtener dias de una semana
-    public function getDaysByWeek($week_id){
-        $days = Day::where('week_id', $week_id)->get();
-        return response()->json($days);
-    }
-
-    // obtener dias de un proyecto
-    public function getDaysByProject($project_id){
-        $days = Day::where('project_id', $project_id)->get();
-        return response()->json($days);
-    }
-    
-
+  
    
-
     public function createTracking(Request $request)
     {
         DB::beginTransaction();
@@ -68,47 +38,36 @@ class TrackingController extends Controller
             // Validar los datos de entrada
             $validatedData = $request->validate([
                 'project_id'  => 'required|exists:projects,id',
-                'user_id'     => 'required|exists:users,id',
                 'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
+                'date_start'  => 'required|date',
+                'duration_days' => 'required|integer|min:1',
             ]);
-    
+
             $project_id  = $validatedData['project_id'];
-            $user_id     = $validatedData['user_id'];
             $title       = $validatedData['title'];
             $description = $validatedData['description'] ?? null;
-    
-            // Obtener todas las semanas del proyecto
-            $weeks = Week::where('project_id', $project_id)->get();
-    
-            if ($weeks->isEmpty()) {
-                return response()->json([
-                    'message'   => 'El proyecto no tiene semanas registradas.',
-                    'trackings' => []
-                ], 400);
-            }
-    
-            $trackings = [];
-            foreach ($weeks as $week) {
-                // Crear tracking para cada semana sin verificar existencias previas
-                $tracking = Tracking::create([
-                    'week_id'     => $week->id,
-                    'project_id'  => $project_id,
-                    'user_id'     => $user_id,
-                    'title'       => $title,
-                    'description' => $description,
-                    'status'      => true
-                ]);
-                $trackings[] = $tracking;
-            }
-    
+            $date_start  = $validatedData['date_start'];
+            $duration_days = $validatedData['duration_days'];
+
+            $tracking = new Tracking();
+            $tracking->project_id = $project_id;
+            $tracking->title = $title;
+            $tracking->description = $description;
+            $tracking->date_start = $date_start;
+            $tracking->duration_days = $duration_days;
+            $tracking->status = true;
+            $tracking->save();
+
+            
+            
             DB::commit();
-    
+
             return response()->json([
                 'message'   => 'Trackings creados exitosamente.',
                 'trackings' => $trackings
             ], 200);
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al crear trackings: ' . $e->getMessage());
@@ -120,5 +79,3 @@ class TrackingController extends Controller
     }
 
 }
-
-

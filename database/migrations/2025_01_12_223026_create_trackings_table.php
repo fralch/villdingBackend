@@ -13,21 +13,18 @@ return new class extends Migration
     {
         Schema::create('trackings', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('week_id');
             $table->unsignedBigInteger('project_id');
-            $table->unsignedBigInteger('user_id');
-            $table->string('title'); 
+            $table->string('title');
             $table->string('description')->nullable();
             $table->date('date_start')->nullable();
-            $table->date('date_end')->nullable();
+            $table->integer('duration_days')->nullable(); // Duración en días
             $table->boolean('status')->default(true); // Estado del seguimiento
             $table->timestamps();
-
-            $table->foreign('week_id')->references('id')->on('weeks')->onDelete('cascade');
+    
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
+    
 
     /**
      * Reverse the migrations.

@@ -9,28 +9,23 @@ class Activity extends Model
 {
     use HasFactory;
 
+    /**
+     * Los atributos que son asignables en masa.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'day_id',
         'project_id',
-        'user_id',
+        'tracking_id', 
         'name',
         'description',
-        'location',  // Nuevo campo
-        'hour_start',
-        'hour_end',
+        'location',
+        'horas',
         'status',
         'icon',
-        'image',     // Nuevo campo
-        'comments'   // Nuevo campo
+        'image',
+        'comments'
     ];
-
-    /**
-     * Relación con el modelo Day.
-     */
-    public function day()
-    {
-        return $this->belongsTo(Day::class);
-    }
 
     /**
      * Relación con el modelo Project.
@@ -41,26 +36,10 @@ class Activity extends Model
     }
 
     /**
-     * Relación con el modelo User.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
      * Relación con el modelo Tracking.
      */
-    public function trackings()
+    public function tracking()
     {
-        return $this->hasMany(Tracking::class);
-    }
-
-    /**
-     * Relación con el modelo Week.
-     */
-    public function weeks()
-    {
-        return $this->hasMany(Week::class);
+        return $this->belongsTo(Tracking::class);
     }
 }
