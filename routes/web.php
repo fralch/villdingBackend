@@ -19,6 +19,10 @@ use App\Http\Controllers\Trackings\ActivityController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/', function () {
+    return view('welcome');
+});
+
 Route::get('/endpoint/images/profile/{filename}', function ($filename) {
     $path = public_path('images/profile/' . $filename);
 
