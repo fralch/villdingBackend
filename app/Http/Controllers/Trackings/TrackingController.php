@@ -50,16 +50,16 @@ class TrackingController extends Controller
             $date_start  = $validatedData['date_start'];
             $duration_days = $validatedData['duration_days'];
 
-            $tracking = new Tracking();
-            $tracking->project_id = $project_id;
-            $tracking->title = $title;
-            $tracking->description = $description;
-            $tracking->date_start = $date_start;
-            $tracking->duration_days = $duration_days;
-            $tracking->status = true;
-            $tracking->save();
-
-            
+            $trackings = Tracking::create([
+                'project_id' => $project_id,
+                'title' => $title,
+                'description' => $description,
+                'date_start' => $date_start,
+                'duration_days' => $duration_days,      
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]); 
             
             DB::commit();
 
