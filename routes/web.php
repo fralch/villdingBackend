@@ -19,6 +19,7 @@ use App\Http\Controllers\Trackings\ActivityController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 Route::get('/endpoint/images/profile/{filename}', function ($filename) {
     $path = public_path('images/profile/' . $filename);
 
@@ -50,26 +51,15 @@ Route::get('/endpoint', function () {
 });
 
 Route::post('/endpoint/user/create', [UserController::class, 'create']);
-
 Route::post('/endpoint/user/update', [UserController::class, 'update']);
-
 Route::post('/endpoint/user/login', [UserController::class, 'login']);
-
 Route::post('/endpoint/user/email_exists', [UserController::class, 'emailExists']);
-
 Route::get('/endpoint/user/getSession', [UserController::class, 'getSession']);
-
 Route::get('/endpoint/user/all', [UserController::class, 'all']);
-
 Route::get('/endpoint/user/{id}', [UserController::class, 'show']);
-
-
-Route::post('/endpoint/user/user_code', [UserController::class, 'searchUserByCode']); 
-
+Route::post('/endpoint/user/user_code', [UserController::class, 'searchUserByCode']);
 Route::post('/endpoint/user/generate-code', [UserCodeController::class, 'generateCode']);
-
 Route::post('/endpoint/user/verify-code', [UserCodeController::class, 'verifyCode']);
-
 Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']);
 
 Route::get('/endpoint/project/types', [ProjectTypeController::class, 'all']);
@@ -86,46 +76,23 @@ Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 Route::post('/endpoint/project/entities/create', [ProjectController::class, 'createProjectEntities']);
 Route::get('/endpoint/project/entities/check/{project_id}', [ProjectController::class, 'checkProjectEntities']);
 
-//attachProject
+// Attach/Detach Project
 Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']); // vincular proyecto a usuario
-
 Route::post('/endpoint/project/detach', [ProjectController::class, 'detachProject']); // desvincular proyecto a usuario
-
 Route::post('/endpoint/project/check-attachment', [ProjectController::class, 'checkAttachmentProjectUser']);
-
 Route::post('/endpoint/user/check-attachment', [UserController::class, 'checkAttachmentUserProject']);
 
-
-// make user admin 
+// Make/Remove Admin
 Route::post('/endpoint/user/makeadmin', [UserController::class, 'makeAdmin']);
-// remove user admin
 Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']);
 
-
-
 // Trackings
-// obtener todos los trackings
 Route::get('/endpoint/trackings', [TrackingController::class, 'trackingAll']);
-// obtener trackings por proyecto
 Route::get('/endpoint/trackings_project/{project_id}', [TrackingController::class, 'trackingByProject']);
-// obtener trackings por semana y proyecto
-Route::get('/endpoint/trackings_week/{week_id}/{project_id}', [TrackingController::class, 'trackingByWeekByProject']);
-// obtener trackings por semana, proyecto y usuario
-Route::get('/endpoint/trackings_week_user/{week_id}/{project_id}/{user_id}', [TrackingController::class, 'trackingByWeekByProjectByUser']);
-// obtener semanas de un proyecto
-Route::get('/endpoint/weeks/{project_id}/', [TrackingController::class, 'getWeeksByProject']);
-// obtener dias de una semana
-Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDaysByWeek']);
-// obtener dias de un proyecto
-Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
-// crear tracking
 Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTracking']);
-// crear actividades
+
+// Activities
 Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
 Route::get('/endpoint/activities/all', [ActivityController::class, 'activityAll']);
 Route::get('/endpoint/activities/project/{project_id}', [ActivityController::class, 'activityByProject']);
 Route::get('/endpoint/activities/week_project/{week_id}/{project_id}', [ActivityController::class, 'activityByWeekByProject']);
-
-
-
-
