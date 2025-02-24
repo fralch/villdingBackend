@@ -36,33 +36,41 @@ class TrackingController extends Controller
             // Validar los datos de entrada
             $validatedData = $request->validate([
                 'project_id'  => 'required|exists:projects,id',
-                'user_id'     => 'required|exists:users,id',
                 'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
-                'week_id'     => 'required|integer'
+                'date_start'  => 'required|date',
+                'duration_days' => 'required|integer|min:1',
             ]);
-    
-            $tracking = Tracking::create([
-                'week_id'     => $validatedData['week_id'],
-                'project_id'  => $validatedData['project_id'],
-                'user_id'     => $validatedData['user_id'],
-                'title'       => $validatedData['title'],
-                'description' => $validatedData['description'] ?? null,
-                'status'      => true
-            ]);
-    
+
+            $project_id  = $validatedData['project_id'];
+            $title       = $validatedData['title'];
+            $description = $validatedData['description'] ?? null;
+            $date_start  = $validatedData['date_start'];
+            $duration_days = $validatedData['duration_days'];
+
+            $trackings = Tracking::create([
+                'project_id' => $project_id,
+                'title' => $title,
+                'description' => $description,
+                'date_start' => $date_start,
+                'duration_days' => $duration_days,      
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]); 
+            
             DB::commit();
-    
+
             return response()->json([
-                'message'   => 'Tracking created successfully.',
-                'tracking' => $tracking
+                'message'   => 'Trackings creados exitosamente.',
+                'trackings' => $trackings
             ], 200);
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error creating tracking: ' . $e->getMessage());
+            \Log::error('Error al crear trackings: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error creating tracking',
+                'message' => 'Error al crear trackings',
                 'error'   => $e->getMessage()
             ], 500);
         }
