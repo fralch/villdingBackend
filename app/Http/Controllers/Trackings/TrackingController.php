@@ -6,31 +6,29 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Tracking;
-use App\Models\Day;
-use App\Models\Week;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Activity;
 
+
 class TrackingController extends Controller
 {
-    public function trackingAll()
-    {
+    /** * Obtiene todos los trackings */
+    public function trackingAll(){
         $trackings = Tracking::all();
         return response()->json($trackings);
     }
 
-    public function trackingByProject($project_id)
-    {
-        // Obtener las semanas con sus trackings asociados
-        $weeks = Week::where('project_id', $project_id)
-                     ->with('trackings') // Asegúrate de que la relación esté definida en el modelo Week
-                     ->get();
-
-        return response()->json($weeks);
-    }
-  
    
+
+    /** * Obtiene trackings de un proyecto específico  */
+    public function trackingByProject($project_id){
+        $trackings = Tracking::where('project_id', $project_id)->get();
+        return response()->json($trackings);
+    }
+
+   
+    /**  * Crea un nuevo tracking */
     public function createTracking(Request $request)
     {
         DB::beginTransaction();
@@ -77,5 +75,6 @@ class TrackingController extends Controller
             ], 500);
         }
     }
-
 }
+
+
