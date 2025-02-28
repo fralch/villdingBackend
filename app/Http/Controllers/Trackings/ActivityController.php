@@ -32,6 +32,13 @@ class ActivityController extends Controller
         return response()->json($weeks);
     }
 
+    public function activityByTracking($tracking_id)
+    {
+        // Obtener las actividades asociadas a la actividad
+        $activities = Activity::where('tracking_id', $tracking_id)->get();
+        return response()->json($activities);
+    }
+    
     public function createActivity(Request $request)
     {
         DB::beginTransaction();
