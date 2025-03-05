@@ -50,6 +50,7 @@ class ProjectController extends Controller
             'code' => Str::random(10),
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'nearest_monday' => $request->nearest_monday,
             'uri' => $imagePath ? $imagePath : 'https://www.hycproyectos.com/wp-content/uploads/2021/06/28_06_-%C2%BFPor-que-es-necesaria-la-interventoria-de-obras-civiles-en-los-proyectos_-970x485.jpg',
             'project_type_id' => $request->project_type_id,
             'project_subtype_id' => $request->project_subtype_id ?? null,

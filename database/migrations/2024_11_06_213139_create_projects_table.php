@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('code'); // Código del proyecto
             $table->date('start_date'); // Fecha de inicio
             $table->date('end_date'); // Fecha de finalización
+            $table->date('nearest_monday'); // Fecha del lunes más cercano
             $table->string('uri')->nullable(); // Campo opcional de URI
             $table->timestamps(); // Campos created_at y updated_at
 
