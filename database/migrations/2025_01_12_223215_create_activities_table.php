@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('icon')->nullable(); // Icono relacionado con la actividad
             $table->string('image')->nullable(); // Imagen asociada a la actividad
             $table->text('comments')->nullable(); // Comentarios opcionales
+            $table->date('fecha_creacion')->nullable(); // Fecha de creación de la actividad
             $table->timestamps();
 
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade'); // Relación con el modelo Project

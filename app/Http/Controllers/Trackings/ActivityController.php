@@ -55,7 +55,7 @@ class ActivityController extends Controller
                 'icon' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
-                'created_at' => 'nullable|date|string',
+                'fecha_creacion' => 'nullable|date',
             ]);
 
             // Procesar la imagen si se proporciona
@@ -64,7 +64,7 @@ class ActivityController extends Controller
             // Crear la actividad
             $activity = Activity::create(array_merge($validatedData, [
                 'image' => $imagePath,
-                'created_at' => $validatedData['created_at'] ?? now(),
+                'created_at' => now(),
                 'updated_at' => now(),
             ]));
 

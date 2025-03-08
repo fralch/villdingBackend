@@ -24,7 +24,8 @@ class Activity extends Model
         'status',
         'icon',
         'image',
-        'comments'
+        'comments', 
+        'fecha_creacion',
     ];
 
     /**
