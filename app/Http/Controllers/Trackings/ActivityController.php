@@ -58,12 +58,14 @@ class ActivityController extends Controller
                 'created_at' => 'nullable|date',
             ]);
     
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imagePath = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/activities'), $imagePath);
-            }
+            // Procesar la imagen si se proporciona
+            $imagePath = $this->processImage($request);
+    
+            // Crear la actividad
+            $activity = Activity::create(array_merge($validatedData, [
+                'image' => $imagePath,
+                'updated_at' => now(),
+            ]));
     
             DB::commit();
     
@@ -82,6 +84,17 @@ class ActivityController extends Controller
         }
     }
     
-   
+    // Método para procesar la imagen
+    private function processImage(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imagePath = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/activities'), $imagePath);
+            return $imagePath;
+        }
+        return null;
+    }
+    
 
 }
