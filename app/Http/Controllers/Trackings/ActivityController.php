@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use App\Models\Tracking;
 use App\Models\Day;
 use App\Models\Week;
@@ -56,21 +55,21 @@ class ActivityController extends Controller
                 'icon' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
-                'created_at' => 'nullable|date',
+                'created_at' => 'nullable|date|string',
             ]);
-    
+
             // Procesar la imagen si se proporciona
             $imagePath = $this->processImage($request);
-    
+
             // Crear la actividad
             $activity = Activity::create(array_merge($validatedData, [
                 'image' => $imagePath,
-                'created_at' =>   Carbon::parse( $validatedData['created_at'] ?? now() ),
+                'created_at' => $validatedData['created_at'] ?? now(),
                 'updated_at' => now(),
             ]));
-    
+
             DB::commit();
-    
+
             return response()->json([
                 'message' => 'Actividad creada exitosamente para el proyecto.',
                 'activity' => $activity,
@@ -85,6 +84,7 @@ class ActivityController extends Controller
             ], 500);
         }
     }
+
     
     // Método para procesar la imagen
     private function processImage(Request $request)
