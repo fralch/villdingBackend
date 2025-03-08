@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 use App\Models\Tracking;
 use App\Models\Day;
 use App\Models\Week;
@@ -64,6 +65,7 @@ class ActivityController extends Controller
             // Crear la actividad
             $activity = Activity::create(array_merge($validatedData, [
                 'image' => $imagePath,
+                'created_at' =>   Carbon::parse( $validatedData['created_at'] ?? now() ),
                 'updated_at' => now(),
             ]));
     
