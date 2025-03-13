@@ -268,6 +268,7 @@ class UserController extends Controller
                    'code' => $project->code,
                    'start_date' => $project->start_date,
                    'end_date' => $project->end_date,
+                   'nearest_monday' => $project->nearest_monday,
                    'uri' => $project->uri,
                    'project_type_id' => $project->project_type_id,
                    'project_subtype_id' => $project->project_subtype_id,
