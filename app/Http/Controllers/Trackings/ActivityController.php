@@ -45,8 +45,9 @@ class ActivityController extends Controller
         try {
             // Validar los datos de entrada
             $validatedData = $request->validate([
+                'id' => 'nullable|exists:activities,id', // Añadido para verificar si existe
                 'project_id' => 'required|exists:projects,id',
-                'tracking_id' => 'required|exists:trackings,id', // Añadido tracking_id
+                'tracking_id' => 'required|exists:trackings,id',
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'location' => 'nullable|string',
@@ -60,8 +61,13 @@ class ActivityController extends Controller
 
             // Procesar la imagen si se proporciona
             $imagePath = $this->processImage($request);
+            
+            // Verificar si existe el ID y actualizar en lugar de crear
+            if ($request->has('id') && $request->id) {
+                return $this->updateActivity($request, $validatedData, $imagePath);
+            }
 
-            // Crear la actividad
+            // Si no existe, crear la actividad
             $activity = Activity::create(array_merge($validatedData, [
                 'image' => $imagePath,
                 'created_at' => now(),
@@ -84,8 +90,54 @@ class ActivityController extends Controller
             ], 500);
         }
     }
-
     
+    // Nuevo método para actualizar actividad
+    public function updateActivity(Request $request, array $validatedData, $imagePath = null)
+    {
+        try {
+            $activity = Activity::findOrFail($request->id);
+            
+            // Si hay una nueva imagen y la actividad ya tenía una, eliminar la anterior
+            if ($imagePath && $activity->image) {
+                $oldImagePath = public_path('images/activities/' . $activity->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            
+            // Preparar los datos para actualizar
+            $updateData = array_merge($validatedData, [
+                'updated_at' => now(),
+            ]);
+            
+            // Solo actualizar la imagen si se proporciona una nueva
+            if ($imagePath) {
+                $updateData['image'] = $imagePath;
+            }
+            
+            // Remover el id del array de actualización
+            unset($updateData['id']);
+            
+            // Actualizar la actividad
+            $activity->update($updateData);
+            
+            DB::commit();
+            
+            return response()->json([
+                'message' => 'Actividad actualizada exitosamente.',
+                'activity' => $activity,
+                'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : ($activity->image ? asset('images/activities/' . $activity->image) : null),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al actualizar actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al actualizar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // Método para procesar la imagen
     private function processImage(Request $request)
     {
@@ -97,6 +149,4 @@ class ActivityController extends Controller
         }
         return null;
     }
-    
-
 }
