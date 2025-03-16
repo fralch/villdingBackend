@@ -59,7 +59,13 @@ class ActivityController extends Controller
                 'fecha_creacion' => 'nullable|date',
             ]);
 
-            // Procesar la imagen si se proporciona
+            // Ensure the storage directory exists
+            $activityImagePath = public_path('images/activities');
+            if (!file_exists($activityImagePath)) {
+                mkdir($activityImagePath, 0755, true);
+            }
+
+            // Process the image if provided
             $imagePath = $this->processImage($request);
             
             // Verificar si existe el ID y actualizar en lugar de crear
@@ -94,6 +100,7 @@ class ActivityController extends Controller
     // Nuevo método para actualizar actividad
     public function updateActivity(Request $request, array $validatedData, $imagePath = null)
     {
+        DB::beginTransaction(); // Add missing transaction start
         try {
             $activity = Activity::findOrFail($request->id);
             
@@ -130,6 +137,10 @@ class ActivityController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            // If image was uploaded but update failed, clean it up
+            if ($imagePath && file_exists(public_path('images/activities/' . $imagePath))) {
+                unlink(public_path('images/activities/' . $imagePath));
+            }
             \Log::error('Error al actualizar actividad: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Error al actualizar actividad',
@@ -138,14 +149,18 @@ class ActivityController extends Controller
         }
     }
 
-    // Método para procesar la imagen
     private function processImage(Request $request)
     {
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imagePath = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/activities'), $imagePath);
-            return $imagePath;
+            try {
+                $image = $request->file('image');
+                $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images/activities'), $imagePath);
+                return $imagePath;
+            } catch (\Exception $e) {
+                \Log::error('Error processing image: ' . $e->getMessage());
+                throw new \Exception('Error processing image: ' . $e->getMessage());
+            }
         }
         return null;
     }
