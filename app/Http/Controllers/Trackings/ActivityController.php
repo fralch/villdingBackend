@@ -45,7 +45,6 @@ class ActivityController extends Controller
         try {
             // Validar los datos de entrada
             $validatedData = $request->validate([
-                'id' => 'nullable|exists:activities,id', // Añadido para verificar si existe
                 'project_id' => 'required|exists:projects,id',
                 'tracking_id' => 'required|exists:trackings,id',
                 'name' => 'required|string|max:255',
@@ -67,13 +66,8 @@ class ActivityController extends Controller
 
             // Process the image if provided
             $imagePath = $this->processImage($request);
-            
-            // Verificar si existe el ID y actualizar en lugar de crear
-            if ($request->has('id') && $request->id) {
-                return $this->updateActivity($request, $validatedData, $imagePath);
-            }
 
-            // Si no existe, crear la actividad
+            // Create the activity
             $activity = Activity::create(array_merge($validatedData, [
                 'image' => $imagePath,
                 'created_at' => now(),
@@ -97,48 +91,64 @@ class ActivityController extends Controller
         }
     }
     
-    // Nuevo método para actualizar actividad
-    public function updateActivity(Request $request, array $validatedData, $imagePath = null)
+    public function update(Request $request, $id)
     {
-        DB::beginTransaction(); // Add missing transaction start
+        DB::beginTransaction();
         try {
-            $activity = Activity::findOrFail($request->id);
+            // Validate the activity exists
+            $activity = Activity::findOrFail($id);
+
+            // Validate the input data
+            $validatedData = $request->validate([
+                'project_id' => 'required|exists:projects,id',
+                'tracking_id' => 'required|exists:trackings,id',
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'location' => 'nullable|string',
+                'horas' => 'nullable|string',
+                'status' => 'nullable|string',
+                'icon' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'comments' => 'nullable|string',
+                'fecha_creacion' => 'nullable|date',
+            ]);
+
+            // Process the image if provided
+            $imagePath = $this->processImage($request);
             
-            // Si hay una nueva imagen y la actividad ya tenía una, eliminar la anterior
+            // If there's a new image and the activity already had one, delete the old image
             if ($imagePath && $activity->image) {
                 $oldImagePath = public_path('images/activities/' . $activity->image);
                 if (file_exists($oldImagePath)) {
                     unlink($oldImagePath);
                 }
             }
-            
-            // Preparar los datos para actualizar
+
+            // Prepare update data
             $updateData = array_merge($validatedData, [
                 'updated_at' => now(),
             ]);
-            
-            // Solo actualizar la imagen si se proporciona una nueva
+
+            // Only update image if a new one is provided
             if ($imagePath) {
                 $updateData['image'] = $imagePath;
             }
-            
-            // Remover el id del array de actualización
-            unset($updateData['id']);
-            
-            // Actualizar la actividad
+
+            // Update the activity
             $activity->update($updateData);
             
             DB::commit();
-            
+
             return response()->json([
                 'message' => 'Actividad actualizada exitosamente.',
                 'activity' => $activity,
                 'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : ($activity->image ? asset('images/activities/' . $activity->image) : null),
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            // If image was uploaded but update failed, clean it up
-            if ($imagePath && file_exists(public_path('images/activities/' . $imagePath))) {
+            // Clean up new image if update failed
+            if (isset($imagePath) && file_exists(public_path('images/activities/' . $imagePath))) {
                 unlink(public_path('images/activities/' . $imagePath));
             }
             \Log::error('Error al actualizar actividad: ' . $e->getMessage());
