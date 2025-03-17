@@ -23,7 +23,7 @@ class TrackingController extends Controller
 
     /** * Obtiene trackings de un proyecto específico  */
     public function trackingByProject($project_id){
-        $trackings = Tracking::where('project_id', $project_id)->get();
+        $trackings = Tracking::with('activities')->where('project_id', $project_id)->get();
         return response()->json($trackings);
     }
 
@@ -76,5 +76,3 @@ class TrackingController extends Controller
         }
     }
 }
-
-
