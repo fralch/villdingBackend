@@ -30,6 +30,9 @@ class TrackingController extends Controller
     */
     /** * Obtiene trackings de un proyecto específico con actividades pendientes/programadas por día */
 /** * Obtiene trackings de un proyecto específico con resumen de actividades por día */
+/**
+ * Obtiene trackings de un proyecto específico con resumen de actividades por día
+ */
 public function trackingByProject($project_id){
     $trackings = Tracking::with('activities')->where('project_id', $project_id)->get();
     
@@ -68,19 +71,20 @@ public function trackingByProject($project_id){
                 continue;
             }
             
-            $activity_date = substr($activity->fecha_creacion, 0, 10); // Formato Y-m-d
+            $activity_date = $activity->fecha_creacion; // Ya está en formato Y-m-d
             
             // Solo procesa si la fecha está dentro del rango del tracking
             if (isset($days_summary[$activity_date])) {
-                // Asumiendo: status=0 (pendiente), status=1 (programada), status=2 (completada)
-                // Ajusta esta lógica según los valores reales de tu sistema
-                if ($activity->status === 0) {
+                // Usamos los valores de cadena para determinar el estado
+                $status = strtolower($activity->status);
+                
+                if ($status === 'pendiente') {
                     $days_summary[$activity_date]['has_pending'] = true;
                     $days_summary[$activity_date]['pending_count']++;
-                } elseif ($activity->status === 1) {
+                } elseif ($status === 'programado') {
                     $days_summary[$activity_date]['has_scheduled'] = true;
                     $days_summary[$activity_date]['scheduled_count']++;
-                } elseif ($activity->status === 2) {
+                } elseif ($status === 'completado') {
                     $days_summary[$activity_date]['has_completed'] = true;
                     $days_summary[$activity_date]['completed_count']++;
                 }
@@ -88,7 +92,7 @@ public function trackingByProject($project_id){
         }
         
         // Agregar el resumen de días al array del tracking
-        $trackingArray['days_summary'] = array_values($days_summary); // Convertir a array indexado
+        $trackingArray['days_summary'] = array_values($days_summary);
         
         // Agregar contadores totales
         $trackingArray['total_pending'] = array_sum(array_column($days_summary, 'pending_count'));
