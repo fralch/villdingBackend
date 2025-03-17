@@ -91,6 +91,9 @@ public function trackingByProject($project_id){
             }
         }
         
+        // Quitar las actividades del array antes de devolverlo
+        unset($trackingArray['activities']);
+        
         // Agregar el resumen de días al array del tracking
         $trackingArray['days_summary'] = array_values($days_summary);
         
