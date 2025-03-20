@@ -73,21 +73,31 @@ public function trackingByProject($project_id){
             
             $activity_date = $activity->fecha_creacion; // Ya está en formato Y-m-d
             
-            // Solo procesa si la fecha está dentro del rango del tracking
-            if (isset($days_summary[$activity_date])) {
-                // Usamos los valores de cadena para determinar el estado
-                $status = strtolower($activity->status);
-                
-                if ($status === 'pendiente') {
-                    $days_summary[$activity_date]['has_pending'] = true;
-                    $days_summary[$activity_date]['pending_count']++;
-                } elseif ($status === 'programado') {
-                    $days_summary[$activity_date]['has_scheduled'] = true;
-                    $days_summary[$activity_date]['scheduled_count']++;
-                } elseif ($status === 'completado') {
-                    $days_summary[$activity_date]['has_completed'] = true;
-                    $days_summary[$activity_date]['completed_count']++;
-                }
+            // Si la fecha no existe en days_summary, la agregamos
+            if (!isset($days_summary[$activity_date])) {
+                $days_summary[$activity_date] = [
+                    'date' => $activity_date,
+                    'has_pending' => false,
+                    'has_scheduled' => false,
+                    'has_completed' => false,
+                    'pending_count' => 0,
+                    'scheduled_count' => 0,
+                    'completed_count' => 0
+                ];
+            }
+            
+            // Procesamos la actividad
+            $status = strtolower($activity->status);
+            
+            if ($status === 'pendiente') {
+                $days_summary[$activity_date]['has_pending'] = true;
+                $days_summary[$activity_date]['pending_count']++;
+            } elseif ($status === 'programado') {
+                $days_summary[$activity_date]['has_scheduled'] = true;
+                $days_summary[$activity_date]['scheduled_count']++;
+            } elseif ($status === 'completado') {
+                $days_summary[$activity_date]['has_completed'] = true;
+                $days_summary[$activity_date]['completed_count']++;
             }
         }
         
