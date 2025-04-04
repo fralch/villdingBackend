@@ -49,6 +49,19 @@ Route::get('/endpoint/images/projects/{filename}', function ($filename) {
     return response($file, 200)->header("Content-Type", $type);
 });
 
+Route::get('/endpoint/images/activities/{filename}', function ($filename) {
+    $path = public_path('images/activities/' . $filename);
+
+    if (!File::exists($path)) {
+        abort(404);
+    }
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    return response($file, 200)->header("Content-Type", $type);
+});
+
 Route::get('/endpoint', function () {
     return view('welcome');
 });
