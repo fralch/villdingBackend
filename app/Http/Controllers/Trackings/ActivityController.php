@@ -143,6 +143,24 @@ class ActivityController extends Controller
             ], 500);
         }
     }
+    
+    function completeActivity(Request $request){
+        DB::beginTransaction();
+        try {
+            $id = $request->input('id');
+            $activity = Activity::findOrFail($id);
+            $activity->status = 'completed';
+            $activity->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Actividad completada exitosamente.'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al completar actividad: ' . $e->getMessage());
+            return response()->json(['message' => 'Error al completar actividad', 'error' => $e->getMessage()], 500);
+        }
+        
+    }
 
     private function processImages(Request $request)
     {
