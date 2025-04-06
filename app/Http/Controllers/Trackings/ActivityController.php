@@ -108,7 +108,8 @@ class ActivityController extends Controller
                 'horas' => 'nullable|string',
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images_to_delete' => 'nullable|array',
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
@@ -118,18 +119,29 @@ class ActivityController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // Process the image if provided
-            if ($request->hasFile('image')) {
-                // Delete old image if it exists
-                if ($activity->image) {
-                    $oldImagePath = public_path('images/activities/' . $activity->image);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
+            // Para manejar la eliminación de imágenes
+            if ($request->has('images_to_delete')) {
+                $currentImages = json_decode($activity->images ?? '[]', true);
+                foreach ($request->images_to_delete as $imageToDelete) {
+                    if (in_array($imageToDelete, $currentImages)) {
+                        // Elimina el archivo físico
+                        $imagePath = public_path('images/activities/' . $imageToDelete);
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                        // Elimina de la lista de imágenes
+                        $currentImages = array_diff($currentImages, [$imageToDelete]);
                     }
                 }
-                
-                $imagePath = $this->processImage($request);
-                $updateData['image'] = $imagePath;
+                $updateData['images'] = json_encode(array_values($currentImages));
+            }
+
+            // Para manejar la subida de nuevas imágenes
+            if ($request->hasFile('images')) {
+                $newImages = $this->processImages($request);
+                $currentImages = json_decode($activity->images ?? '[]', true);
+                $allImages = array_merge($currentImages, json_decode($newImages, true));
+                $updateData['images'] = json_encode($allImages);
             }
 
             // Update the activity
@@ -140,7 +152,7 @@ class ActivityController extends Controller
             return response()->json([
                 'message' => 'Actividad actualizada exitosamente.',
                 'activity' => $activity,
-                'image_path' => $activity->image ? asset('images/activities/' . $activity->image) : null,
+                'images' => json_decode($activity->images ?? '[]'),
             ], 200);
 
         } catch (\Exception $e) {
