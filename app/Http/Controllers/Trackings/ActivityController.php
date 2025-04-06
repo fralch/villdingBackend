@@ -43,7 +43,7 @@ class ActivityController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Validate the input data
+            // Validar los datos de entrada
             $validatedData = $request->validate([
                 'project_id' => 'required|exists:projects,id',
                 'tracking_id' => 'required|exists:trackings,id',
@@ -53,8 +53,7 @@ class ActivityController extends Controller
                 'horas' => 'nullable|string',
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // For handling multiple images
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',    // Keep original validation
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
@@ -65,27 +64,22 @@ class ActivityController extends Controller
                 mkdir($activityImagePath, 0755, true);
             }
 
-            // Process the images and get paths as JSON string
-            $imagePaths = $this->processImages($request);
+            // Process the image if provided
+            $imagePath = $this->processImage($request);
 
             // Create the activity
             $activity = Activity::create(array_merge($validatedData, [
-                'image' => $imagePaths, // Store all image paths as JSON in the 'image' column
+                'image' => $imagePath,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]));
 
             DB::commit();
-            
-            // For response, decode the JSON to get array of paths
-            $imagePathArray = json_decode($imagePaths) ?: [];
 
             return response()->json([
                 'message' => 'Actividad creada exitosamente para el proyecto.',
                 'activity' => $activity,
-                'image_paths' => array_map(function($path) {
-                    return asset('images/activities/' . $path);
-                }, $imagePathArray),
+                'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : null,
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -98,116 +92,98 @@ class ActivityController extends Controller
     }
     
     public function updateActivity(Request $request, $id)
-{
-    DB::beginTransaction();
-    try {
-        // Find the activity
-        $activity = Activity::findOrFail($id);
-        
-        // Validate the input data
-        $validatedData = $request->validate([
-            'project_id' => 'sometimes|required|exists:projects,id',
-            'tracking_id' => 'sometimes|required|exists:trackings,id',
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'location' => 'nullable|string',
-            'horas' => 'nullable|string',
-            'status' => 'nullable|string',
-            'icon' => 'nullable|string',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'comments' => 'nullable|string',
-            'fecha_creacion' => 'nullable|date',
-        ]);
-
-        // Get existing images
-        $existingImages = json_decode($activity->image, true) ?: [];
-        if (!is_array($existingImages)) {
-            // Handle case where existing image is a single path string
-            $existingImages = [$activity->image];
-        }
-        
-        // Process new images if provided
-        $newImagePaths = [];
-        if ($request->hasFile('images')) {
-            // Process multiple images
-            foreach ($request->file('images') as $image) {
-                $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/activities'), $imagePath);
-                $newImagePaths[] = $imagePath;
-            }
-        } else if ($request->hasFile('image')) {
-            // Process single image
-            $image = $request->file('image');
-            $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/activities'), $imagePath);
-            $newImagePaths[] = $imagePath;
-        }
-        
-        // Merge existing and new images if needed
-        if (!empty($newImagePaths)) {
-            $allImagePaths = array_merge($existingImages, $newImagePaths);
-            $validatedData['image'] = json_encode($allImagePaths);
-        }
-
-        // Update the activity
-        $activity->update($validatedData);
-
-        DB::commit();
-
-        $responseImagePaths = json_decode($activity->image) ?: [];
-        if (!is_array($responseImagePaths)) {
-            $responseImagePaths = [$activity->image];
-        }
-
-        return response()->json([
-            'message' => 'Actividad actualizada exitosamente.',
-            'activity' => $activity,
-            'image_paths' => array_map(function($path) {
-                return asset('images/activities/' . $path);
-            }, $responseImagePaths),
-        ], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('Error al actualizar actividad: ' . $e->getMessage());
-        return response()->json([
-            'message' => 'Error al actualizar actividad',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-    private function processImages(Request $request)
     {
-        $imagePaths = [];
-        
-        // Process multiple images if present
-        if ($request->hasFile('images')) {
-            try {
-                foreach ($request->file('images') as $image) {
-                    $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images/activities'), $imagePath);
-                    $imagePaths[] = $imagePath;
+        DB::beginTransaction();
+        try {
+            // Find the activity
+            $activity = Activity::findOrFail($id);
+            
+            // Validate the input data
+            $validatedData = $request->validate([
+                'project_id' => 'required|exists:projects,id',
+                'tracking_id' => 'required|exists:trackings,id',
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'location' => 'nullable|string',
+                'horas' => 'nullable|string',
+                'status' => 'nullable|string',
+                'icon' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'comments' => 'nullable|string',
+                'fecha_creacion' => 'nullable|date',
+            ]);
+
+            // Prepare update data
+            $updateData = array_merge($validatedData, [
+                'updated_at' => now(),
+            ]);
+
+            // Process the image if provided
+            if ($request->hasFile('image')) {
+                // Delete old image if it exists
+                if ($activity->image) {
+                    $oldImagePath = public_path('images/activities/' . $activity->image);
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
                 }
-            } catch (\Exception $e) {
-                \Log::error('Error processing multiple images: ' . $e->getMessage());
-                throw new \Exception('Error processing multiple images: ' . $e->getMessage());
+                
+                $imagePath = $this->processImage($request);
+                $updateData['image'] = $imagePath;
             }
-        } 
-        // Process single image if present (for backward compatibility)
-        else if ($request->hasFile('image')) {
+
+            // Update the activity
+            $activity->update($updateData);
+            
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Actividad actualizada exitosamente.',
+                'activity' => $activity,
+                'image_path' => $activity->image ? asset('images/activities/' . $activity->image) : null,
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al actualizar actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al actualizar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function processImage(Request $request)
+    {
+        if ($request->hasFile('image')) {
             try {
                 $image = $request->file('image');
                 $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images/activities'), $imagePath);
-                $imagePaths[] = $imagePath;
+                return $imagePath;
             } catch (\Exception $e) {
                 \Log::error('Error processing image: ' . $e->getMessage());
                 throw new \Exception('Error processing image: ' . $e->getMessage());
             }
         }
-        
-        // Return JSON string of image paths
-        return !empty($imagePaths) ? json_encode($imagePaths) : null;
+        return null;
+    }
+
+    private function processImages(Request $request)
+    {
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                try {
+                    $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/activities'), $imagePath);
+                    $imagePaths[] = $imagePath;
+                } catch (\Exception $e) {
+                    \Log::error('Error processing image: ' . $e->getMessage());
+                    throw new \Exception('Error processing image: ' . $e->getMessage());
+                }
+            }
+        }
+        return json_encode($imagePaths);
     }
 }
