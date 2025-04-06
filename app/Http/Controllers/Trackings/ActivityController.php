@@ -149,7 +149,7 @@ class ActivityController extends Controller
         try {
             $id = $request->input('id');
             $activity = Activity::findOrFail($id);
-            $activity->status = 'completada';
+            $activity->status = 'completado';
             $activity->save();
 
             DB::commit();
