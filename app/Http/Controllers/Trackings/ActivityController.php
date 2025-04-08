@@ -68,7 +68,7 @@ class ActivityController extends Controller
                 $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
                 
                 if ($activityDate->gt($today)) {
-                    $validatedData['status'] = 'completado';
+                    $validatedData['status'] = 'programado';
                 }
             }
 
