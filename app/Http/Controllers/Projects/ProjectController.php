@@ -124,15 +124,65 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateProject(Request $request, string $id)
     {
-        
+        try {
+            // Validar los datos de entrada
+            $validatedData = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'location' => 'sometimes|string|max:255',
+                'company' => 'sometimes|string|max:255',
+                'start_date' => 'sometimes|date',
+                'end_date' => 'sometimes|date|after_or_equal:start_date',
+                'nearest_monday' => 'sometimes|date',
+                'project_type_id' => 'sometimes|exists:project_types,id',
+                'project_subtype_id' => 'sometimes|nullable|exists:project_subtypes,id',
+                'uri' => 'sometimes|file|image|max:2048' // Máximo 2MB
+            ]);
 
-        // Buscar el proyecto y actualizarlo
-        $project = Project::findOrFail($id);
-        $project->update($request->all());
+            // Buscar el proyecto
+            $project = Project::findOrFail($id);
 
-        return response()->json($project);
+            // Procesar la imagen si se proporciona una nueva
+            if ($request->hasFile('uri')) {
+                // Eliminar la imagen anterior si existe y no es la imagen por defecto
+                if ($project->uri && $project->uri !== 'https://www.hycproyectos.com/wp-content/uploads/2021/06/28_06_-%C2%BFPor-que-es-necesaria-la-interventoria-de-obras-civiles-en-los-proyectos_-970x485.jpg') {
+                    $oldImagePath = public_path('images/projects/') . $project->uri;
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
+                }
+
+                // Guardar la nueva imagen
+                $image = $request->file('uri');
+                $imagePath = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images/projects'), $imagePath);
+                $validatedData['uri'] = $imagePath;
+            }
+
+            // Actualizar el proyecto
+            $project->update($validatedData);
+
+            return response()->json([
+                'message' => 'Proyecto actualizado correctamente',
+                'project' => $project
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado'
+            ], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el proyecto',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
