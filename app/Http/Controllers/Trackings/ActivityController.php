@@ -59,6 +59,19 @@ class ActivityController extends Controller
                 'fecha_creacion' => 'nullable|date',
             ]);
 
+            // Set timezone to Lima, Peru
+            date_default_timezone_set('America/Lima');
+            
+            // Check if fecha_creacion is after today
+            if (isset($validatedData['fecha_creacion'])) {
+                $activityDate = \Carbon\Carbon::parse($validatedData['fecha_creacion']);
+                $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
+                
+                if ($activityDate->gt($today)) {
+                    $validatedData['status'] = 'completado';
+                }
+            }
+
             // Process images
             $imagePaths = $this->processImages($request);
 
