@@ -99,6 +99,7 @@ Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class,
 Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 Route::post('/endpoint/project/update', [ProjectController::class, 'updateProject']);
+Route::delete('/endpoint/project/destroy/{id}', [ProjectController::class, 'destroyProject']);
 
 // Projects entities
 Route::post('/endpoint/project/entities/create', [ProjectController::class, 'createProjectEntities']);
