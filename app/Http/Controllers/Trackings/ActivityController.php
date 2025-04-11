@@ -135,9 +135,9 @@ class ActivityController extends Controller
                 'horas' => 'nullable|string',
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
-                'images' => 'nullable|array|max:5', // Limit to max 5 images
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images' => 'sometimes|nullable|array|max:5',
+                'images.*' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
