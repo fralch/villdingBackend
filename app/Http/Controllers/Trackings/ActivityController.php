@@ -148,36 +148,20 @@ class ActivityController extends Controller
             \Log::info('Datos validados: ' . json_encode($validatedData));
 
             // Process new images if provided
-            if ($request->hasFile('images') || $request->hasFile('image')) {
-                \Log::info('Procesando imágenes para la actividad: ' . $id);
+            if ($request->has('existing_images')) {
+                $existingImages = json_decode($request->existing_images, true);
                 
-                // Get existing images
-                $existingImages = json_decode($activity->image, true) ?: [];
-                \Log::info('Imágenes existentes: ' . json_encode($existingImages));
-                
-                // Check if adding new images would exceed the limit of 5
-                $newImageCount = $request->hasFile('images') ? count($request->file('images')) : 
-                                ($request->hasFile('image') ? 1 : 0);
-                
-                \Log::info('Número de imágenes nuevas: ' . $newImageCount);
-                
-                $totalImageCount = count($existingImages) + $newImageCount;
-                \Log::info('Número total de imágenes después de actualizar: ' . $totalImageCount);
-                
-                if ($totalImageCount > 5) {
-                    \Log::warning('Se excedió el límite de imágenes (5)');
-                    return response()->json([
-                        'message' => 'No se pueden agregar más imágenes. El límite es de 5 imágenes por actividad.',
-                    ], 422);
-                }
-                
+                // Combinar con las nuevas imágenes que se están subiendo
                 $newImagePaths = $this->processImages($request);
-                \Log::info('Nuevas rutas de imágenes: ' . $newImagePaths);
+                $newImagePathsArray = json_decode($newImagePaths, true) ?: [];
                 
-                // Merge with existing images
-                $allImages = array_merge($existingImages, json_decode($newImagePaths, true) ?: []);
+                // Mezclar imágenes existentes con nuevas
+                $allImages = array_merge($existingImages, $newImagePathsArray);
                 $validatedData['image'] = json_encode($allImages);
-                \Log::info('Todas las imágenes después de fusionar: ' . $validatedData['image']);
+            } else {
+                // Solo procesar las nuevas imágenes
+                $newImagePaths = $this->processImages($request);
+                $validatedData['image'] = $newImagePaths;
             }
 
             // Update the activity
