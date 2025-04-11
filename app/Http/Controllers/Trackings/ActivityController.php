@@ -147,22 +147,42 @@ class ActivityController extends Controller
             ]);
             \Log::info('Datos validados: ' . json_encode($validatedData));
 
-            // Process new images if provided
+            // Manejar imágenes
+            $finalImagePaths = [];
+            
+            // Procesar imágenes existentes si se proporcionan
             if ($request->has('existing_images')) {
-                $existingImages = json_decode($request->existing_images, true);
+                // Si las imágenes existentes vienen como string JSON, decodificarlas
+                if (is_string($request->existing_images)) {
+                    $existingImages = json_decode($request->existing_images, true);
+                } else {
+                    $existingImages = $request->existing_images;
+                }
                 
-                // Combinar con las nuevas imágenes que se están subiendo
-                $newImagePaths = $this->processImages($request);
-                $newImagePathsArray = json_decode($newImagePaths, true) ?: [];
-                
-                // Mezclar imágenes existentes con nuevas
-                $allImages = array_merge($existingImages, $newImagePathsArray);
-                $validatedData['image'] = json_encode($allImages);
-            } else {
-                // Solo procesar las nuevas imágenes
-                $newImagePaths = $this->processImages($request);
-                $validatedData['image'] = $newImagePaths;
+                // Asegurarse de que existingImages sea un array
+                if (is_array($existingImages)) {
+                    $finalImagePaths = $existingImages;
+                }
+            } else if ($activity->image) {
+                // Mantener las imágenes actuales si no se especifican nuevas
+                $currentImages = json_decode($activity->image, true);
+                if (is_array($currentImages)) {
+                    $finalImagePaths = $currentImages;
+                }
             }
+            
+            // Procesar nuevas imágenes si se están subiendo
+            $newImagePaths = $this->processImages($request);
+            if ($newImagePaths) {
+                $newImagePathsArray = json_decode($newImagePaths, true) ?: [];
+                $finalImagePaths = array_merge($finalImagePaths, $newImagePathsArray);
+            }
+            
+            // Guardar la ruta de imágenes final en formato JSON
+            $validatedData['image'] = !empty($finalImagePaths) ? json_encode($finalImagePaths) : null;
+            
+            // Actualizar fecha de modificación
+            $validatedData['updated_at'] = now();
 
             // Update the activity
             $activity->update($validatedData);
