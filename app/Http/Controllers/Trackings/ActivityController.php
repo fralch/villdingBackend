@@ -59,6 +59,21 @@ class ActivityController extends Controller
                 'fecha_creacion' => 'nullable|date',
             ]);
 
+            // Check for duplicates based on project_id, tracking_id, and name
+            $existingActivity = Activity::where('project_id', $validatedData['project_id'])
+                ->where('tracking_id', $validatedData['tracking_id'])
+                ->where('name', $validatedData['name']);
+                
+                   
+            $existingActivity = $existingActivity->first();
+            
+            if ($existingActivity) {
+                return response()->json([
+                    'message' => 'Ya existe una actividad con estos datos.',
+                    'activity' => $existingActivity,
+                ], 409); // 409 Conflict status code
+            }
+
             // Set timezone to Lima, Peru
             date_default_timezone_set('America/Lima');
             
