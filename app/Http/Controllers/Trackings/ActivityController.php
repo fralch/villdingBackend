@@ -122,8 +122,12 @@ class ActivityController extends Controller
     {
         DB::beginTransaction();
         try {
+            \Log::info('Iniciando actualización de actividad ID: ' . $id);
+            \Log::info('Datos recibidos: ' . json_encode($request->all()));
+            
             // Find the activity
             $activity = Activity::findOrFail($id);
+            \Log::info('Actividad encontrada: ' . $activity->id . ' - ' . $activity->name);
             
             // Validate the input data
             $validatedData = $request->validate([
@@ -141,33 +145,44 @@ class ActivityController extends Controller
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
+            \Log::info('Datos validados: ' . json_encode($validatedData));
 
             // Process new images if provided
             if ($request->hasFile('images') || $request->hasFile('image')) {
+                \Log::info('Procesando imágenes para la actividad: ' . $id);
+                
                 // Get existing images
                 $existingImages = json_decode($activity->image, true) ?: [];
+                \Log::info('Imágenes existentes: ' . json_encode($existingImages));
                 
                 // Check if adding new images would exceed the limit of 5
                 $newImageCount = $request->hasFile('images') ? count($request->file('images')) : 
                                 ($request->hasFile('image') ? 1 : 0);
                 
+                \Log::info('Número de imágenes nuevas: ' . $newImageCount);
+                
                 $totalImageCount = count($existingImages) + $newImageCount;
+                \Log::info('Número total de imágenes después de actualizar: ' . $totalImageCount);
                 
                 if ($totalImageCount > 5) {
+                    \Log::warning('Se excedió el límite de imágenes (5)');
                     return response()->json([
                         'message' => 'No se pueden agregar más imágenes. El límite es de 5 imágenes por actividad.',
                     ], 422);
                 }
                 
                 $newImagePaths = $this->processImages($request);
+                \Log::info('Nuevas rutas de imágenes: ' . $newImagePaths);
                 
                 // Merge with existing images
                 $allImages = array_merge($existingImages, json_decode($newImagePaths, true) ?: []);
                 $validatedData['image'] = json_encode($allImages);
+                \Log::info('Todas las imágenes después de fusionar: ' . $validatedData['image']);
             }
 
             // Update the activity
             $activity->update($validatedData);
+            \Log::info('Actividad actualizada correctamente: ' . $activity->id);
 
             DB::commit();
 
@@ -181,6 +196,7 @@ class ActivityController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al actualizar actividad: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'message' => 'Error al actualizar actividad',
                 'error' => $e->getMessage()
