@@ -53,7 +53,6 @@ class ActivityController extends Controller
                 'horas' => 'nullable|string',
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
-                'images' => 'nullable|array|max:5', // Limit to max 5 images
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
@@ -135,33 +134,18 @@ class ActivityController extends Controller
                 'horas' => 'nullable|string',
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
-                'images' => 'sometimes|nullable|array|max:5',
-                'images.*' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
 
             // Process new images if provided
             if ($request->hasFile('images') || $request->hasFile('image')) {
-                // Get existing images
-                $existingImages = json_decode($activity->image, true) ?: [];
-                
-                // Check if adding new images would exceed the limit of 5
-                $newImageCount = $request->hasFile('images') ? count($request->file('images')) : 
-                                ($request->hasFile('image') ? 1 : 0);
-                
-                $totalImageCount = count($existingImages) + $newImageCount;
-                
-                if ($totalImageCount > 5) {
-                    return response()->json([
-                        'message' => 'No se pueden agregar más imágenes. El límite es de 5 imágenes por actividad.',
-                    ], 422);
-                }
-                
                 $newImagePaths = $this->processImages($request);
                 
-                // Merge with existing images
+                // Merge with existing images if any
+                $existingImages = json_decode($activity->image, true) ?: [];
                 $allImages = array_merge($existingImages, json_decode($newImagePaths, true) ?: []);
                 $validatedData['image'] = json_encode($allImages);
             }
@@ -213,9 +197,6 @@ class ActivityController extends Controller
         // Handle both 'images' (multiple) and 'image' (single) uploads
         $images = $request->hasFile('images') ? $request->file('images') : 
                  ($request->hasFile('image') ? [$request->file('image')] : []);
-        
-        // Ensure we only process up to 5 images
-        $images = array_slice($images, 0, 5);
 
         foreach ($images as $image) {
             try {
