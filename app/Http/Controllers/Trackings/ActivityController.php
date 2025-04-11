@@ -211,4 +211,40 @@ class ActivityController extends Controller
         
         return !empty($imagePaths) ? json_encode($imagePaths) : null;
     }
+
+    public function deleteActivity($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Find the activity
+            $activity = Activity::findOrFail($id);
+
+            // Delete associated images from storage
+            if ($activity->image) {
+                $images = json_decode($activity->image, true);
+                if (is_array($images)) {
+                    foreach ($images as $imagePath) {
+                        $fullPath = public_path('images/activities/' . $imagePath);
+                        if (file_exists($fullPath)) {
+                            unlink($fullPath);
+                        }
+                    }
+                }
+            }
+
+            // Delete the activity
+            $activity->delete();
+
+            DB::commit();
+            return response()->json(['message' => 'Actividad eliminada exitosamente.'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al eliminar actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al eliminar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

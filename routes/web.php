@@ -98,7 +98,8 @@ Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class,
 // Projects
 Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
-Route::post('/endpoint/project/update', [ProjectController::class, 'updateProject']);
+Route::post('/endpoint/project/update/{id}', [ProjectController::class, 'updateProject']);
+Route::delete('/endpoint/project/destroy/{id}', [ProjectController::class, 'destroyProject']);
 
 // Projects entities
 Route::post('/endpoint/project/entities/create', [ProjectController::class, 'createProjectEntities']);
@@ -142,6 +143,7 @@ Route::get('/endpoint/activities/project/{project_id}', [ActivityController::cla
 Route::get('/endpoint/activities/tracking/{tracking_id}', [ActivityController::class, 'activityByTracking']);
 Route::put('/endpoint/activities/{id}', [ActivityController::class, 'updateActivity']);
 Route::post('/endpoint/activities/complete', [ActivityController::class, 'completeActivity']);
+Route::delete('/endpoint/activities/{id}', [ActivityController::class, 'deleteActivity']);
 
 
 
