@@ -120,32 +120,51 @@ class ActivityController extends Controller
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'existing_images' => 'nullable|string',
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
-
-            // Process new images if provided
-            if ($request->hasFile('images') || $request->hasFile('image')) {
-                $newImagePaths = $this->processImages($request);
-                
-                // Merge with existing images if any
-                $existingImages = json_decode($activity->image, true) ?: [];
-                $allImages = array_merge($existingImages, json_decode($newImagePaths, true) ?: []);
-                $validatedData['image'] = json_encode($allImages);
+    
+            // Obtener imágenes existentes
+            $existingImages = json_decode($activity->image, true) ?: [];
+            
+            // Si se enviaron nombres de imágenes existentes a mantener
+            if ($request->has('existing_images')) {
+                $existingImagesToKeep = json_decode($request->input('existing_images'), true) ?: [];
+                // Filtrar solo las imágenes existentes que se quieren mantener
+                $existingImages = array_values(array_intersect($existingImages, $existingImagesToKeep));
             }
-
+    
+            // Procesar nuevas imágenes si se proporcionaron
+            $newImages = [];
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/activities'), $imagePath);
+                    $newImages[] = $imagePath;
+                }
+            }
+            
+            // Combinar imágenes existentes con nuevas
+            $allImages = array_merge($existingImages, $newImages);
+            $validatedData['image'] = json_encode($allImages);
+    
+            // Eliminar existing_images del validated data ya que no es un campo de la BD
+            if (isset($validatedData['existing_images'])) {
+                unset($validatedData['existing_images']);
+            }
+    
             // Update the activity
             $activity->update($validatedData);
-
+    
             DB::commit();
-
+    
             return response()->json([
                 'message' => 'Actividad actualizada exitosamente.',
                 'activity' => $activity,
                 'image_paths' => array_map(function($path) {
                     return asset('images/activities/' . $path);
-                }, json_decode($activity->image) ?: []),
+                }, $allImages),
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
