@@ -143,5 +143,5 @@ Route::get('/endpoint/activities/project/{project_id}', [ActivityController::cla
 Route::get('/endpoint/activities/tracking/{tracking_id}', [ActivityController::class, 'activityByTracking']);
 Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActivity']);
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
-Route::post('/endpoint/activities/complete', [ActivityController::class, 'completeActivity']);
+Route::post('/endpoint/activities_complete', [ActivityController::class, 'completeActivity']);
 Route::delete('/endpoint/activities/{id}', [ActivityController::class, 'deleteActivity']);
