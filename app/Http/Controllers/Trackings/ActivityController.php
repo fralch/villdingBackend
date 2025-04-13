@@ -139,52 +139,63 @@ class ActivityController extends Controller
                 'horas' => 'nullable|string',
                 'status' => 'nullable|string',
                 'icon' => 'nullable|string',
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'existing_images' => 'nullable|string',
+                'images' => 'sometimes|nullable|array|max:5',
+                'images.*' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
-    
-            // Obtener imágenes existentes
-            $existingImages = json_decode($activity->image, true) ?: [];
+            \Log::info('Datos validados: ' . json_encode($validatedData));
+
+            // Manejar imágenes
+            $finalImagePaths = [];
             
-            // Si se enviaron nombres de imágenes existentes a mantener
+            // Procesar imágenes existentes si se proporcionan
             if ($request->has('existing_images')) {
-                $existingImagesToKeep = json_decode($request->input('existing_images'), true) ?: [];
-                // Filtrar solo las imágenes existentes que se quieren mantener
-                $existingImages = array_values(array_intersect($existingImages, $existingImagesToKeep));
-            }
-    
-            // Procesar nuevas imágenes si se proporcionaron
-            $newImages = [];
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images/activities'), $imagePath);
-                    $newImages[] = $imagePath;
+                // Si las imágenes existentes vienen como string JSON, decodificarlas
+                if (is_string($request->existing_images)) {
+                    $existingImages = json_decode($request->existing_images, true);
+                } else {
+                    $existingImages = $request->existing_images;
+                }
+                
+                // Asegurarse de que existingImages sea un array
+                if (is_array($existingImages)) {
+                    $finalImagePaths = $existingImages;
+                }
+            } else if ($activity->image) {
+                // Mantener las imágenes actuales si no se especifican nuevas
+                $currentImages = json_decode($activity->image, true);
+                if (is_array($currentImages)) {
+                    $finalImagePaths = $currentImages;
                 }
             }
             
-            // Combinar imágenes existentes con nuevas
-            $allImages = array_merge($existingImages, $newImages);
-            $validatedData['image'] = json_encode($allImages);
-    
-            // Eliminar existing_images del validated data ya que no es un campo de la BD
-            if (isset($validatedData['existing_images'])) {
-                unset($validatedData['existing_images']);
+            // Procesar nuevas imágenes si se están subiendo
+            $newImagePaths = $this->processImages($request);
+            if ($newImagePaths) {
+                $newImagePathsArray = json_decode($newImagePaths, true) ?: [];
+                $finalImagePaths = array_merge($finalImagePaths, $newImagePathsArray);
             }
-    
+            
+            // Guardar la ruta de imágenes final en formato JSON
+            $validatedData['image'] = !empty($finalImagePaths) ? json_encode($finalImagePaths) : null;
+            
+            // Actualizar fecha de modificación
+            $validatedData['updated_at'] = now();
+
             // Update the activity
             $activity->update($validatedData);
-    
+            \Log::info('Actividad actualizada correctamente: ' . $activity->id);
+
             DB::commit();
-    
+
             return response()->json([
                 'message' => 'Actividad actualizada exitosamente.',
                 'activity' => $activity,
                 'image_paths' => array_map(function($path) {
                     return asset('images/activities/' . $path);
-                }, $allImages),
+                }, json_decode($activity->image) ?: []),
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
