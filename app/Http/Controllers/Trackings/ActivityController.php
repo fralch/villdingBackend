@@ -271,8 +271,12 @@ class ActivityController extends Controller
     function completeActivity(Request $request){
         DB::beginTransaction();
         try {
-            $id = $request->input('id');
+            $id = intval($request->input('id'));
+            // Añade un log para ver qué valor llega realmente
+            \Log::info('ID a buscar:', ['id' => $id]);
+            
             $activity = Activity::findOrFail($id);
+            
             
             // Log activity found for debugging
             \Log::info('Activity found:', [
