@@ -283,6 +283,7 @@ class ActivityController extends Controller
             \Log::error('Error al completar actividad: ' . $e->getMessage());
             return response()->json(['message' => 'Error al completar actividad', 'error' => $e->getMessage()], 500);
         }
+        
     }
 
     private function processImages(Request $request)
