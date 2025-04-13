@@ -281,7 +281,11 @@ class ActivityController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al completar actividad: ' . $e->getMessage());
-            return response()->json(['message' => 'Error al completar actividad', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
         }
         
     }
