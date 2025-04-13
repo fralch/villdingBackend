@@ -273,8 +273,22 @@ class ActivityController extends Controller
         try {
             $id = $request->input('id');
             $activity = Activity::findOrFail($id);
+            
+            // Log activity found for debugging
+            \Log::info('Activity found:', [
+                'id' => $activity->id,
+                'name' => $activity->name,
+                'current_status' => $activity->status
+            ]);
+            
             $activity->status = 'completado';
             $activity->save();
+            
+            // Log after status update
+            \Log::info('Activity status updated:', [
+                'id' => $activity->id,
+                'new_status' => $activity->status
+            ]);
 
             DB::commit();
             return response()->json(['message' => 'Actividad completada exitosamente.'], 200);
