@@ -9,25 +9,19 @@ class Tracking extends Model
 {
     use HasFactory;
 
-  
+    /**
+     * Los atributos que son asignables en masa.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'week_id',
         'project_id',
-        'user_id',
         'title',
         'description',
         'date_start',
-        'date_end',
+        'duration_days',
         'status'
     ];
-
-    /**
-     * Relación con el modelo Week.
-     */
-    public function week()
-    {
-        return $this->belongsTo(Week::class);
-    }
 
     /**
      * Relación con el modelo Project.
@@ -38,29 +32,10 @@ class Tracking extends Model
     }
 
     /**
-     * Relación con el modelo User.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Relación con el modelo Day.
-     */
-    public function days()
-    {
-        return $this->hasMany(Day::class);
-    }
-
-    /**
      * Relación con el modelo Activity.
      */
     public function activities()
     {
         return $this->hasMany(Activity::class);
     }
-
-    
-    
 }

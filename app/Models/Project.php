@@ -16,6 +16,7 @@ class Project extends Model
         'code',
         'start_date',
         'end_date',
+        'nearest_monday',
         'uri',
         'project_type_id',
         'project_subtype_id',

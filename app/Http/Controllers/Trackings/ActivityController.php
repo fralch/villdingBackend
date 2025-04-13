@@ -32,80 +32,348 @@ class ActivityController extends Controller
         return response()->json($weeks);
     }
 
-    // obtener actividades por dia enlazadas a una semana y proyecto
-    public function activityByWeekByProject($week_id, $project_id){
-             // Obtener los días de la semana de un proyecto
-        $days = Day::where('week_id', $week_id)->where('project_id', $project_id)->get();
-
-        // Obtener las actividades asociadas a cada día
-        $activities = Activity::whereIn('day_id', $days->pluck('id'))->get();   
+    public function activityByTracking($tracking_id)
+    {
+        // Obtener las actividades asociadas a la actividad
+        $activities = Activity::where('tracking_id', $tracking_id)->get();
         return response()->json($activities);
     }
-
+    
     public function createActivity(Request $request)
     {
         DB::beginTransaction();
         try {
-            // Validar los datos de entrada (sin tracking_id)
+            // Validate the input data
             $validatedData = $request->validate([
                 'project_id' => 'required|exists:projects,id',
-                'user_id' => 'required|exists:users,id',
+                'tracking_id' => 'required|exists:trackings,id',
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'location' => 'nullable|string',
-                'hour_start' => 'required|date_format:H:i|before:hour_end',
-                'hour_end' => 'required|date_format:H:i|after:hour_start',
-                'status' => 'required|string|max:255',
+                'horas' => 'nullable|string',
+                'status' => 'nullable|string',
                 'icon' => 'nullable|string',
+                'images' => 'nullable|array|max:5', // Limit to max 5 images
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'comments' => 'nullable|string',
+                'fecha_creacion' => 'nullable|date',
             ]);
+
+            // Check for duplicates based on project_id, tracking_id, and name
+            $existingActivity = Activity::where('project_id', $validatedData['project_id'])
+                ->where('tracking_id', $validatedData['tracking_id'])
+                ->where('name', $validatedData['name']);
+                
+                   
+            $existingActivity = $existingActivity->first();
             
-            // Procesar la imagen si se proporciona
-            $imagePath = $this->processImage($request);
-    
-            // Obtener los IDs de los días del proyecto de la semana
-            $daysIds = Day::where('week_id', $request->week_id)->pluck('id')->toArray();
-    
-            // Generar el array de actividades
-            $activities = array_map(function ($dayId) use ($validatedData, $imagePath) {
-                return array_merge($validatedData, [
-                    'day_id' => $dayId,
-                    'image' => $imagePath,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }, $daysIds);
-    
-            // Insertar todas las actividades en una sola consulta
-            Activity::insert($activities);
-    
+            if ($existingActivity) {
+                return response()->json([
+                    'message' => 'Ya existe una actividad con estos datos.',
+                    'activity' => $existingActivity,
+                ], 409); // 409 Conflict status code
+            }
+
+            // Set timezone to Lima, Peru
+            date_default_timezone_set('America/Lima');
+            
+            // Check if fecha_creacion is after today
+            if (isset($validatedData['fecha_creacion'])) {
+                $activityDate = \Carbon\Carbon::parse($validatedData['fecha_creacion']);
+                $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
+                
+                if ($activityDate->gt($today)) {
+                    $validatedData['status'] = 'programado';
+                }
+            }
+
+            // Process images
+            $imagePaths = $this->processImages($request);
+
+            // Create the activity
+            $activity = Activity::create(array_merge($validatedData, [
+                'image' => $imagePaths,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+
             DB::commit();
-    
+            
             return response()->json([
-                'message' => 'Actividades creadas exitosamente para el proyecto.',
-                'image_path' => $imagePath ? asset('images/activities/' . $imagePath) : null,
+                'message' => 'Actividad creada exitosamente.',
+                'activity' => $activity,
+                'image_paths' => array_map(function($path) {
+                    return asset('images/activities/' . $path);
+                }, json_decode($imagePaths) ?: []),
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error al crear actividades: ' . $e->getMessage());
+            \Log::error('Error al crear actividad: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error al crear actividades',
+                'message' => 'Error al crear actividad',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
     
-    // Método para procesar la imagen
-    private function processImage(Request $request)
+    /**
+     * Actualiza una actividad sin imágenes (usando JSON)
+     */
+    public function updateActivity(Request $request, $id)
     {
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imagePath = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/activities'), $imagePath);
-            return $imagePath;
+        DB::beginTransaction();
+        try {
+            \Log::info('Iniciando actualización básica de actividad ID: ' . $id);
+            \Log::info('Datos recibidos: ' . json_encode($request->all()));
+            
+            // Find the activity
+            $activity = Activity::findOrFail($id);
+            \Log::info('Actividad encontrada: ' . $activity->id . ' - ' . $activity->name);
+            
+            // Validate the input data - sin campos de imágenes
+            $validatedData = $request->validate([
+                'project_id' => 'sometimes|required|exists:projects,id',
+                'tracking_id' => 'sometimes|required|exists:trackings,id',
+                'name' => 'sometimes|required|string|max:255',
+                'description' => 'nullable|string',
+                'location' => 'nullable|string',
+                'horas' => 'nullable|string',
+                'status' => 'nullable|string',
+                'icon' => 'nullable|string',
+                'comments' => 'nullable|string',
+                'fecha_creacion' => 'nullable|date',
+            ]);
+            \Log::info('Datos validados: ' . json_encode($validatedData));
+
+            // Mantener las imágenes actuales
+            // Nota: No se modifican las imágenes en esta función
+            
+            // Actualizar fecha de modificación
+            $validatedData['updated_at'] = now();
+
+            // Update the activity
+            $activity->update($validatedData);
+            \Log::info('Actividad actualizada correctamente: ' . $activity->id);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Actividad actualizada exitosamente.',
+                'activity' => $activity,
+                'image_paths' => array_map(function($path) {
+                    return asset('images/activities/' . $path);
+                }, json_decode($activity->image) ?: []),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al actualizar actividad: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'message' => 'Error al actualizar actividad',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        return null;
+    }
+    
+    /**
+     * Actualiza una actividad con imágenes (usando FormData)
+     */
+    public function updateActivityWithImages(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            \Log::info('Iniciando actualización de actividad con imágenes ID: ' . $id);
+            \Log::info('Datos recibidos: ' . json_encode($request->except(['images', 'image'])));
+            
+            // Find the activity
+            $activity = Activity::findOrFail($id);
+            \Log::info('Actividad encontrada: ' . $activity->id . ' - ' . $activity->name);
+            
+            // Validar datos básicos (no incluimos validación de imágenes todavía)
+            $validatedData = $request->validate([
+                'project_id' => 'sometimes|required|exists:projects,id',
+                'tracking_id' => 'sometimes|required|exists:trackings,id',
+                'name' => 'sometimes|required|string|max:255',
+                'description' => 'nullable|string',
+                'location' => 'nullable|string',
+                'horas' => 'nullable|string',
+                'status' => 'nullable|string',
+                'icon' => 'nullable|string',
+                'comments' => 'nullable|string',
+                'fecha_creacion' => 'nullable|date',
+            ]);
+            
+            // Manejar imágenes
+            $finalImagePaths = [];
+            
+            // Procesar imágenes existentes enviadas desde el cliente
+            // Esto viene como JSON string del campo 'existing_images'
+            if ($request->has('existing_images')) {
+                if (is_string($request->existing_images)) {
+                    $existingImages = json_decode($request->existing_images, true);
+                    if (is_array($existingImages)) {
+                        $finalImagePaths = $existingImages;
+                    }
+                } else if (is_array($request->existing_images)) {
+                    $finalImagePaths = $request->existing_images;
+                }
+            } 
+            // Si no hay existing_images especificadas, mantenemos las actuales
+            else if (empty($finalImagePaths) && $activity->image) {
+                $currentImages = json_decode($activity->image, true);
+                if (is_array($currentImages)) {
+                    $finalImagePaths = $currentImages;
+                }
+            }
+            
+            \Log::info('Imágenes existentes procesadas: ' . json_encode($finalImagePaths));
+            
+            // Procesar nuevas imágenes si existen
+            $newImagePaths = $this->processImages($request);
+            if ($newImagePaths) {
+                $newImagePathsArray = json_decode($newImagePaths, true) ?: [];
+                $finalImagePaths = array_merge($finalImagePaths, $newImagePathsArray);
+                \Log::info('Imágenes nuevas procesadas: ' . json_encode($newImagePathsArray));
+            }
+            
+            // Guardar la ruta de imágenes final en formato JSON
+            $validatedData['image'] = !empty($finalImagePaths) ? json_encode($finalImagePaths) : null;
+            
+            // Actualizar fecha de modificación
+            $validatedData['updated_at'] = now();
+
+            // Update the activity
+            $activity->update($validatedData);
+            \Log::info('Actividad actualizada correctamente con imágenes: ' . $activity->id);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Actividad actualizada exitosamente con imágenes.',
+                'activity' => $activity,
+                'image_paths' => array_map(function($path) {
+                    return asset('images/activities/' . $path);
+                }, json_decode($activity->image) ?: []),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al actualizar actividad con imágenes: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'message' => 'Error al actualizar actividad con imágenes',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    function completeActivity(Request $request){
+        DB::beginTransaction();
+        try {
+            $id = $request->input('id');
+            $activity = Activity::findOrFail($id);
+            $activity->status = 'completado';
+            $activity->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Actividad completada exitosamente.'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al completar actividad: ' . $e->getMessage());
+            return response()->json(['message' => 'Error al completar actividad', 'error' => $e->getMessage()], 500);
+        }
     }
 
+    private function processImages(Request $request)
+    {
+        \Log::info('Iniciando procesamiento de imágenes');
+        $imagePaths = [];
+        
+        // Handle 'images' array from form-data (from React Native)
+        if ($request->hasFile('images')) {
+            $images = is_array($request->file('images')) ? 
+                $request->file('images') : [$request->file('images')];
+            
+            \Log::info('Número de imágenes a procesar: ' . count($images));
+            
+            // Ensure we only process up to 5 images
+            $images = array_slice($images, 0, 5);
+    
+            foreach ($images as $index => $image) {
+                try {
+                    if ($image && $image->isValid()) {
+                        \Log::info('Procesando imagen #' . ($index + 1));
+                        $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                        $image->move(public_path('images/activities'), $imagePath);
+                        $imagePaths[] = $imagePath;
+                        \Log::info('Imagen guardada en: ' . $imagePath);
+                    } else {
+                        \Log::warning('Imagen no válida o no proporcionada en índice: ' . $index);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error procesando imagen #' . ($index + 1) . ': ' . $e->getMessage());
+                    throw new \Exception('Error processing image: ' . $e->getMessage());
+                }
+            }
+        }
+        // Handle single 'image' field (fallback)
+        else if ($request->hasFile('image')) {
+            try {
+                $image = $request->file('image');
+                if ($image && $image->isValid()) {
+                    \Log::info('Procesando imagen única');
+                    $imagePath = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images/activities'), $imagePath);
+                    $imagePaths[] = $imagePath;
+                    \Log::info('Imagen guardada en: ' . $imagePath);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error procesando imagen única: ' . $e->getMessage());
+                throw new \Exception('Error processing image: ' . $e->getMessage());
+            }
+        } else {
+            \Log::info('No se encontraron imágenes para procesar');
+        }
+        
+        $result = !empty($imagePaths) ? json_encode($imagePaths) : null;
+        \Log::info('Finalizado procesamiento de imágenes. Resultado: ' . $result);
+        return $result;
+    }
+
+    public function deleteActivity($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Find the activity
+            $activity = Activity::findOrFail($id);
+
+            // Delete associated images from storage
+            if ($activity->image) {
+                $images = json_decode($activity->image, true);
+                if (is_array($images)) {
+                    foreach ($images as $imagePath) {
+                        $fullPath = public_path('images/activities/' . $imagePath);
+                        if (file_exists($fullPath)) {
+                            unlink($fullPath);
+                        }
+                    }
+                }
+            }
+
+            // Delete the activity
+            $activity->delete();
+
+            DB::commit();
+            return response()->json(['message' => 'Actividad eliminada exitosamente.'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al eliminar actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al eliminar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
