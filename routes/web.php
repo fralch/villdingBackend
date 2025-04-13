@@ -145,8 +145,3 @@ Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActi
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
 Route::post('/endpoint/activities/complete', [ActivityController::class, 'completeActivity']);
 Route::delete('/endpoint/activities/{id}', [ActivityController::class, 'deleteActivity']);
-
-
-
-
-
