@@ -60,6 +60,10 @@ class ActivityController extends Controller
                 'fecha_creacion' => 'nullable|date',
             ]);
 
+            // Establecer un valor predeterminado para 'horas' si es null
+            $validatedData['horas'] = $validatedData['horas'] ?? '0';
+
+
             // Check for duplicates based on project_id, tracking_id, and name
             $existingActivity = Activity::where('project_id', $validatedData['project_id'])
                 ->where('tracking_id', $validatedData['tracking_id'])
@@ -271,18 +275,41 @@ class ActivityController extends Controller
     function completeActivity(Request $request){
         DB::beginTransaction();
         try {
-            $id = $request->input('id');
+            $id = intval($request->input('id'));
+            // Añade un log para ver qué valor llega realmente
+            \Log::info('ID a buscar:', ['id' => $id]);
+            
             $activity = Activity::findOrFail($id);
+            
+            
+            // Log activity found for debugging
+            \Log::info('Activity found:', [
+                'id' => $activity->id,
+                'name' => $activity->name,
+                'current_status' => $activity->status
+            ]);
+            
             $activity->status = 'completado';
             $activity->save();
+            
+            // Log after status update
+            \Log::info('Activity status updated:', [
+                'id' => $activity->id,
+                'new_status' => $activity->status
+            ]);
 
             DB::commit();
             return response()->json(['message' => 'Actividad completada exitosamente.'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al completar actividad: ' . $e->getMessage());
-            return response()->json(['message' => 'Error al completar actividad', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
         }
+        
     }
 
     private function processImages(Request $request)
