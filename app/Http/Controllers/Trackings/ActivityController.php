@@ -272,45 +272,61 @@ class ActivityController extends Controller
         }
     }
 
-    public function updateActivityStatusByDate(Request $request, $id)
+    public function updateActivityStatusByDate(Request $request, $project_id)
     {
         DB::beginTransaction();
         try {
-            $activity = Activity::findOrFail($id);
+            $activities = Activity::where('project_id', $project_id)->get();
 
-            if (!$activity->fecha_creacion) {
+            if ($activities->isEmpty()) {
                 DB::rollBack();
-                return response()->json(['message' => 'La actividad no tiene una fecha de creación definida.'], 400);
+                return response()->json(['message' => 'No se encontraron actividades para el proyecto especificado.'], 404);
             }
+
+            $updatedActivities = [];
+            $errors = [];
 
             // Set timezone to Lima, Peru
             date_default_timezone_set('America/Lima');
-            $activityDate = \Carbon\Carbon::parse($activity->fecha_creacion)->startOfDay();
             $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
 
-            if ($activityDate->lte($today)) {
-                $activity->status = 'pendiente';
-            } else {
-                $activity->status = 'programado';
+            foreach ($activities as $activity) {
+                if (!$activity->fecha_creacion) {
+                    $errors[] = ['activity_id' => $activity->id, 'error' => 'La actividad no tiene una fecha de creación definida.'];
+                    continue; // Skip this activity
+                }
+
+                $activityDate = \Carbon\Carbon::parse($activity->fecha_creacion)->startOfDay();
+
+                if ($activityDate->lte($today)) {
+                    $activity->status = 'pendiente';
+                } else {
+                    $activity->status = 'programado';
+                }
+
+                $activity->updated_at = now();
+                $activity->save();
+                $updatedActivities[] = $activity;
             }
 
-            $activity->updated_at = now();
-            $activity->save();
-
             DB::commit();
+            
+            $responseMessage = 'Estado de las actividades actualizado exitosamente.';
+            if (!empty($errors)) {
+                $responseMessage .= ' Algunas actividades no pudieron ser actualizadas.';
+            }
+
             return response()->json([
-                'message' => 'Estado de la actividad actualizado exitosamente.',
-                'activity' => $activity
+                'message' => $responseMessage,
+                'updated_activities' => $updatedActivities,
+                'errors' => $errors
             ], 200);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Actividad no encontrada.'], 404);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error al actualizar estado de actividad: ' . $e->getMessage());
+            \Log::error('Error al actualizar estado de actividades por proyecto: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Error al actualizar estado de actividad',
+                'message' => 'Error al actualizar estado de actividades por proyecto',
                 'error' => $e->getMessage()
             ], 500);
         }
