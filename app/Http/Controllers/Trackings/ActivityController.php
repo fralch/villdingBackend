@@ -271,6 +271,50 @@ class ActivityController extends Controller
             ], 500);
         }
     }
+
+    public function updateActivityStatusByDate(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $activity = Activity::findOrFail($id);
+
+            if (!$activity->fecha_creacion) {
+                DB::rollBack();
+                return response()->json(['message' => 'La actividad no tiene una fecha de creación definida.'], 400);
+            }
+
+            // Set timezone to Lima, Peru
+            date_default_timezone_set('America/Lima');
+            $activityDate = \Carbon\Carbon::parse($activity->fecha_creacion)->startOfDay();
+            $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
+
+            if ($activityDate->lte($today)) {
+                $activity->status = 'pendiente';
+            } else {
+                $activity->status = 'programado';
+            }
+
+            $activity->updated_at = now();
+            $activity->save();
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Estado de la actividad actualizado exitosamente.',
+                'activity' => $activity
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Actividad no encontrada.'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al actualizar estado de actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al actualizar estado de actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
     
     function completeActivity(Request $request){
         DB::beginTransaction();
