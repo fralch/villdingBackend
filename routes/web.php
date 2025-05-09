@@ -144,3 +144,4 @@ Route::get('/endpoint/activities/tracking/{tracking_id}', [ActivityController::c
 Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActivity']);
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
 Route::post('/endpoint/activities_complete', [ActivityController::class, 'completeActivity']);
+Route::post('/endpoint/activities_check/{id}', [ActivityController::class, 'updateActivityStatusByDate']);
