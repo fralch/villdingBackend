@@ -295,6 +295,11 @@ class ActivityController extends Controller
                     $errors[] = ['activity_id' => $activity->id, 'error' => 'La actividad no tiene una fecha de creación definida.'];
                     continue; // Skip this activity
                 }
+                
+                // No cambiar el estado si ya está completado
+                if ($activity->status === 'completado') {
+                    continue; // Mantener el estado completado
+                }
 
                 $activityDate = \Carbon\Carbon::parse($activity->fecha_creacion)->startOfDay();
 
