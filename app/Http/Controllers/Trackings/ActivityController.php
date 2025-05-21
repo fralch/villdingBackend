@@ -150,6 +150,31 @@ class ActivityController extends Controller
                 'fecha_creacion' => 'nullable|date',
             ]);
             \Log::info('Datos validados: ' . json_encode($validatedData));
+            
+            // Verificar si se está intentando cambiar el nombre
+            if (isset($validatedData['name']) && $validatedData['name'] !== $activity->name) {
+                \Log::info('Verificando duplicados para el nuevo nombre: ' . $validatedData['name']);
+                
+                // Determinar project_id y tracking_id a usar para la verificación
+                $projectId = $validatedData['project_id'] ?? $activity->project_id;
+                $trackingId = $validatedData['tracking_id'] ?? $activity->tracking_id;
+                
+                // Verificar si ya existe otra actividad con el mismo nombre (excluyendo la actual)
+                $existingActivity = Activity::where('project_id', $projectId)
+                    ->where('tracking_id', $trackingId)
+                    ->where('name', $validatedData['name'])
+                    ->where('id', '!=', $id) // Excluir la actividad actual
+                    ->first();
+                
+                if ($existingActivity) {
+                    \Log::warning('Se encontró una actividad existente con el mismo nombre: ' . $existingActivity->id);
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Ya existe otra actividad con este nombre.',
+                        'activity' => $existingActivity,
+                    ], 409); // 409 Conflict status code
+                }
+            }
 
             // Mantener las imágenes actuales
             // Nota: No se modifican las imágenes en esta función
@@ -208,6 +233,31 @@ class ActivityController extends Controller
                 'comments' => 'nullable|string',
                 'fecha_creacion' => 'nullable|date',
             ]);
+            
+            // Verificar si se está intentando cambiar el nombre
+            if (isset($validatedData['name']) && $validatedData['name'] !== $activity->name) {
+                \Log::info('Verificando duplicados para el nuevo nombre: ' . $validatedData['name']);
+                
+                // Determinar project_id y tracking_id a usar para la verificación
+                $projectId = $validatedData['project_id'] ?? $activity->project_id;
+                $trackingId = $validatedData['tracking_id'] ?? $activity->tracking_id;
+                
+                // Verificar si ya existe otra actividad con el mismo nombre (excluyendo la actual)
+                $existingActivity = Activity::where('project_id', $projectId)
+                    ->where('tracking_id', $trackingId)
+                    ->where('name', $validatedData['name'])
+                    ->where('id', '!=', $id) // Excluir la actividad actual
+                    ->first();
+                
+                if ($existingActivity) {
+                    \Log::warning('Se encontró una actividad existente con el mismo nombre: ' . $existingActivity->id);
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Ya existe otra actividad con este nombre.',
+                        'activity' => $existingActivity,
+                    ], 409); // 409 Conflict status code
+                }
+            }
             
             // Manejar imágenes
             $finalImagePaths = [];
