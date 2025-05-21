@@ -167,4 +167,63 @@ class TrackingController extends Controller
             ], 500);
         }
     }
+
+    /** * Actualiza el título de un tracking específico */
+    public function updateTrackingTitle(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            // Validar los datos de entrada
+            $validatedData = $request->validate([
+                'title' => 'required|string|max:255',
+            ]);
+
+            $tracking = Tracking::findOrFail($id);
+            $tracking->title = $validatedData['title'];
+            $tracking->updated_at = now();
+            $tracking->save();
+            
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Título del tracking actualizado exitosamente.',
+                'tracking' => $tracking
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al actualizar el título del tracking: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al actualizar el título del tracking',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /** * Elimina un tracking específico */
+    public function deleteTracking($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Buscar el tracking
+            $tracking = Tracking::findOrFail($id);
+            
+            // Eliminar el tracking y sus actividades relacionadas (gracias a la eliminación en cascada)
+            $tracking->delete();
+            
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tracking eliminado exitosamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al eliminar el tracking: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al eliminar el tracking',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
 }

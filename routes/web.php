@@ -136,6 +136,8 @@ Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDay
 Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
 // crear tracking
 Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTracking']);
+Route::post('/endpoint/tracking/update-title/{id}', [TrackingController::class, 'updateTrackingTitle']);
+Route::post('/endpoint/tracking/delete/{id}', [TrackingController::class, 'deleteTracking']);
 // crear actividades
 Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
 Route::get('/endpoint/activities/all', [ActivityController::class, 'activityAll']);
@@ -145,3 +147,6 @@ Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActi
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
 Route::post('/endpoint/activities_complete', [ActivityController::class, 'completeActivity']);
 Route::post('/endpoint/activities_check/{id}', [ActivityController::class, 'updateActivityStatusByDate']);
+Route::post('/endpoint/activities_delete/{id}', [ActivityController::class, 'deleteActivity']); 
+
+
