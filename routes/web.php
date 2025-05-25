@@ -91,6 +91,8 @@ Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']
 
 Route::get('/endpoint/project/types', [ProjectTypeController::class, 'all']);
 Route::post('/endpoint/project/type/store', [ProjectTypeController::class, 'store']);
+Route::get('/endpoint/project/types/{project_id}', [ProjectTypeController::class, 'getByProject']);
+Route::get('/endpoint/project/subtypes/{project_id}', [ProjectSubtypeController::class, 'getByProject']);
 
 Route::get('/endpoint/project/subtypes', [ProjectSubtypeController::class, 'all']);
 Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class, 'store']);
@@ -147,6 +149,8 @@ Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActi
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
 Route::post('/endpoint/activities_complete', [ActivityController::class, 'completeActivity']);
 Route::post('/endpoint/activities_check/{id}', [ActivityController::class, 'updateActivityStatusByDate']);
-Route::post('/endpoint/activities_delete/{id}', [ActivityController::class, 'deleteActivity']); 
+Route::post('/endpoint/activities_delete/{id}', [ActivityController::class, 'deleteActivity']);
+
+
 
 
