@@ -62,15 +62,5 @@ class ProjectTypeController extends Controller
         $projectType->delete();
 
         return response()->json(['message' => 'Tipo de proyecto eliminado correctamente']);
-    }
-
-    /*  
-      Obtener los tipos de  un proyecto
-      GET /endpoint/project/types/{project_id}
-    */
-    public function getByProject($project_id)
-    {
-        $project = ProjectType::where('project_id', $project_id)->get();
-        return response()->json($project);
-    }
+    } 
 }

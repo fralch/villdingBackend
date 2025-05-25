@@ -314,5 +314,77 @@ class ProjectController extends Controller
             return response()->json($weeks);
         }
     }
+
+      /*  
+      Obtener los tipos de  un proyecto
+      GET /endpoint/project/types/{project_id}
+    */
+    public function getProjectTypes(string $project_id)
+    {
+        try {
+            // Buscar el proyecto por ID
+            $project = Project::findOrFail($project_id);
+            
+            // Obtener el tipo y subtipo del proyecto
+            $projectType = $project->type;
+            $projectSubtype = $project->subtype;
+            
+            return response()->json([
+                'project_id' => $project->id,
+                'project_name' => $project->name,
+                'type' => $projectType,
+                'subtype' => $projectSubtype
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los tipos del proyecto',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
     
+     /*
+      Obtener todos los subtipos de un proyecto
+      GET /endpoint/project/subtypes/{project_id}
+    */
+    public function getProjectSubtypes(string $project_id)
+    {
+        try {
+            // Buscar el proyecto por ID
+            $project = Project::findOrFail($project_id);
+            
+            // Obtener el tipo de proyecto
+            $projectType = $project->type;
+            
+            if (!$projectType) {
+                return response()->json([
+                    'message' => 'El proyecto no tiene un tipo asignado'
+                ], 404);
+            }
+            
+            // Obtener todos los subtipos asociados a ese tipo de proyecto
+            $subtypes = ProjectSubtype::where('project_type_id', $projectType->id)->get();
+            
+            return response()->json([
+                'project_id' => $project->id,
+                'project_name' => $project->name,
+                'project_type_id' => $projectType->id,
+                'project_type_name' => $projectType->name,
+                'subtypes' => $subtypes
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los subtipos del proyecto',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

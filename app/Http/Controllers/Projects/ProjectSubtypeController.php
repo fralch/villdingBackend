@@ -70,9 +70,5 @@ class ProjectSubtypeController extends Controller
       Obtener todos los subtipos de un proyecto
       GET /endpoint/project/subtypes/{project_id}
     */
-    public function getByProject($project_id)
-    {
-        $project = ProjectSubtype::where('project_id', $project_id)->get();
-        return response()->json($project);
-    }
+   
 }

@@ -91,8 +91,8 @@ Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']
 
 Route::get('/endpoint/project/types', [ProjectTypeController::class, 'all']);
 Route::post('/endpoint/project/type/store', [ProjectTypeController::class, 'store']);
-Route::get('/endpoint/project/types/{project_id}', [ProjectTypeController::class, 'getByProject']);
-Route::get('/endpoint/project/subtypes/{project_id}', [ProjectSubtypeController::class, 'getByProject']);
+Route::get('/endpoint/project/types/{project_id}', [ProjectController::class, 'getProjectTypes']);
+Route::get('/endpoint/project/subtypes/{project_id}', [ProjectController::class, 'getProjectSubtypes']);
 
 Route::get('/endpoint/project/subtypes', [ProjectSubtypeController::class, 'all']);
 Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class, 'store']);
