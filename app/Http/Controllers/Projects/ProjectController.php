@@ -143,6 +143,20 @@ class ProjectController extends Controller
             // Buscar el proyecto
             $project = Project::findOrFail($id);
 
+            // Verificar si se está actualizando el nombre y si ya existe otro proyecto con ese nombre
+            if (isset($validatedData['name']) && $validatedData['name'] !== $project->name) {
+                $existingProject = Project::where('name', $validatedData['name'])
+                    ->where('id', '!=', $id)
+                    ->first();
+                
+                if ($existingProject) {
+                    return response()->json([
+                        'message' => 'Ya existe un proyecto con este nombre',
+                        'error' => 'El nombre del proyecto debe ser único'
+                    ], 422);
+                }
+            }
+
             // Procesar la imagen si se proporciona una nueva
             if ($request->hasFile('uri')) {
                 // Eliminar la imagen anterior si existe y no es la imagen por defecto
