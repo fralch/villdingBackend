@@ -63,18 +63,14 @@ class ActivityController extends Controller
             // Establecer un valor predeterminado para 'horas' si es null
             $validatedData['horas'] = $validatedData['horas'] ?? '0';
 
-
-            // Check for duplicates based on project_id, tracking_id, and name
+            // Check for duplicates based on project_id and name only
             $existingActivity = Activity::where('project_id', $validatedData['project_id'])
-                ->where('tracking_id', $validatedData['tracking_id'])
-                ->where('name', $validatedData['name']);
-                
-                   
-            $existingActivity = $existingActivity->first();
+                ->where('name', $validatedData['name'])
+                ->first();
             
             if ($existingActivity) {
                 return response()->json([
-                    'message' => 'Ya existe una actividad con estos datos.',
+                    'message' => 'Ya existe una actividad con este nombre en el proyecto.',
                     'activity' => $existingActivity,
                 ], 409); // 409 Conflict status code
             }
