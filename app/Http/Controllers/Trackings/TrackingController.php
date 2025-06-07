@@ -132,6 +132,99 @@ class TrackingController extends Controller
     }
 
    
+    /** * Obtiene trackings de un proyecto específico incluyendo los eliminados con soft delete */
+    public function trackingByProjectWithTrashed($project_id){
+        // Obtiene trackings incluyendo los eliminados con soft delete
+        $trackings = Tracking::withTrashed()->with('activities')->where('project_id', $project_id)->get();
+        
+        $result = [];
+        foreach ($trackings as $tracking) {
+            // Convertir el tracking a un array para poder manipularlo
+            $trackingArray = $tracking->toArray();
+        
+            // Calcula la fecha de finalización basada en date_start y duration_days
+            $start_date = new \DateTime($tracking->date_start);
+            $end_date = (clone $start_date)->modify('+' . ($tracking->duration_days - 1) . ' days');
+        
+            // Formato para almacenar resumen de actividades por día
+            $days_summary = [];
+        
+            // Inicializa el array de días con fechas desde date_start hasta date_start + duration_days
+            $current_date = clone $start_date;
+            while ($current_date <= $end_date) {
+                $date_string = $current_date->format('Y-m-d');
+                $days_summary[$date_string] = [
+                    'date' => $date_string,
+                    'has_pending' => false,
+                    'has_scheduled' => false,
+                    'has_completed' => false,
+                    'pending_count' => 0,
+                    'scheduled_count' => 0,
+                    'completed_count' => 0
+                ];
+                $current_date->modify('+1 day');
+            }
+        
+            // Para cada actividad, actualiza el estado del día correspondiente
+            foreach ($tracking->activities as $activity) {
+                // Si la actividad no tiene una fecha específica, la omitimos
+                if (empty($activity->fecha_creacion)) {
+                    continue;
+                }
+                
+                $activity_date = $activity->fecha_creacion; // Ya está en formato Y-m-d
+                
+                // Si la fecha no existe en days_summary, la agregamos
+                if (!isset($days_summary[$activity_date])) {
+                    $days_summary[$activity_date] = [
+                        'date' => $activity_date,
+                        'has_pending' => false,
+                        'has_scheduled' => false,
+                        'has_completed' => false,
+                        'pending_count' => 0,
+                        'scheduled_count' => 0,
+                        'completed_count' => 0
+                    ];
+                }
+                
+                // Procesamos la actividad
+                $status = strtolower($activity->status);
+                
+                if ($status === 'pendiente') {
+                    $days_summary[$activity_date]['has_pending'] = true;
+                    $days_summary[$activity_date]['pending_count']++;
+                } elseif ($status === 'programado') {
+                    $days_summary[$activity_date]['has_scheduled'] = true;
+                    $days_summary[$activity_date]['scheduled_count']++;
+                } elseif ($status === 'completado') {
+                    $days_summary[$activity_date]['has_completed'] = true;
+                    $days_summary[$activity_date]['completed_count']++;
+                }
+            }
+            
+            // Quitar las actividades del array antes de devolverlo
+            unset($trackingArray['activities']);
+            
+            // Filtrar sólo los días que tengan al menos una actividad (pendiente, programada o completada)
+            $filtered_days_summary = array_filter($days_summary, function($day) {
+                return $day['has_pending'] || $day['has_scheduled'] || $day['has_completed'];
+            });
+            
+            // Agregar el resumen de días filtrado al array del tracking
+            $trackingArray['days_summary'] = array_values($filtered_days_summary);
+            
+            // Agregar contadores totales (calculados a partir del array original para mantener los totales correctos)
+            $trackingArray['total_pending'] = array_sum(array_column($days_summary, 'pending_count'));
+            $trackingArray['total_scheduled'] = array_sum(array_column($days_summary, 'scheduled_count'));
+            $trackingArray['total_completed'] = array_sum(array_column($days_summary, 'completed_count'));
+            
+            $result[] = $trackingArray;
+        }
+        
+        return response()->json($result);
+    }
+
+   
     /**  * Crea un nuevo tracking */
     public function createTracking(Request $request)
     {

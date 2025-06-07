@@ -130,6 +130,8 @@ Route::get('/endpoint/trackings/with-trashed', [TrackingController::class, 'trac
 Route::get('/endpoint/trackings/only-trashed', [TrackingController::class, 'trackingOnlyTrashed']);
 // obtener trackings por proyecto
 Route::get('/endpoint/trackings_project/{project_id}', [TrackingController::class, 'trackingByProject']);
+// obtener trackings por proyecto incluyendo eliminados
+Route::get('/endpoint/trackings_project_with_finish/{project_id}', [TrackingController::class, 'trackingByProjectWithTrashed']);
 // obtener trackings por semana y proyecto
 Route::get('/endpoint/trackings_week/{week_id}/{project_id}', [TrackingController::class, 'trackingByWeekByProject']);
 // obtener trackings por semana, proyecto y usuario
