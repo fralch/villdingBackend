@@ -10,12 +10,23 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\Activity;
 
-
 class TrackingController extends Controller
 {
-    /** * Obtiene todos los trackings */
+    /** * Obtiene todos los trackings (solo los no eliminados) */
     public function trackingAll(){
-        $trackings = Tracking::all();
+        $trackings = Tracking::all(); // Solo obtiene los no eliminados por defecto
+        return response()->json($trackings);
+    }
+
+    /** * Obtiene todos los trackings incluyendo los eliminados */
+    public function trackingAllWithTrashed(){
+        $trackings = Tracking::withTrashed()->get();
+        return response()->json($trackings);
+    }
+
+    /** * Obtiene solo los trackings eliminados */
+    public function trackingOnlyTrashed(){
+        $trackings = Tracking::onlyTrashed()->get();
         return response()->json($trackings);
     }
 
@@ -30,6 +41,7 @@ class TrackingController extends Controller
     */
     /** * Obtiene trackings de un proyecto específico con actividades pendientes/programadas por día */
     public function trackingByProject($project_id){
+        // Solo obtiene trackings no eliminados
         $trackings = Tracking::with('activities')->where('project_id', $project_id)->get();
         
         $result = [];
@@ -200,7 +212,7 @@ class TrackingController extends Controller
         }
     }
 
-    /** * Elimina un tracking específico */
+    /** * Elimina un tracking específico (soft delete) */
     public function deleteTracking($id)
     {
         DB::beginTransaction();
@@ -208,13 +220,13 @@ class TrackingController extends Controller
             // Buscar el tracking
             $tracking = Tracking::findOrFail($id);
             
-            // Eliminar el tracking y sus actividades relacionadas (gracias a la eliminación en cascada)
+            // Soft delete del tracking
             $tracking->delete();
             
             DB::commit();
 
             return response()->json([
-                'message' => 'Tracking eliminado exitosamente.'
+                'message' => 'Tracking eliminado exitosamente (soft delete).'
             ], 200);
 
         } catch (\Exception $e) {
@@ -222,6 +234,61 @@ class TrackingController extends Controller
             \Log::error('Error al eliminar el tracking: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Error al eliminar el tracking',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /** * Restaura un tracking eliminado */
+    public function restoreTracking($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Buscar el tracking eliminado
+            $tracking = Tracking::onlyTrashed()->findOrFail($id);
+            
+            // Restaurar el tracking
+            $tracking->restore();
+            
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tracking restaurado exitosamente.',
+                'tracking' => $tracking
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al restaurar el tracking: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al restaurar el tracking',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /** * Elimina permanentemente un tracking */
+    public function forceDeleteTracking($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Buscar el tracking (incluyendo eliminados)
+            $tracking = Tracking::withTrashed()->findOrFail($id);
+            
+            // Eliminar permanentemente
+            $tracking->forceDelete();
+            
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tracking eliminado permanentemente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al eliminar permanentemente el tracking: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al eliminar permanentemente el tracking',
                 'error'   => $e->getMessage()
             ], 500);
         }

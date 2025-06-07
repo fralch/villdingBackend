@@ -122,8 +122,12 @@ Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']
 
 
 // Trackings
-// obtener todos los trackings
+// obtener todos los trackings (solo activos)
 Route::get('/endpoint/trackings', [TrackingController::class, 'trackingAll']);
+// obtener todos los trackings incluyendo eliminados
+Route::get('/endpoint/trackings/with-trashed', [TrackingController::class, 'trackingAllWithTrashed']);
+// obtener solo trackings eliminados
+Route::get('/endpoint/trackings/only-trashed', [TrackingController::class, 'trackingOnlyTrashed']);
 // obtener trackings por proyecto
 Route::get('/endpoint/trackings_project/{project_id}', [TrackingController::class, 'trackingByProject']);
 // obtener trackings por semana y proyecto
@@ -139,7 +143,12 @@ Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'g
 // crear tracking
 Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTracking']);
 Route::post('/endpoint/tracking/update-title/{id}', [TrackingController::class, 'updateTrackingTitle']);
+// eliminar tracking (soft delete)
 Route::post('/endpoint/tracking/delete/{id}', [TrackingController::class, 'deleteTracking']);
+// restaurar tracking eliminado
+Route::post('/endpoint/tracking/restore/{id}', [TrackingController::class, 'restoreTracking']);
+// eliminar tracking permanentemente
+Route::delete('/endpoint/tracking/force-delete/{id}', [TrackingController::class, 'forceDeleteTracking']);
 // crear actividades
 Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
 Route::get('/endpoint/activities/all', [ActivityController::class, 'activityAll']);
