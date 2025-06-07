@@ -19,10 +19,21 @@ use App\Http\Controllers\Trackings\ActivityController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// ============================================================================
+// RUTAS PRINCIPALES
+// ============================================================================
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/endpoint', function () {
+    return view('welcome');
+});
+
+// ============================================================================
+// RUTAS DE IMÁGENES ESTÁTICAS
+// ============================================================================
 Route::get('/endpoint/images/profile/{filename}', function ($filename) {
     $path = public_path('images/profile/' . $filename);
 
@@ -62,106 +73,99 @@ Route::get('/endpoint/images/activities/{filename}', function ($filename) {
     return response($file, 200)->header("Content-Type", $type);
 });
 
-Route::get('/endpoint', function () {
-    return view('welcome');
-});
+// ============================================================================
+// RUTAS DE USUARIOS
+// ============================================================================
 
+// Gestión básica de usuarios
 Route::post('/endpoint/user/create', [UserController::class, 'create']);
-
 Route::post('/endpoint/user/update', [UserController::class, 'update']);
-
 Route::post('/endpoint/user/login', [UserController::class, 'login']);
-
 Route::post('/endpoint/user/email_exists', [UserController::class, 'emailExists']);
-
 Route::get('/endpoint/user/getSession', [UserController::class, 'getSession']);
-
 Route::get('/endpoint/user/all', [UserController::class, 'all']);
-
 Route::get('/endpoint/user/{id}', [UserController::class, 'show']);
+Route::post('/endpoint/user/user_code', [UserController::class, 'searchUserByCode']);
 
-
-Route::post('/endpoint/user/user_code', [UserController::class, 'searchUserByCode']); 
-
+// Códigos de usuario
 Route::post('/endpoint/user/generate-code', [UserCodeController::class, 'generateCode']);
-
 Route::post('/endpoint/user/verify-code', [UserCodeController::class, 'verifyCode']);
-
 Route::get('/endpoint/user/show-codes', [UserCodeController::class, 'showCodes']);
 
+// Administración de usuarios
+Route::post('/endpoint/user/makeadmin', [UserController::class, 'makeAdmin']);
+Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']);
+
+// Vinculación usuario-proyecto
+Route::post('/endpoint/user/check-attachment', [UserController::class, 'checkAttachmentUserProject']);
+
+// ============================================================================
+// RUTAS DE PROYECTOS
+// ============================================================================
+
+// Tipos de proyecto
 Route::get('/endpoint/project/types', [ProjectTypeController::class, 'all']);
 Route::post('/endpoint/project/type/store', [ProjectTypeController::class, 'store']);
 Route::get('/endpoint/project/types/{project_id}', [ProjectController::class, 'getProjectTypes']);
-Route::get('/endpoint/project/subtypes/{project_id}', [ProjectController::class, 'getProjectSubtypes']);
 
+// Subtipos de proyecto
 Route::get('/endpoint/project/subtypes', [ProjectSubtypeController::class, 'all']);
 Route::post('/endpoint/project/subtype/store', [ProjectSubtypeController::class, 'store']);
+Route::get('/endpoint/project/subtypes/{project_id}', [ProjectController::class, 'getProjectSubtypes']);
 
-// Projects
+// Gestión de proyectos
 Route::get('/endpoint/projects', [ProjectController::class, 'all']);
 Route::post('/endpoint/project/store', [ProjectController::class, 'store']);
 Route::post('/endpoint/project/update/{id}', [ProjectController::class, 'updateProject']);
 Route::delete('/endpoint/project/destroy/{id}', [ProjectController::class, 'destroyProject']);
 
-// Projects entities
+// Entidades de proyecto
 Route::post('/endpoint/project/entities/create', [ProjectController::class, 'createProjectEntities']);
 Route::get('/endpoint/project/entities/check/{project_id}', [ProjectController::class, 'checkProjectEntities']);
 
-//attachProject
-Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']); // vincular proyecto a usuario
-Route::post('/endpoint/project/detach', [ProjectController::class, 'detachProject']); // desvincular proyecto a usuario
+// Vinculación proyecto-usuario
+Route::post('/endpoint/project/attach', [ProjectController::class, 'attachProject']);
+Route::post('/endpoint/project/detach', [ProjectController::class, 'detachProject']);
 Route::post('/endpoint/project/check-attachment', [ProjectController::class, 'checkAttachmentProjectUser']);
-Route::post('/endpoint/user/check-attachment', [UserController::class, 'checkAttachmentUserProject']);
 
+// ============================================================================
+// RUTAS DE SEGUIMIENTOS (Trackings)
+// ============================================================================
 
-// make user admin 
-Route::post('/endpoint/user/makeadmin', [UserController::class, 'makeAdmin']);
-// remove user admin
-Route::post('/endpoint/user/removeadmin', [UserController::class, 'removeAdmin']);
-
-
-
-// Trackings
-// obtener todos los trackings (solo activos)
+// Obtener los seguimientos (Trackings)
 Route::get('/endpoint/trackings', [TrackingController::class, 'trackingAll']);
-// obtener todos los trackings incluyendo eliminados
 Route::get('/endpoint/trackings/with-trashed', [TrackingController::class, 'trackingAllWithTrashed']);
-// obtener solo trackings eliminados
 Route::get('/endpoint/trackings/only-trashed', [TrackingController::class, 'trackingOnlyTrashed']);
-// obtener trackings por proyecto
 Route::get('/endpoint/trackings_project/{project_id}', [TrackingController::class, 'trackingByProject']);
-// obtener trackings por proyecto incluyendo eliminados
 Route::get('/endpoint/trackings_project_with_finish/{project_id}', [TrackingController::class, 'trackingByProjectWithTrashed']);
-// obtener trackings por semana y proyecto
 Route::get('/endpoint/trackings_week/{week_id}/{project_id}', [TrackingController::class, 'trackingByWeekByProject']);
-// obtener trackings por semana, proyecto y usuario
 Route::get('/endpoint/trackings_week_user/{week_id}/{project_id}/{user_id}', [TrackingController::class, 'trackingByWeekByProjectByUser']);
-// obtener semanas de un proyecto
-Route::get('/endpoint/weeks/{project_id}/', [TrackingController::class, 'getWeeksByProject']);
-// obtener dias de una semana
-Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDaysByWeek']);
-// obtener dias de un proyecto
-Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
-// crear tracking
+
+// Gestión de trackings
 Route::post('/endpoint/trackings/create', [TrackingController::class, 'createTracking']);
 Route::post('/endpoint/tracking/update-title/{id}', [TrackingController::class, 'updateTrackingTitle']);
-// eliminar tracking (soft delete)
 Route::post('/endpoint/tracking/delete/{id}', [TrackingController::class, 'deleteTracking']);
-// restaurar tracking eliminado
 Route::post('/endpoint/tracking/restore/{id}', [TrackingController::class, 'restoreTracking']);
-// eliminar tracking permanentemente
 Route::delete('/endpoint/tracking/force-delete/{id}', [TrackingController::class, 'forceDeleteTracking']);
-// crear actividades
-Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
+
+// Gestión de trackings por tiempo
+Route::get('/endpoint/weeks/{project_id}/', [TrackingController::class, 'getWeeksByProject']);
+Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDaysByWeek']);
+Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
+
+// ============================================================================
+// RUTAS DE ACTIVIDADES
+// ============================================================================
+
+// Obtener actividades
 Route::get('/endpoint/activities/all', [ActivityController::class, 'activityAll']);
 Route::get('/endpoint/activities/project/{project_id}', [ActivityController::class, 'activityByProject']);
 Route::get('/endpoint/activities/tracking/{tracking_id}', [ActivityController::class, 'activityByTracking']);
+
+// Gestión de actividades
+Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
 Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActivity']);
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
 Route::post('/endpoint/activities_complete', [ActivityController::class, 'completeActivity']);
 Route::post('/endpoint/activities_check/{id}', [ActivityController::class, 'updateActivityStatusByDate']);
 Route::post('/endpoint/activities_delete/{id}', [ActivityController::class, 'deleteActivity']);
-
-
-
-
