@@ -306,22 +306,25 @@ class TrackingController extends Controller
     }
 
     /** * Elimina un tracking específico (soft delete) */
-    public function deleteTracking($id)
+    public function deleteTracking($id, Request $request)
     {
         DB::beginTransaction();
         try {
             // Buscar el tracking
             $tracking = Tracking::findOrFail($id);
             
-            // Soft delete del tracking
-            $tracking->delete();
+            // Usar timestamp del request o now() por defecto
+            $deletedAt = $request->input('deleted_at', now());
+            
+            $tracking->deleted_at = $deletedAt;
+            $tracking->save();
             
             DB::commit();
-
+    
             return response()->json([
                 'message' => 'Tracking eliminado exitosamente (soft delete).'
             ], 200);
-
+    
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al eliminar el tracking: ' . $e->getMessage());
