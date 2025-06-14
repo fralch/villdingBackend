@@ -63,17 +63,7 @@ class ActivityController extends Controller
             // Establecer un valor predeterminado para 'horas' si es null
             $validatedData['horas'] = $validatedData['horas'] ?? '0';
 
-            // Check for duplicates based on project_id and name only
-            $existingActivity = Activity::where('project_id', $validatedData['project_id'])
-                ->where('name', $validatedData['name'])
-                ->first();
-            
-            if ($existingActivity) {
-                return response()->json([
-                    'message' => 'Ya existe una actividad con este nombre en el proyecto.',
-                    'activity' => $existingActivity,
-                ], 409); // 409 Conflict status code
-            }
+            // Duplicate validation removed - activities can now have the same name
 
             // Set timezone to Lima, Peru
             date_default_timezone_set('America/Lima');
@@ -147,30 +137,7 @@ class ActivityController extends Controller
             ]);
             \Log::info('Datos validados: ' . json_encode($validatedData));
             
-            // Verificar si se está intentando cambiar el nombre
-            if (isset($validatedData['name']) && $validatedData['name'] !== $activity->name) {
-                \Log::info('Verificando duplicados para el nuevo nombre: ' . $validatedData['name']);
-                
-                // Determinar project_id y tracking_id a usar para la verificación
-                $projectId = $validatedData['project_id'] ?? $activity->project_id;
-                $trackingId = $validatedData['tracking_id'] ?? $activity->tracking_id;
-                
-                // Verificar si ya existe otra actividad con el mismo nombre (excluyendo la actual)
-                $existingActivity = Activity::where('project_id', $projectId)
-                    ->where('tracking_id', $trackingId)
-                    ->where('name', $validatedData['name'])
-                    ->where('id', '!=', $id) // Excluir la actividad actual
-                    ->first();
-                
-                if ($existingActivity) {
-                    \Log::warning('Se encontró una actividad existente con el mismo nombre: ' . $existingActivity->id);
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Ya existe otra actividad con este nombre.',
-                        'activity' => $existingActivity,
-                    ], 409); // 409 Conflict status code
-                }
-            }
+            // Duplicate validation removed - activities can now have the same name during updates
 
             // Mantener las imágenes actuales
             // Nota: No se modifican las imágenes en esta función
