@@ -438,10 +438,15 @@ class ActivityController extends Controller
         $fileName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
 
         try {
-            $storedPath = Storage::disk('s3')->putFileAs('activities', $image, $fileName);
+            // Usar S3 en producción, almacenamiento local en desarrollo
+            if (app()->environment('production')) {
+                $storedPath = Storage::disk('s3')->putFileAs('activities', $image, $fileName);
+            } else {
+                $storedPath = Storage::disk('public')->putFileAs('activities', $image, $fileName);
+            }
             return $storedPath;
         } catch (\Exception $e) {
-            \Log::error('Error subiendo imagen a S3: ' . $e->getMessage());
+            \Log::error('Error subiendo imagen: ' . $e->getMessage());
             throw new \Exception('Error processing image: ' . $e->getMessage());
         }
     }
@@ -481,12 +486,16 @@ class ActivityController extends Controller
             return;
         }
 
-        if (Storage::disk('s3')->exists($imageKey)) {
-            Storage::disk('s3')->delete($imageKey);
-            \Log::info('Imagen eliminada de S3: ' . $imageKey);
+        // Usar el disco apropiado según el entorno
+        $disk = app()->environment('production') ? 's3' : 'public';
+
+        if (Storage::disk($disk)->exists($imageKey)) {
+            Storage::disk($disk)->delete($imageKey);
+            \Log::info('Imagen eliminada de ' . $disk . ': ' . $imageKey);
             return;
         }
 
+        // Fallback para archivos locales antiguos
         $localPath = public_path('images/activities/' . basename($imageKey));
         if (file_exists($localPath)) {
             unlink($localPath);

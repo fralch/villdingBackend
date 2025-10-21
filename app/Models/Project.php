@@ -99,7 +99,12 @@ class Project extends Model
             return asset($value);
         }
 
-        return Storage::disk('s3')->url($value);
+        // Usar S3 en producción, almacenamiento local en desarrollo
+        if (config('app.env') === 'production') {
+            return Storage::disk('s3')->url($value);
+        } else {
+            return Storage::disk('public')->url($value);
+        }
     }
     
 }

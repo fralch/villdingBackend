@@ -82,6 +82,11 @@ class User extends Authenticatable
             return asset($value);
         }
 
-        return Storage::disk('s3')->url($value);
+        // En desarrollo usar almacenamiento local, en producción usar S3
+        if (config('app.env') === 'production') {
+            return Storage::disk('s3')->url($value);
+        } else {
+            return Storage::disk('public')->url($value);
+        }
     }
 }

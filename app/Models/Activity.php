@@ -78,7 +78,12 @@ class Activity extends Model
         }
 
         if (Str::contains($path, '/')) {
-            return Storage::disk('s3')->url($path);
+            // Usar S3 en producción, almacenamiento local en desarrollo
+            if (config('app.env') === 'production') {
+                return Storage::disk('s3')->url($path);
+            } else {
+                return Storage::disk('public')->url($path);
+            }
         }
 
         return asset('images/activities/' . ltrim($path, '/'));

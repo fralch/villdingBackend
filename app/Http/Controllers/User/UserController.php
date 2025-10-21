@@ -32,7 +32,13 @@ class UserController extends Controller
         if ($request->hasFile('uri')) {
             $image = $request->file('uri');
             $fileName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
-            $profileImagePath = Storage::disk('s3')->putFileAs('profiles', $image, $fileName);
+            
+            // Usar almacenamiento local para desarrollo, S3 para producción
+            if (config('app.env') === 'production') {
+                $profileImagePath = Storage::disk('s3')->putFileAs('profiles', $image, $fileName);
+            } else {
+                $profileImagePath = Storage::disk('public')->putFileAs('profiles', $image, $fileName);
+            }
         }
 
         // Crear el usuario
