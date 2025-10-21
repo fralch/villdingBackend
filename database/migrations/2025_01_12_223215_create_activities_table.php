@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name'); // Nombre de la actividad
             $table->text('description')->nullable(); // Descripción de la actividad
             $table->string('location')->nullable(); // Ubicación de la actividad
-            $table->string('horas')->nullble(); // Horas de inicio y fin de la actividad
+            $table->string('horas')->nullable(); // Horas de inicio y fin de la actividad
             $table->string('status')->default('pendiente'); // pendiente, en progreso, finalizado
             $table->string('icon')->nullable(); // Icono relacionado con la actividad
             $table->string('image')->nullable(); // Imagen asociada a la actividad

@@ -397,12 +397,12 @@ class TrackingController extends Controller
      */
     public function generateDailyReport(Request $request, $tracking_id)
     {
-        try {
-            // Validar la fecha
-            $validatedData = $request->validate([
-                'date' => 'required|date|date_format:Y-m-d',
-            ]);
+        // Validar la fecha (esto lanzará ValidationException si falla)
+        $validatedData = $request->validate([
+            'date' => 'required|date|date_format:Y-m-d',
+        ]);
 
+        try {
             $reportDate = $validatedData['date'];
 
             // Obtener el tracking con sus relaciones
@@ -449,6 +449,10 @@ class TrackingController extends Controller
             // Retornar el PDF para descarga
             return $pdf->download($fileName);
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Tracking no encontrado'
+            ], 404);
         } catch (\Exception $e) {
             \Log::error('Error al generar reporte diario: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
