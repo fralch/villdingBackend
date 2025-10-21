@@ -9,6 +9,7 @@ use App\Models\Tracking;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Activity;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TrackingController extends Controller
 {
@@ -370,10 +371,10 @@ class TrackingController extends Controller
         try {
             // Buscar el tracking (incluyendo eliminados)
             $tracking = Tracking::withTrashed()->findOrFail($id);
-            
+
             // Eliminar permanentemente
             $tracking->forceDelete();
-            
+
             DB::commit();
 
             return response()->json([
@@ -385,6 +386,74 @@ class TrackingController extends Controller
             \Log::error('Error al eliminar permanentemente el tracking: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Error al eliminar permanentemente el tracking',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /** * Genera un reporte diario de actividades en PDF
+     * @param int $tracking_id ID del tracking
+     * @param string $date Fecha del reporte (formato Y-m-d)
+     */
+    public function generateDailyReport(Request $request, $tracking_id)
+    {
+        try {
+            // Validar la fecha
+            $validatedData = $request->validate([
+                'date' => 'required|date|date_format:Y-m-d',
+            ]);
+
+            $reportDate = $validatedData['date'];
+
+            // Obtener el tracking con sus relaciones
+            $tracking = Tracking::with(['project.type', 'project.subtype'])
+                ->findOrFail($tracking_id);
+
+            // Obtener las actividades del día específico
+            $activities = Activity::where('tracking_id', $tracking_id)
+                ->whereDate('fecha_creacion', $reportDate)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            // Calcular el número de semana basado en date_start del tracking
+            $startDate = \Carbon\Carbon::parse($tracking->date_start);
+            $currentDate = \Carbon\Carbon::parse($reportDate);
+            $weekNumber = $startDate->diffInWeeks($currentDate) + 1;
+
+            // Formatear la fecha para el reporte
+            $formattedDate = \Carbon\Carbon::parse($reportDate)
+                ->locale('es')
+                ->isoFormat('dddd, D [de] MMMM [de] YYYY');
+
+            // Preparar los datos para la vista
+            $data = [
+                'tracking' => $tracking,
+                'project' => $tracking->project,
+                'activities' => $activities,
+                'reportDate' => $reportDate,
+                'formattedDate' => $formattedDate,
+                'weekNumber' => str_pad($weekNumber, 3, '0', STR_PAD_LEFT),
+            ];
+
+            // Generar el PDF
+            $pdf = Pdf::loadView('reports.daily-activity-report', $data);
+
+            // Configurar el PDF
+            $pdf->setPaper('a4', 'portrait');
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isRemoteEnabled', true);
+
+            // Nombre del archivo
+            $fileName = 'reporte_diario_' . $tracking->project->name . '_' . $reportDate . '.pdf';
+
+            // Retornar el PDF para descarga
+            return $pdf->download($fileName);
+
+        } catch (\Exception $e) {
+            \Log::error('Error al generar reporte diario: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'message' => 'Error al generar reporte diario',
                 'error'   => $e->getMessage()
             ], 500);
         }
