@@ -6,6 +6,7 @@
     <title>Reporte Diario - {{ $project->name }}</title>
     <style>
         @page {
+            size: A4;
             margin: 0;
         }
         body {
@@ -13,146 +14,175 @@
             color: #333;
             font-size: 10pt;
             margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         .page-break {
             page-break-after: always;
         }
+
+        /* Cover Page */
         .cover-page {
-            background-color: #f0f4f8;
-            height: 100vh;
-            padding: 50px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            height: 100vh;
+            background-color: #f8f9fa;
+            padding: 3cm;
+            text-align: center;
         }
         .cover-header {
             text-align: right;
+            height: 50px;
         }
         .cover-header img {
-            max-width: 150px;
+            max-height: 50px;
         }
         .cover-body {
-            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .cover-title {
-            font-size: 32pt;
+            font-size: 28pt;
             font-weight: bold;
-            color: #1a4d5c;
-            margin-bottom: 20px;
+            color: #2c3e50;
+            margin-bottom: 15px;
         }
         .cover-project-name {
-            font-size: 24pt;
-            color: #2c7a7b;
-            margin-bottom: 40px;
+            font-size: 20pt;
+            color: #34495e;
+            margin-bottom: 30px;
         }
         .cover-image-container {
-            width: 70%;
-            margin: 0 auto 40px;
-            border: 4px solid #2c7a7b;
-            padding: 10px;
+            width: 100%;
+            max-width: 15cm;
+            margin: 0 auto 30px;
+            border: 1px solid #dee2e6;
+            padding: 8px;
             background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
         .cover-image {
             max-width: 100%;
-            max-height: 350px;
-            object-fit: cover;
+            max-height: 8cm;
+            object-fit: contain;
         }
         .cover-footer {
-            text-align: center;
-            font-size: 12pt;
-            color: #555;
+            font-size: 11pt;
+            color: #7f8c8d;
         }
-        .activities-page {
-            padding: 40px 50px;
+        .cover-footer div {
+            margin-bottom: 5px;
+        }
+
+        /* Content Pages */
+        .content-page {
+            padding: 2cm;
             position: relative;
-            min-height: 95vh;
+            min-height: calc(100vh - 4cm); /* Full A4 height minus padding */
         }
         .page-header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #1a4d5c;
-            padding-bottom: 10px;
-        }
-        .page-header h1 {
-            font-size: 20pt;
-            color: #1a4d5c;
-            margin: 0;
-        }
-        .page-header h2 {
-            font-size: 14pt;
-            color: #2c7a7b;
-            margin: 5px 0;
+            position: absolute;
+            top: 1cm;
+            left: 2cm;
+            right: 2cm;
+            text-align: right;
+            font-size: 9pt;
+            color: #7f8c8d;
         }
         .page-footer {
             position: absolute;
-            bottom: 10px;
-            left: 50px;
-            right: 50px;
+            bottom: 1cm;
+            left: 2cm;
+            right: 2cm;
             text-align: center;
             font-size: 9pt;
-            color: #888;
-            border-top: 1px solid #ddd;
-            padding-top: 5px;
+            color: #7f8c8d;
+            border-top: 1px solid #dee2e6;
+            padding-top: 8px;
         }
+        .page-title {
+            text-align: center;
+            font-size: 18pt;
+            color: #2c3e50;
+            margin-bottom: 1.5cm;
+            font-weight: bold;
+        }
+
+        /* Activity Card */
         .activity-card {
-            margin-bottom: 20px;
+            margin-bottom: 1cm;
             page-break-inside: avoid;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 4px;
+            background: #ffffff;
             overflow: hidden;
-            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .activity-header {
-            background-color: #1a4d5c;
+            background-color: #34495e;
             color: white;
-            padding: 12px 15px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .activity-name {
-            font-size: 14pt;
+            font-size: 13pt;
             font-weight: bold;
         }
         .activity-status {
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 5px 12px;
+            border-radius: 4px;
             font-size: 9pt;
             font-weight: bold;
             text-transform: uppercase;
         }
-        .activity-status.completado { background-color: #4ade80; color: #1a4d5c; }
-        .activity-status.programado { background-color: #fbbf24; color: #1a4d5c; }
-        .activity-status.pendiente { background-color: #ef4444; color: white; }
+        .activity-status.completado { background-color: #27ae60; color: white; }
+        .activity-status.programado { background-color: #f39c12; color: white; }
+        .activity-status.pendiente { background-color: #c0392b; color: white; }
+
         .activity-body {
-            display: flex;
             padding: 15px;
+        }
+        .activity-grid {
+            display: flex;
             gap: 15px;
         }
         .activity-details {
-            width: 50%;
-        }
-        .activity-description {
-            font-size: 10pt;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-        .activity-meta {
-            font-size: 9pt;
-            color: #555;
+            width: 55%;
         }
         .activity-images {
-            width: 50%;
+            width: 45%;
+        }
+        .detail-item {
+            margin-bottom: 12px;
+        }
+        .detail-item strong {
+            display: block;
+            font-size: 9pt;
+            color: #7f8c8d;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+        .detail-item p {
+            margin: 0;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        .activity-images-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
         .activity-image-container {
-            border: 1px solid #ddd;
+            border: 1px solid #dee2e6;
             border-radius: 4px;
-            background-color: #f9f9f9;
-            height: 150px;
+            background-color: #f8f9fa;
+            height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -163,29 +193,40 @@
             max-height: 100%;
             object-fit: cover;
         }
+        .no-images-placeholder {
+            grid-column: span 2;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            color: #bdc3c7;
+            border-radius: 4px;
+            border: 1px dashed #dee2e6;
+        }
         .no-activities {
             text-align: center;
-            padding: 100px 20px;
-            font-size: 16pt;
-            color: #999;
+            padding: 5cm 1cm;
+            font-size: 14pt;
+            color: #95a5a6;
         }
     </style>
 </head>
 <body>
-    <!-- PORTADA -->
+    <!-- COVER PAGE -->
     <div class="cover-page">
         <div class="cover-header">
-            <!-- Puedes poner un logo aquí -->
+            <!-- You can place a logo here -->
             <!-- <img src="URL_DEL_LOGO" alt="Logo"> -->
         </div>
         <div class="cover-body">
-            <div class="cover-title">REPORTE DE SEGUIMIENTO</div>
-            <div class="cover-project-name">{{ strtoupper($project->name) }}</div>
+            <div class="cover-title">REPORTE DE SEGUIMIENTO DE ACTIVIDADES</div>
             @if($project->uri)
                 <div class="cover-image-container">
-                    <img src="{{ $project->uri }}" alt="Proyecto" class="cover-image">
+                    <img src="{{ $project->uri }}" alt="Imagen del Proyecto" class="cover-image">
                 </div>
             @endif
+            <div class="cover-project-name">{{ strtoupper($project->name) }}</div>
         </div>
         <div class="cover-footer">
             <div><strong>Seguimiento:</strong> {{ $tracking->title }}</div>
@@ -196,19 +237,20 @@
 
     <div class="page-break"></div>
 
-    <!-- PÁGINAS DE ACTIVIDADES -->
+    <!-- ACTIVITY PAGES -->
     @if($activities->count() > 0)
         @php
-            $activitiesPerPage = 3;
+            $activitiesPerPage = 2; // Adjusted for more detail and better spacing
             $chunks = $activities->chunk($activitiesPerPage);
         @endphp
 
         @foreach($chunks as $chunkIndex => $chunk)
-            <div class="activities-page">
+            <div class="content-page">
                 <div class="page-header">
-                    <h1>{{ strtoupper($tracking->title) }}</h1>
-                    <h2>{{ ucfirst($formattedDate) }}</h2>
+                    <span>{{ $project->name }} | {{ $formattedDate }}</span>
                 </div>
+
+                <h1 class="page-title">{{ strtoupper($tracking->title) }}</h1>
 
                 @foreach($chunk as $activity)
                     @php
@@ -222,39 +264,51 @@
                             <span class="activity-status {{ $statusClass }}">{{ $activity->status }}</span>
                         </div>
                         <div class="activity-body">
-                            <div class="activity-details">
-                                <div class="activity-description">
-                                    {{ $activity->description ?? 'Sin descripción.' }}
-                                </div>
-                                <div class="activity-meta">
+                            <div class="activity-grid">
+                                <div class="activity-details">
+                                    <div class="detail-item">
+                                        <strong>Descripción</strong>
+                                        <p>{{ $activity->description ?? 'Sin descripción.' }}</p>
+                                    </div>
                                     @if($activity->location)
-                                        <div><strong>Ubicación:</strong> {{ $activity->location }}</div>
+                                    <div class="detail-item">
+                                        <strong>Ubicación</strong>
+                                        <p>{{ $activity->location }}</p>
+                                    </div>
                                     @endif
                                     @if($activity->comments)
-                                        <div><strong>Comentarios:</strong> {{ $activity->comments }}</div>
-                                    @endif
-                                    <div><strong>Horas:</strong> {{ $activity->horas ?? 'N/A' }}</div>
-                                </div>
-                            </div>
-                            <div class="activity-images">
-                                @if(count($imageUrls) > 0)
-                                    @foreach(array_slice($imageUrls, 0, 4) as $imageUrl)
-                                        <div class="activity-image-container">
-                                            <img src="{{ $imageUrl }}" alt="Actividad" class="activity-image">
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="activity-image-container" style="grid-column: span 2;">
-                                        <span>Sin imágenes</span>
+                                    <div class="detail-item">
+                                        <strong>Comentarios</strong>
+                                        <p>{{ $activity->comments }}</p>
                                     </div>
-                                @endif
+                                    @endif
+                                    <div class="detail-item">
+                                        <strong>Horas</strong>
+                                        <p>{{ $activity->horas ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="activity-images">
+                                    <div class="activity-images-grid">
+                                        @if(count($imageUrls) > 0)
+                                            @foreach(array_slice($imageUrls, 0, 4) as $imageUrl)
+                                                <div class="activity-image-container">
+                                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="activity-image">
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="no-images-placeholder">
+                                                <span>Sin Imágenes</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
 
                 <div class="page-footer">
-                    <span>Reporte de Seguimiento - {{ $project->name }}</span> | Página {{ $loop->iteration }} de {{ $chunks->count() }}
+                    <span>Página {{ $loop->iteration }} de {{ $chunks->count() }}</span>
                 </div>
             </div>
 
@@ -263,16 +317,16 @@
             @endif
         @endforeach
     @else
-        <div class="activities-page">
+        <div class="content-page">
             <div class="page-header">
-                <h1>{{ strtoupper($tracking->title) }}</h1>
-                <h2>{{ ucfirst($formattedDate) }}</h2>
+                <span>{{ $project->name }} | {{ $formattedDate }}</span>
             </div>
+            <h1 class="page-title">{{ strtoupper($tracking->title) }}</h1>
             <div class="no-activities">
                 No hay actividades registradas para este día.
             </div>
             <div class="page-footer">
-                <span>Reporte de Seguimiento - {{ $project->name }}</span>
+                <span>Página 1 de 1</span>
             </div>
         </div>
     @endif
