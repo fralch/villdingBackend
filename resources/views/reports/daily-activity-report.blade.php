@@ -198,7 +198,7 @@
             border: 1px solid #dee2e6;
             border-radius: 8px;
             background-color: #f8f9fa;
-            height: 160px; /* Imágenes más grandes */
+            height: 320px; /* Imágenes más grandes */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -211,7 +211,7 @@
         }
         .no-images-placeholder {
             grid-column: span 2;
-            height: 160px; /* Coincide con el contenedor */
+            height: 320px; /* Coincide con el contenedor */
             display: flex;
             align-items: center;
             justify-content: center;
