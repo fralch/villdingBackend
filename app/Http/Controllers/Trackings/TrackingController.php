@@ -403,6 +403,10 @@ class TrackingController extends Controller
         ]);
 
         try {
+            // Incrementar límites para producción
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '512M');
+
             $reportDate = $validatedData['date'];
 
             // Obtener el tracking con sus relaciones
@@ -420,10 +424,30 @@ class TrackingController extends Controller
             $currentDate = \Carbon\Carbon::parse($reportDate);
             $weekNumber = $startDate->diffInWeeks($currentDate) + 1;
 
-            // Formatear la fecha para el reporte
-            $formattedDate = \Carbon\Carbon::parse($reportDate)
-                ->locale('es')
-                ->isoFormat('dddd, D [de] MMMM [de] YYYY');
+            // Formatear la fecha para el reporte (con fallback si locale español no está disponible)
+            try {
+                $formattedDate = \Carbon\Carbon::parse($reportDate)
+                    ->locale('es')
+                    ->isoFormat('dddd, D [de] MMMM [de] YYYY');
+            } catch (\Exception $e) {
+                // Fallback manual si locale español no está disponible
+                \Log::warning('Locale español no disponible, usando formato alternativo');
+                $months = [
+                    1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+                    5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+                    9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+                ];
+                $days = [
+                    0 => 'domingo', 1 => 'lunes', 2 => 'martes', 3 => 'miércoles',
+                    4 => 'jueves', 5 => 'viernes', 6 => 'sábado'
+                ];
+                $date = \Carbon\Carbon::parse($reportDate);
+                $dayName = $days[$date->dayOfWeek];
+                $day = $date->day;
+                $monthName = $months[$date->month];
+                $year = $date->year;
+                $formattedDate = ucfirst($dayName) . ', ' . $day . ' de ' . $monthName . ' de ' . $year;
+            }
 
             // Preparar los datos para la vista
             $data = [
@@ -435,30 +459,49 @@ class TrackingController extends Controller
                 'weekNumber' => str_pad($weekNumber, 3, '0', STR_PAD_LEFT),
             ];
 
-            // Generar el PDF
+            // Generar el PDF con manejo mejorado de errores
             $pdf = Pdf::loadView('reports.daily-activity-report', $data);
 
-            // Configurar el PDF
+            // Configurar el PDF con opciones de producción
             $pdf->setPaper('a4', 'portrait');
             $pdf->setOption('isHtml5ParserEnabled', true);
             $pdf->setOption('isRemoteEnabled', true);
 
-            // Nombre del archivo
-            $fileName = 'reporte_diario_' . $tracking->project->name . '_' . $reportDate . '.pdf';
+            // Opciones adicionales para producción
+            $pdf->setOption('chroot', [storage_path('app/public'), public_path()]);
+            $pdf->setOption('enable_remote', true);
+            $pdf->setOption('defaultFont', 'Helvetica');
+
+            // Timeout para carga de imágenes externas
+            $pdf->setOption('httpContext', [
+                'http' => [
+                    'timeout' => 30,
+                    'ignore_errors' => true
+                ]
+            ]);
+
+            // Nombre del archivo (sanitizar nombre del proyecto)
+            $projectName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $tracking->project->name);
+            $fileName = 'reporte_diario_' . $projectName . '_' . $reportDate . '.pdf';
 
             // Retornar el PDF para descarga
             return $pdf->download($fileName);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            \Log::error('Tracking no encontrado: ' . $tracking_id);
             return response()->json([
                 'message' => 'Tracking no encontrado'
             ], 404);
         } catch (\Exception $e) {
             \Log::error('Error al generar reporte diario: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Tracking ID: ' . $tracking_id);
+            \Log::error('Report Date: ' . ($reportDate ?? 'N/A'));
+
             return response()->json([
                 'message' => 'Error al generar reporte diario',
-                'error'   => $e->getMessage()
+                'error'   => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getTraceAsString() : 'Enable debug mode for details'
             ], 500);
         }
     }
