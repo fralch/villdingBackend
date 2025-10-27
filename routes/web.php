@@ -111,6 +111,9 @@ Route::get('/endpoint/weeks/{project_id}/', [TrackingController::class, 'getWeek
 Route::get('/endpoint/days_week/{week_id}/', [TrackingController::class, 'getDaysByWeek']);
 Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'getDaysByProject']);
 
+// Reportes de tracking
+Route::post('/endpoint/tracking/report/daily/{tracking_id}', [TrackingController::class, 'generateDailyReport']);
+
 // ============================================================================
 // RUTAS DE ACTIVIDADES
 // ============================================================================
