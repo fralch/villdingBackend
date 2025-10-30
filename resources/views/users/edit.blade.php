@@ -3,35 +3,31 @@
 @section('title', 'Editar Usuario')
 
 @section('content')
-<!-- Header Section -->
-<div class="header-section mb-5">
-    <div class="container-fluid">
+<!-- Encabezado -->
+<div class="container-fluid">
+    <div class="bg-white rounded-3 p-3 p-md-4 mb-4 shadow-sm border">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="icon-wrapper me-3">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="me-3 d-inline-flex align-items-center justify-content-center rounded-3 border" style="width:40px;height:40px;color:var(--bs-secondary-color);background-color: rgba(var(--bs-primary-rgb), .04);">
                         <i class="fas fa-user-edit"></i>
                     </div>
                     <div>
-                        <h1 class="page-title mb-1">Editar Usuario</h1>
-                        <p class="page-subtitle mb-0">Actualiza la información del usuario {{ $user->name }}</p>
+                        <h4 class="mb-1 fw-semibold">Editar Usuario</h4>
+                        <p class="mb-0 text-muted">Actualiza la información de {{ $user->name }}</p>
                     </div>
                 </div>
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb custom-breadcrumb">
+                    <ol class="breadcrumb breadcrumb-sm mb-0">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('users.index') }}">
-                                <i class="fas fa-users me-1"></i>Usuarios
-                            </a>
+                            <a href="{{ route('users.index') }}"><i class="fas fa-users me-1 text-muted"></i>Usuarios</a>
                         </li>
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('users.show', $user->id) }}">{{ $user->name }}</a>
-                        </li>
-                        <li class="breadcrumb-item active">Editar</li>
+                        <li class="breadcrumb-item"><a href="{{ route('users.show', $user->id) }}">{{ $user->name }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Editar</li>
                     </ol>
                 </nav>
             </div>
-            <div class="col-md-4 text-end">
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <a href="{{ route('users.show', $user->id) }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Volver al Perfil
                 </a>
@@ -355,18 +351,32 @@
 <style>
     /* Form Styling */
     .form-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        border: none;
+        background-color: #fff;
+        border-radius: .75rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid var(--bs-border-color);
         overflow: hidden;
     }
 
     .form-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        margin: -1.5rem -1.5rem 2rem -1.5rem;
+        background-color: #fff;
+        color: var(--bs-body-color);
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--bs-border-color);
+        margin: 0 0 1.5rem 0;
+    }
+
+    .form-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--bs-border-color);
+        border-radius: .75rem;
+        color: var(--bs-secondary-color);
+        background-color: rgba(var(--bs-primary-rgb), .04);
+        font-size: 1rem;
     }
 
     .form-header h4 {
@@ -400,15 +410,16 @@
     }
 
     .section-icon {
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--bs-border-color);
+        border-radius: .75rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 1.2rem;
+        color: var(--bs-secondary-color);
+        background-color: rgba(var(--bs-primary-rgb), .04);
+        font-size: 1rem;
     }
 
     .section-title {
@@ -424,39 +435,39 @@
 
     /* Floating Labels */
     .form-floating > label {
-        color: #718096;
+        color: var(--bs-secondary-color);
         font-weight: 500;
     }
 
     .form-floating > .form-control:focus ~ label,
     .form-floating > .form-control:not(:placeholder-shown) ~ label {
-        color: #667eea;
+        color: var(--bs-primary);
         transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
     }
 
     .form-floating > .form-control {
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid var(--bs-border-color);
+        border-radius: .75rem;
         padding: 1rem 0.75rem;
         font-size: 1rem;
         transition: all 0.3s ease;
     }
 
     .form-floating > .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.12);
     }
 
     .form-floating > .form-select {
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid var(--bs-border-color);
+        border-radius: .75rem;
         padding: 1rem 0.75rem;
         transition: all 0.3s ease;
     }
 
     .form-floating > .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.12);
     }
 
     /* Password Toggle */
@@ -467,7 +478,7 @@
         transform: translateY(-50%);
         background: none;
         border: none;
-        color: #718096;
+        color: var(--bs-secondary-color);
         cursor: pointer;
         z-index: 10;
         transition: color 0.3s ease;
@@ -478,12 +489,12 @@
     }
 
     .password-toggle:hover {
-        color: #667eea;
+        color: var(--bs-primary);
     }
 
     .password-toggle:focus {
         outline: none;
-        color: #667eea;
+        color: var(--bs-primary);
     }
 
     /* Current Image */
@@ -529,12 +540,12 @@
 
     /* Upload Area */
     .upload-area {
-        border: 3px dashed #cbd5e0;
-        border-radius: 15px;
-        padding: 3rem 2rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: .75rem;
+        padding: 2rem 1.5rem;
         text-align: center;
-        background: #f8fafc;
-        transition: all 0.3s ease;
+        background: #fff;
+        transition: all 0.2s ease;
         cursor: pointer;
         position: relative;
         min-height: 200px;
@@ -544,30 +555,29 @@
     }
 
     .upload-area:hover {
-        border-color: #667eea;
-        background: #f0f4ff;
+        border-color: var(--bs-primary);
+        background: rgba(var(--bs-primary-rgb), .03);
     }
 
     .upload-area.dragover {
-        border-color: #667eea;
-        background: #e6f3ff;
-        transform: scale(1.02);
+        border-color: var(--bs-primary);
+        background: rgba(var(--bs-primary-rgb), .06);
     }
 
     .upload-icon {
         font-size: 3rem;
-        color: #a0aec0;
+        color: var(--bs-secondary-color);
         margin-bottom: 1rem;
     }
 
     .upload-title {
-        color: #2d3748;
+        color: var(--bs-body-color);
         font-weight: 600;
         margin-bottom: 0.5rem;
     }
 
     .upload-subtitle {
-        color: #718096;
+        color: var(--bs-secondary-color);
         margin-bottom: 1.5rem;
     }
 
@@ -583,8 +593,8 @@
         width: 150px;
         height: 150px;
         object-fit: cover;
-        border-radius: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-radius: .75rem;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     }
 
     .preview-actions {
@@ -596,7 +606,7 @@
     .form-actions {
         margin-top: 3rem;
         padding-top: 2rem;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid var(--bs-border-color);
     }
 
     .btn-lg {
@@ -608,26 +618,27 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        box-shadow: 0 4px 10px rgba(var(--bs-primary-rgb), 0.2);
     }
 
     .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        transform: translateY(-1px);
+        filter: brightness(0.98);
+        box-shadow: 0 6px 16px rgba(var(--bs-primary-rgb), 0.25);
     }
 
     .btn-outline-secondary {
-        border: 2px solid #e2e8f0;
-        color: #718096;
+        border: 1px solid var(--bs-border-color);
+        color: var(--bs-secondary-color);
     }
 
     .btn-outline-secondary:hover {
-        background: #f7fafc;
-        border-color: #cbd5e0;
-        color: #4a5568;
-        transform: translateY(-2px);
+        background: var(--bs-light-bg, #f8f9fa);
+        border-color: var(--bs-border-color);
+        color: var(--bs-body-color);
+        transform: translateY(-1px);
     }
 
     /* Loading Animation */
@@ -640,8 +651,8 @@
     /* Responsive */
     @media (max-width: 768px) {
         .form-header {
-            padding: 1.5rem;
-            margin: -1rem -1rem 1.5rem -1rem;
+            padding: 1rem 1.25rem;
+            margin: 0 0 1rem 0;
         }
 
         .section-icon {
@@ -651,7 +662,7 @@
         }
 
         .upload-area {
-            padding: 2rem 1rem;
+            padding: 1.5rem 1rem;
         }
 
         .form-actions .d-flex {

@@ -3,34 +3,22 @@
 @section('title', 'Detalles del Usuario')
 
 @section('content')
-<!-- Header Section -->
-<div class="page-header mb-5">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <div class="header-content">
-                    <div class="header-icon">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <div class="header-text">
-                        <h1 class="header-title">Perfil de Usuario</h1>
-                        <p class="header-subtitle">Información detallada del usuario</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 text-end">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb custom-breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('users.index') }}">
-                                <i class="fas fa-users me-1"></i>Usuarios
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active">{{ $user->name }}</li>
-                    </ol>
-                </nav>
+<!-- Encabezado sobrio -->
+<div class="bg-white rounded-3 p-3 p-md-4 mb-4 shadow-sm border">
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="me-3 text-muted"><i class="fas fa-user-circle fa-lg"></i></div>
+            <div>
+                <h1 class="h4 fw-semibold mb-1 text-dark">Perfil de usuario</h1>
+                <p class="mb-0 text-muted">Información detallada del usuario</p>
             </div>
         </div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('users.index') }}" class="text-decoration-none"><i class="fas fa-users me-1"></i>Usuarios</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ $user->name }}</li>
+            </ol>
+        </nav>
     </div>
 </div>
 
@@ -376,12 +364,14 @@
 .header-icon {
     width: 60px;
     height: 60px;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    color: var(--bs-secondary);
 }
 
 .header-title {
@@ -397,19 +387,19 @@
 }
 
 .custom-breadcrumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     border-radius: 10px;
-    padding: 0.75rem 1rem;
+    padding: 0;
     margin: 0;
 }
 
 .custom-breadcrumb .breadcrumb-item a {
-    color: white;
+    color: var(--bs-primary);
     text-decoration: none;
 }
 
 .custom-breadcrumb .breadcrumb-item.active {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--bs-secondary);
 }
 
 /* Profile Card */
@@ -433,7 +423,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bs-gray-200);
 }
 
 .profile-avatar {
@@ -501,10 +491,11 @@
 }
 
 .code-badge {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
     padding: 0.5rem 1rem;
     border-radius: 20px;
+    border: 1px solid var(--bs-border-color);
     font-weight: 600;
     font-size: 0.9rem;
 }
@@ -527,18 +518,21 @@
 }
 
 .badge-item.admin {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    color: white;
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
 }
 
 .badge-item.user {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    color: white;
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
 }
 
 .badge-item.premium {
-    background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
-    color: white;
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
 }
 
 .profile-stats {
@@ -595,14 +589,15 @@
 .info-card {
     background: white;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--bs-border-color);
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .info-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
 .info-header {
@@ -622,24 +617,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    color: white;
+    font-size: 1.1rem;
+    color: var(--bs-secondary);
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
 }
 
 .info-icon.personal {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bs-light);
 }
 
 .info-icon.contact {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: var(--bs-light);
 }
 
 .info-icon.account {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: var(--bs-light);
 }
 
 .info-icon.projects {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: var(--bs-light);
 }
 
 .info-title h4 {
@@ -660,10 +657,11 @@
 }
 
 .projects-count {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
     padding: 0.5rem 1rem;
     border-radius: 20px;
+    border: 1px solid var(--bs-border-color);
     font-weight: 700;
     font-size: 1rem;
 }
@@ -701,20 +699,21 @@
 }
 
 .email-link {
-    color: #667eea;
+    color: var(--bs-primary);
     text-decoration: none;
 }
 
 .email-link:hover {
-    color: #764ba2;
+    color: rgba(var(--bs-primary-rgb), .85);
     text-decoration: underline;
 }
 
 .user-code {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
+    border: 1px solid var(--bs-border-color);
     font-size: 0.85rem;
     font-weight: 600;
 }
@@ -730,18 +729,21 @@
 }
 
 .gender-badge.male {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
 }
 
 .gender-badge.female {
-    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
 }
 
 .gender-badge.other {
-    background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
 }
 
 .date-info {
@@ -775,8 +777,8 @@
 
 .project-item:hover {
     background: white;
-    border-color: #667eea;
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+    border-color: var(--bs-primary);
+    box-shadow: 0 5px 15px rgba(var(--bs-primary-rgb), 0.1);
 }
 
 .project-header {
@@ -789,12 +791,13 @@
 .project-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--bs-secondary);
     font-size: 1rem;
 }
 
@@ -826,13 +829,15 @@
 }
 
 .role-badge.admin {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
 }
 
 .role-badge.member {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    color: white;
+    background: var(--bs-light);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
 }
 
 .project-details {

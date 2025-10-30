@@ -3,37 +3,28 @@
 @section('title', 'Crear Nuevo Usuario')
 
 @section('content')
-<!-- Header Section with Gradient Background -->
-<div class="bg-gradient-primary text-white rounded-4 p-4 mb-4 shadow-custom">
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <div class="d-flex align-items-center mb-2">
-                <div class="bg-white bg-opacity-20 rounded-circle p-3 me-3">
-                    <i class="fas fa-user-plus fa-2x"></i>
-                </div>
-                <div>
-                    <h1 class="h2 fw-bold mb-1">Crear Nuevo Usuario</h1>
-                    <p class="mb-0 opacity-90">Agrega un nuevo usuario al sistema</p>
-                </div>
+<!-- Encabezado de página sobrio -->
+<div class="bg-white rounded-3 p-3 p-md-4 mb-4 shadow-sm border">
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="me-3 text-muted">
+                <i class="fas fa-user-plus fa-lg"></i>
             </div>
-        </div>
-        <div class="col-md-4 text-end">
-            <div class="bg-white bg-opacity-10 rounded-3 p-3">
-                <i class="fas fa-users fa-2x mb-2"></i>
-                <div class="small">Sistema de Gestión</div>
+            <div>
+                <h1 class="h4 fw-semibold mb-1 text-dark">Crear nuevo usuario</h1>
+                <p class="mb-0 text-muted">Agrega un nuevo usuario al sistema</p>
             </div>
         </div>
     </div>
-    
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mt-3">
-        <ol class="breadcrumb breadcrumb-dark mb-0">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item">
-                <a href="{{ route('users.index') }}" class="text-white text-decoration-none">
+                <a href="{{ route('users.index') }}" class="text-decoration-none">
                     <i class="fas fa-users me-1"></i>Usuarios
                 </a>
             </li>
-            <li class="breadcrumb-item active text-white-50">Crear</li>
+            <li class="breadcrumb-item active" aria-current="page">Crear</li>
         </ol>
     </nav>
 </div>
@@ -77,12 +68,10 @@
 
             <!-- Step 1: Personal Information -->
             <div class="card border-0 shadow-sm mb-4 form-step" id="step-1">
-                <div class="card-header bg-gradient-accent text-white border-0">
+                <div class="card-header bg-white border-0">
                     <div class="d-flex align-items-center">
-                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <h5 class="mb-0 fw-bold">Información Personal</h5>
+                        <div class="me-2 text-muted"><i class="fas fa-user"></i></div>
+                        <h6 class="mb-0 fw-semibold">Información personal</h6>
                     </div>
                 </div>
                 <div class="card-body p-4">
@@ -97,7 +86,7 @@
                                        placeholder="Nombre"
                                        required>
                                 <label for="name">
-                                    <i class="fas fa-user me-2 text-primary"></i>Nombre <span class="text-danger">*</span>
+                                    <i class="fas fa-user me-2 text-muted"></i>Nombre <span class="text-danger">*</span>
                                 </label>
                                 @error('name')
                                     <div class="invalid-feedback">
@@ -117,7 +106,7 @@
                                        placeholder="Apellido"
                                        required>
                                 <label for="last_name">
-                                    <i class="fas fa-user me-2 text-primary"></i>Apellido <span class="text-danger">*</span>
+                                    <i class="fas fa-user me-2 text-muted"></i>Apellido <span class="text-danger">*</span>
                                 </label>
                                 @error('last_name')
                                     <div class="invalid-feedback">
@@ -140,7 +129,7 @@
                                        min="1"
                                        max="120">
                                 <label for="edad">
-                                    <i class="fas fa-calendar-alt me-2 text-primary"></i>Edad
+                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>Edad
                                 </label>
                                 @error('edad')
                                     <div class="invalid-feedback">
@@ -161,7 +150,7 @@
                                     <option value="Otro" {{ old('genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
                                 </select>
                                 <label for="genero">
-                                    <i class="fas fa-venus-mars me-2 text-primary"></i>Género
+                                    <i class="fas fa-venus-mars me-2 text-muted"></i>Género
                                 </label>
                                 @error('genero')
                                     <div class="invalid-feedback">
@@ -180,7 +169,7 @@
                                        value="{{ old('telefono') }}"
                                        placeholder="Teléfono">
                                 <label for="telefono">
-                                    <i class="fas fa-phone me-2 text-primary"></i>Teléfono
+                                    <i class="fas fa-phone me-2 text-muted"></i>Teléfono
                                 </label>
                                 @error('telefono')
                                     <div class="invalid-feedback">
@@ -201,12 +190,10 @@
 
             <!-- Step 2: Account Information -->
             <div class="card border-0 shadow-sm mb-4 form-step d-none" id="step-2">
-                <div class="card-header bg-gradient-accent text-white border-0">
+                <div class="card-header bg-white border-0">
                     <div class="d-flex align-items-center">
-                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <h5 class="mb-0 fw-bold">Información de Cuenta</h5>
+                        <div class="me-2 text-muted"><i class="fas fa-key"></i></div>
+                        <h6 class="mb-0 fw-semibold">Información de cuenta</h6>
                     </div>
                 </div>
                 <div class="card-body p-4">
@@ -220,7 +207,7 @@
                                    placeholder="Email"
                                    required>
                             <label for="email">
-                                <i class="fas fa-envelope me-2 text-primary"></i>Email <span class="text-danger">*</span>
+                                <i class="fas fa-envelope me-2 text-muted"></i>Email <span class="text-danger">*</span>
                             </label>
                             @error('email')
                                 <div class="invalid-feedback">
@@ -240,7 +227,7 @@
                                        placeholder="Contraseña"
                                        required>
                                 <label for="password">
-                                    <i class="fas fa-lock me-2 text-primary"></i>Contraseña <span class="text-danger">*</span>
+                                    <i class="fas fa-lock me-2 text-muted"></i>Contraseña <span class="text-danger">*</span>
                                 </label>
                                 <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-3" 
                                         onclick="togglePassword('password')" style="z-index: 10;">
@@ -264,7 +251,7 @@
                                        placeholder="Confirmar Contraseña"
                                        required>
                                 <label for="password_confirmation">
-                                    <i class="fas fa-lock me-2 text-primary"></i>Confirmar Contraseña <span class="text-danger">*</span>
+                                    <i class="fas fa-lock me-2 text-muted"></i>Confirmar Contraseña <span class="text-danger">*</span>
                                 </label>
                                 <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-3" 
                                         onclick="togglePassword('password_confirmation')" style="z-index: 10;">
@@ -283,7 +270,7 @@
                                 <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
                             </select>
                             <label for="role">
-                                <i class="fas fa-user-tag me-2 text-primary"></i>Rol del Usuario
+                                <i class="fas fa-user-tag me-2 text-muted"></i>Rol del Usuario
                             </label>
                             @error('role')
                                 <div class="invalid-feedback">
@@ -306,24 +293,22 @@
 
             <!-- Step 3: Profile Photo -->
             <div class="card border-0 shadow-sm mb-4 form-step d-none" id="step-3">
-                <div class="card-header bg-gradient-accent text-white border-0">
+                <div class="card-header bg-white border-0">
                     <div class="d-flex align-items-center">
-                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                            <i class="fas fa-image"></i>
-                        </div>
-                        <h5 class="mb-0 fw-bold">Foto de Perfil</h5>
+                        <div class="me-2 text-muted"><i class="fas fa-image"></i></div>
+                        <h6 class="mb-0 fw-semibold">Foto de perfil</h6>
                     </div>
                 </div>
                 <div class="card-body p-4 text-center">
                     <!-- Image Upload Area -->
-                    <div class="upload-area border-2 border-dashed border-primary rounded-4 p-5 mb-4 position-relative" 
+                    <div class="upload-area border rounded-3 p-4 mb-4 position-relative bg-white" 
                          onclick="document.getElementById('uri').click()" 
                          ondrop="handleDrop(event)" 
                          ondragover="handleDragOver(event)"
                          ondragleave="handleDragLeave(event)">
                         
                         <div id="upload-placeholder">
-                            <div class="text-primary mb-3">
+                            <div class="text-muted mb-3">
                                 <i class="fas fa-cloud-upload-alt fa-4x"></i>
                             </div>
                             <h6 class="fw-bold mb-2">Arrastra y suelta tu imagen aquí</h6>
@@ -370,7 +355,7 @@
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            <i class="fas fa-info-circle text-muted me-2"></i>
                             <small class="text-muted">¿Necesitas ayuda? Consulta la guía de usuario</small>
                         </div>
                         <a href="{{ route('users.index') }}" class="btn btn-outline-secondary btn-sm">
@@ -416,16 +401,16 @@
 }
 
 .step-indicator.active .step-circle {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
+    background: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
     transform: scale(1.1);
 }
 
 .step-indicator.completed .step-circle {
-    background: var(--success-color);
-    border-color: var(--success-color);
-    color: white;
+    background: var(--bs-success);
+    border-color: var(--bs-success);
+    color: #fff;
 }
 
 /* Upload Area Styles */
@@ -436,13 +421,13 @@
 }
 
 .upload-area:hover {
-    border-color: var(--accent-color) !important;
+    border-color: var(--bs-primary) !important;
     background: var(--bs-primary-bg-subtle);
     transform: translateY(-2px);
 }
 
 .upload-area.drag-over {
-    border-color: var(--success-color) !important;
+    border-color: var(--bs-success) !important;
     background: var(--bs-success-bg-subtle);
     transform: scale(1.02);
 }
@@ -451,13 +436,13 @@
 .form-floating > .form-control:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label,
 .form-floating > .form-select ~ label {
-    color: var(--primary-color);
+    color: var(--bs-primary);
 }
 
 .form-floating > .form-control:focus,
 .form-floating > .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
 }
 
 /* Password Toggle Button */
@@ -469,7 +454,7 @@
 }
 
 .btn-link:hover {
-    color: var(--primary-color);
+    color: var(--bs-primary);
 }
 
 /* Breadcrumb Dark Theme */

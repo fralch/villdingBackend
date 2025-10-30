@@ -16,63 +16,55 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow-sm h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Usuarios</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $users->total() }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
+    <div class="row g-3">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label mb-1">Total Usuarios</div>
+                        <div class="stat-value h4 mb-0">{{ $users->total() }}</div>
+                    </div>
+                    <div class="icon-circle" title="Total">
+                        <i class="fas fa-users"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow-sm h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Administradores</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $users->where('role', 'admin')->count() }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-crown fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label mb-1">Administradores</div>
+                        <div class="stat-value h4 mb-0">{{ $users->where('role', 'admin')->count() }}</div>
+                    </div>
+                    <div class="icon-circle danger" title="Admins">
+                        <i class="fas fa-crown"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow-sm h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Usuarios Regulares</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $users->where('role', '!=', 'admin')->count() }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label mb-1">Usuarios Regulares</div>
+                        <div class="stat-value h4 mb-0">{{ $users->where('role', '!=', 'admin')->count() }}</div>
+                    </div>
+                    <div class="icon-circle secondary" title="Regulares">
+                        <i class="fas fa-user"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow-sm h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Verificados</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $users->whereNotNull('email_verified_at')->count() }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="stat-label mb-1">Verificados</div>
+                        <div class="stat-value h4 mb-0">{{ $users->whereNotNull('email_verified_at')->count() }}</div>
+                    </div>
+                    <div class="icon-circle success" title="Verificados">
+                        <i class="fas fa-check-circle"></i>
                     </div>
                 </div>
             </div>
@@ -82,13 +74,13 @@
     <!-- Users Table -->
     <div class="card shadow-sm">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Lista de Usuarios</h6>
+            <h6 class="m-0 fw-semibold">Lista de Usuarios</h6>
             <span class="badge bg-light text-dark">{{ $users->total() }} en total</span>
         </div>
         <div class="card-body">
             @if($users->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>Imagen</th>
