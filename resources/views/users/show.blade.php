@@ -77,10 +77,7 @@
                             <div class="stat-label">Proyectos</div>
                         </div>
                         <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ $user->created_at->diffInDays() }}</div>
-                            <div class="stat-label">Días activo</div>
-                        </div>
+                       
                     </div>
 
                     <div class="profile-actions">
@@ -414,7 +411,7 @@
 .profile-header {
     position: relative;
     height: 120px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .profile-bg {
@@ -424,6 +421,7 @@
     right: 0;
     bottom: 0;
     background: var(--bs-gray-200);
+    z-index: 1;
 }
 
 .profile-avatar {
@@ -437,6 +435,7 @@
     border: 4px solid white;
     overflow: hidden;
     background: white;
+    z-index: 2;
 }
 
 .avatar-img {
