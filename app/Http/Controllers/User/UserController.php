@@ -25,36 +25,68 @@ class UserController extends Controller
      */
     public function create(Request $request)
     {
-        
+        // Validar los datos de entrada
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+            'edad' => 'nullable|integer',
+            'genero' => 'nullable|string|max:50',
+            'telefono' => 'nullable|string|max:20',
+            'role' => 'nullable|string|in:user,admin',
+        ]);
+
         // Procesar la imagen si se proporciona
         $profileImagePath = null;
+        $imageUploaded = false;
 
         if ($request->hasFile('uri')) {
             $image = $request->file('uri');
-            $fileName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
-            $profileImagePath = Storage::disk('s3')->putFileAs('profiles', $image, $fileName);
+
+            // Validar el archivo de imagen
+            if ($image->isValid()) {
+                $fileName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
+                $profileImagePath = Storage::disk('s3')->putFileAs('profiles', $image, $fileName);
+                $imageUploaded = true;
+            }
         }
 
-        // Crear el usuario
-        $user = User::create([
-            'name' => $request->name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'edad' => $request->edad,
-            'genero' => $request->genero,
-            'telefono' => $request->telefono,
-            'password' => Hash::make($request->input('password')),
-            'is_paid_user' => 0,
-            'user_code' =>  $this->generateUniqueUserCode(),
-            'role' => $request->input('role', 'user'), // Valor por defecto es 'user' si no se pasa
-            'uri' => $profileImagePath ?: null, // Almacena la ruta de la imagen si existe
-        ]);
+        try {
+            // Crear el usuario
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'last_name' => $validatedData['last_name'],
+                'email' => $validatedData['email'],
+                'edad' => $validatedData['edad'] ?? null,
+                'genero' => $validatedData['genero'] ?? null,
+                'telefono' => $validatedData['telefono'] ?? null,
+                'password' => Hash::make($validatedData['password']),
+                'is_paid_user' => 0,
+                'user_code' => $this->generateUniqueUserCode(),
+                'role' => $validatedData['role'] ?? 'user',
+                'uri' => $profileImagePath,
+            ]);
 
-        // Retornar la respuesta con los datos del usuario
-        return response([
-            'message' => 'User created successfully',
-            'user' => $user
-        ], 201);
+            // Retornar la respuesta con los datos del usuario
+            return response([
+                'message' => 'User created successfully',
+                'user' => $user,
+                'image_uploaded' => $imageUploaded,
+                'profile_image_path' => $profileImagePath
+            ], 201);
+        } catch (\Exception $e) {
+            // Si falla la creación del usuario y se subió una imagen, eliminarla de S3
+            if ($profileImagePath) {
+                Storage::disk('s3')->delete($profileImagePath);
+            }
+
+            // Retornar el error
+            return response([
+                'message' => 'Failed to create user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
      /**
      * Genera un código de usuario único con 7 caracteres: una letra mayúscula seguida de 6 números.
