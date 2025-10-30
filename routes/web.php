@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\UserWebController;
 use App\Http\Controllers\User\UserCodeController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\ProjectSubtypeController;
@@ -32,7 +33,21 @@ Route::get('/endpoint', function () {
 });
 
 // ============================================================================
-// RUTAS DE USUARIOS
+// RUTAS WEB DE GESTIÓN DE USUARIOS (Vistas Blade)
+// ============================================================================
+// Estas rutas utilizan el prefijo /admin/users para evitar conflictos con las rutas API
+Route::prefix('admin')->name('users.')->group(function () {
+    Route::get('/users', [UserWebController::class, 'index'])->name('index');
+    Route::get('/users/create', [UserWebController::class, 'create'])->name('create');
+    Route::post('/users', [UserWebController::class, 'store'])->name('store');
+    Route::get('/users/{id}', [UserWebController::class, 'show'])->name('show');
+    Route::get('/users/{id}/edit', [UserWebController::class, 'edit'])->name('edit');
+    Route::put('/users/{id}', [UserWebController::class, 'update'])->name('update');
+    Route::delete('/users/{id}', [UserWebController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================================
+// RUTAS DE USUARIOS (API Endpoints)
 // ============================================================================
 
 // Gestión básica de usuarios
