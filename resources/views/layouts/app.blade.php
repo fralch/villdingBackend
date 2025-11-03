@@ -172,6 +172,14 @@
                             <i class="fas fa-user-plus me-1"></i> Nuevo Usuario
                         </a>
                     </li>
+                    <li class="nav-item d-flex align-items-center ms-2">
+                        <form method="POST" action="{{ route('simple_login.logout') }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-sign-out-alt me-1"></i> Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>

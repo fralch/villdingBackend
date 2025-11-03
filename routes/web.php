@@ -9,6 +9,7 @@ use App\Http\Controllers\Projects\ProjectSubtypeController;
 use App\Http\Controllers\Projects\ProjectTypeController;
 use App\Http\Controllers\Trackings\TrackingController;
 use App\Http\Controllers\Trackings\ActivityController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +26,7 @@ use App\Http\Controllers\Trackings\ActivityController;
 // RUTAS PRINCIPALES
 // ============================================================================
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/admin');
 });
 
 Route::get('/endpoint', function () {
@@ -33,10 +34,50 @@ Route::get('/endpoint', function () {
 });
 
 // ============================================================================
+// LOGIN BÁSICO PARA ADMIN (Protege las rutas /admin/users)
+// ============================================================================
+// Rutas de login simples con credenciales prefijadas (env o hardcode)
+Route::prefix('admin')->group(function () {
+    // Mostrar formulario de login
+    Route::get('/login', function () {
+        return view('auth.login');
+    })->name('simple_login.show');
+
+    // Procesar login
+    Route::post('/login', function (Request $request) {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $expectedUser = env('SIMPLE_LOGIN_USER', 'admin');
+        $expectedPass = env('SIMPLE_LOGIN_PASSWORD', 'password');
+
+        if ($request->input('username') === $expectedUser && $request->input('password') === $expectedPass) {
+            $request->session()->put('simple_login', true);
+            return redirect()->route('users.index');
+        }
+
+        return back()->withInput()->with('error', 'Credenciales inválidas');
+    })->name('simple_login.do');
+
+    // Cerrar sesión
+    Route::post('/logout', function (Request $request) {
+        $request->session()->forget('simple_login');
+        $request->session()->regenerateToken();
+        return redirect()->route('simple_login.show');
+    })->name('simple_login.logout');
+});
+
+// ============================================================================
 // RUTAS WEB DE GESTIÓN DE USUARIOS (Vistas Blade)
 // ============================================================================
-// Estas rutas utilizan el prefijo /admin/users para evitar conflictos con las rutas API
-Route::prefix('admin')->name('users.')->group(function () {
+// Estas rutas utilizan el prefijo /admin/users y se protegen con el middleware simple.login
+Route::prefix('admin')->middleware('simple.login')->name('users.')->group(function () {
+    // Redirección base de /admin según estado de sesión
+    Route::get('/', function () {
+        return redirect()->route('users.index');
+    });
     Route::get('/users', [UserWebController::class, 'index'])->name('index');
     Route::get('/users/create', [UserWebController::class, 'create'])->name('create');
     Route::post('/users', [UserWebController::class, 'store'])->name('store');
