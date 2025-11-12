@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4;
-            margin: 0;
+            margin: 12mm;
         }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
@@ -24,7 +24,8 @@
 
         /* --- Páginas de Contenido --- */
         .content-page {
-            padding: 1cm 2cm 1.2cm 2cm;
+            /* Ajuste de padding para trabajar con margen de @page y evitar espacios extra */
+            padding: 0.5cm 1.6cm 0.8cm 1.6cm;
             position: relative;
             box-sizing: border-box;
         }
@@ -68,7 +69,8 @@
 
         /* Nombre del seguimiento con línea */
         .tracking-section {
-            margin-bottom: 1.5cm;
+            /* Reducido para eliminar espacio innecesario antes de la tarjeta */
+            margin-bottom: 0.4cm;
         }
         .tracking-title {
             font-size: 12pt;
@@ -138,7 +140,7 @@
         .activity-time {
             font-size: 9pt;
             color: #2c3e50;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         /* Descripción */
@@ -146,22 +148,27 @@
             font-size: 9.5pt;
             color: #2c3e50;
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         /* Galería de Imágenes */
         .activity-gallery {
-            margin-top: 20px;
+            /* Eliminar espacio no deseado antes de la primera imagen */
+            margin-top: 6px;
         }
         .gallery-image-container {
             margin-bottom: 15px;
             text-align: center;
+            /* Evita cortes dentro de cada imagen y mejora salto de página */
+            page-break-inside: avoid;
         }
         .gallery-image {
+            /* Mantener proporcionalidad sin distorsión y adaptarse al contenedor */
             max-width: 100%;
-            width: 570px;
+            width: auto;
             height: auto;
             object-fit: contain;
+            display: inline-block;
         }
 
         .no-activities {
