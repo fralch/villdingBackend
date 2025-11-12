@@ -24,9 +24,8 @@
 
         /* --- Páginas de Contenido --- */
         .content-page {
-            padding: 1.5cm 2.5cm 2cm 2.5cm;
+            padding: 1cm 2cm 1.2cm 2cm;
             position: relative;
-            min-height: 100vh;
             box-sizing: border-box;
         }
 
@@ -35,7 +34,7 @@
             text-align: right;
             font-size: 8.5pt;
             color: #95a5a6;
-            margin-bottom: 1cm;
+            margin-bottom: 0.5cm;
             font-weight: 300;
         }
 
@@ -45,13 +44,13 @@
             font-size: 24pt;
             color: #0f3854;
             font-weight: bold;
-            margin-bottom: 1cm;
+            margin-bottom: 0.6cm;
             letter-spacing: 1px;
         }
 
         /* Información del proyecto */
         .project-info {
-            margin-bottom: 1.2cm;
+            margin-bottom: 0.7cm;
         }
         .project-name {
             font-size: 13pt;
@@ -76,14 +75,13 @@
             font-weight: bold;
             color: #0f3854;
             padding-bottom: 8px;
-            border-bottom: 3px solid #0f3854;
-            margin-bottom: 1cm;
+            border-bottom: 2px solid #0f3854;
+            margin-bottom: 0.6cm;
         }
 
         /* --- Tarjeta de Actividad --- */
         .activity-card {
-            margin-bottom: 1.5cm;
-            page-break-inside: avoid;
+            margin-bottom: 1cm;
         }
 
         /* Header de actividad con ícono */
@@ -124,9 +122,9 @@
             color: white;
             margin-bottom: 8px;
         }
-        .activity-status.completado { background-color: #2ecc71; }
-        .activity-status.programado { background-color: #f39c12; }
-        .activity-status.pendiente { background-color: #e74c3c; }
+        .activity-status.completado { background-color: #4ec291; }
+        .activity-status.programado { background-color: transparent; border: 1.5px solid #f4c724; color: #f4c724; }
+        .activity-status.pendiente { background-color: #f4c724; }
 
         /* Título de la actividad */
         .activity-name {
