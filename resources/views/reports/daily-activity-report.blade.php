@@ -233,7 +233,9 @@
                             <div class="activity-name">{{ $activity->name }}</div>
 
                             <!-- Horario -->
-                            <div class="activity-time">{{ $activity->horas ?? 'N/A' }}</div>
+                            @if($activity->horas != 0)
+                                <div class="activity-time">{{ $activity->horas }}</div>
+                            @endif
 
                             <!-- Descripción -->
                             <div class="activity-description">
