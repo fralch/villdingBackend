@@ -223,13 +223,6 @@
                 <!-- Tarjeta de actividad -->
                 <div class="activity-card">
                     <div class="activity-header">
-                        <!-- Ícono de herramientas/construcción -->
-                        <div class="activity-icon">
-                            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="32" cy="32" r="30" fill="#0f3854" opacity="0.15"/>
-                                <path d="M24 20L28 24L24 28M32 20L36 24L32 28M40 20L44 24L40 28M20 32H44M20 40H44" stroke="#0f3854" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
 
                         <!-- Contenido de la actividad -->
                         <div class="activity-content">
