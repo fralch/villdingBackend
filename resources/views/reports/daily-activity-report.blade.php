@@ -7,14 +7,14 @@
     <style>
         @page {
             size: A4;
-            margin: 12mm;
+            margin: 10mm;
         }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             color: #2c3e50;
             font-size: 10pt;
             margin: 0;
-            line-height: 1.6;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -25,7 +25,7 @@
         /* --- Páginas de Contenido --- */
         .content-page {
             /* Ajuste de padding para trabajar con margen de @page y evitar espacios extra */
-            padding: 0.5cm 1.6cm 0.8cm 1.6cm;
+            padding: 0.3cm 1.2cm 0.3cm 1.2cm;
             position: relative;
             box-sizing: border-box;
         }
@@ -35,7 +35,7 @@
             text-align: right;
             font-size: 8.5pt;
             color: #95a5a6;
-            margin-bottom: 0.5cm;
+            margin-bottom: 0.3cm;
             font-weight: 300;
         }
 
@@ -45,13 +45,13 @@
             font-size: 24pt;
             color: #0f3854;
             font-weight: bold;
-            margin-bottom: 0.6cm;
+            margin-bottom: 0.3cm;
             letter-spacing: 1px;
         }
 
         /* Información del proyecto */
         .project-info {
-            margin-bottom: 0.7cm;
+            margin-bottom: 0.4cm;
         }
         .project-name {
             font-size: 13pt;
@@ -70,20 +70,20 @@
         /* Nombre del seguimiento con línea */
         .tracking-section {
             /* Reducido para eliminar espacio innecesario antes de la tarjeta */
-            margin-bottom: 0.4cm;
+            margin-bottom: 0.2cm;
         }
         .tracking-title {
             font-size: 12pt;
             font-weight: bold;
             color: #0f3854;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
             border-bottom: 2px solid #0f3854;
-            margin-bottom: 0.6cm;
+            margin-bottom: 0.3cm;
         }
 
         /* --- Tarjeta de Actividad --- */
         .activity-card {
-            margin-bottom: 1cm;
+            margin-bottom: 0.6cm;
         }
 
         /* Header de actividad con ícono */
@@ -157,7 +157,7 @@
             margin-top: 6px;
         }
         .gallery-image-container {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-align: center;
             /* Evita cortes dentro de cada imagen y mejora salto de página */
             page-break-inside: avoid;
