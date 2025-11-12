@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4;
-            margin: 1.2cm 1.5cm;
+            margin: 0;
         }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
@@ -24,7 +24,7 @@
 
         /* --- Páginas de Contenido --- */
         .content-page {
-            padding: 0.2cm 0 0.4cm 0;
+            padding: 1cm 2cm 1.2cm 2cm;
             position: relative;
             box-sizing: border-box;
         }
@@ -76,7 +76,7 @@
             color: #0f3854;
             padding-bottom: 8px;
             border-bottom: 2px solid #0f3854;
-            margin-bottom: 0.3cm;
+            margin-bottom: 0.6cm;
         }
 
         /* --- Tarjeta de Actividad --- */
@@ -151,23 +151,17 @@
 
         /* Galería de Imágenes */
         .activity-gallery {
-            margin-top: 16px;
+            margin-top: 20px;
         }
         .gallery-image-container {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             text-align: center;
-            page-break-inside: avoid;
-            break-inside: avoid;
         }
         .gallery-image {
-            display: block;
-            width: 100%;
             max-width: 100%;
+            width: 570px;
             height: auto;
-            max-height: 20cm;
             object-fit: contain;
-            page-break-inside: avoid;
-            break-inside: avoid;
         }
 
         .no-activities {
