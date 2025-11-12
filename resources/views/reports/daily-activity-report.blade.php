@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Seguimiento - {{ $project->name }}</title>
+    <title>Reporte Diario - {{ $project->name }}</title>
     <style>
         @page {
             size: A4;
@@ -11,10 +11,10 @@
         }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            color: #333;
+            color: #2c3e50;
             font-size: 10pt;
             margin: 0;
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -22,307 +22,238 @@
             page-break-after: always;
         }
 
-        /* --- Portada --- */
-        .cover-page {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
-            background-color: #f8f9fa;
-            padding: 2.5cm;
-            box-sizing: border-box; /* Asegura que el padding esté incluido en el height */
-        }
-        .cover-header {
-            text-align: right;
-            height: 50px;
-        }
-        .cover-header img {
-            max-height: 50px;
-        }
-        .cover-body {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .cover-title {
-            font-size: 26pt; /* Ligeramente ajustado */
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        .cover-project-name {
-            font-size: 18pt; /* Ligeramente ajustado */
-            color: #555;
-            font-weight: 300;
-            margin-bottom: 30px;
-        }
-        .cover-image-container {
-            width: 100%;
-            max-width: 16cm;
-            margin: 0 auto 30px;
-            border: 1px solid #dee2e6;
-            padding: 10px;
-            background-color: #fff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-            border-radius: 8px;
-        }
-        .cover-image {
-            max-width: 100%;
-            max-height: 9cm;
-            object-fit: contain;
-        }
-        .cover-footer {
-            font-size: 11pt;
-            color: #555;
-            text-align: left;
-            border-top: 2px solid #34495e;
-            padding-top: 20px;
-            margin-top: 30px;
-        }
-        .cover-footer div {
-            margin-bottom: 8px;
-        }
-
         /* --- Páginas de Contenido --- */
         .content-page {
-            padding: 2.5cm 2cm; /* Más espacio arriba/abajo */
+            padding: 1.5cm 2.5cm 2cm 2.5cm;
             position: relative;
-            min-height: calc(100vh - 5cm); /* A4 height - padding */
+            min-height: 100vh;
             box-sizing: border-box;
         }
+
+        /* Header superior derecho */
         .page-header {
-            position: absolute;
-            top: 1.5cm;
-            left: 2cm;
-            right: 2cm;
             text-align: right;
-            font-size: 9pt;
-            color: #7f8c8d;
-        }
-        .page-footer {
-            position: absolute;
-            bottom: 1.5cm;
-            left: 2cm;
-            right: 2cm;
-            text-align: center;
-            font-size: 9pt;
-            color: #7f8c8d;
-            border-top: 1px solid #dee2e6;
-            padding-top: 10px;
-        }
-        .page-title {
-            text-align: center;
-            font-size: 16pt; /* Más cohesivo con el resto */
-            color: #2c3e50;
-            margin-bottom: 1.5cm;
-            font-weight: bold;
-            border-bottom: 3px solid #34495e;
-            padding-bottom: 10px;
-        }
-
-        /* --- Tarjeta de Actividad (Rediseñada) --- */
-        .activity-card {
+            font-size: 8.5pt;
+            color: #95a5a6;
             margin-bottom: 1cm;
+            font-weight: 300;
+        }
+
+        /* Título principal "REPORTE DIARIO" */
+        .main-title {
+            text-align: center;
+            font-size: 24pt;
+            color: #0f3854;
+            font-weight: bold;
+            margin-bottom: 1cm;
+            letter-spacing: 1px;
+        }
+
+        /* Información del proyecto */
+        .project-info {
+            margin-bottom: 1.2cm;
+        }
+        .project-name {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #0f3854;
+            margin-bottom: 5px;
+        }
+        .project-location,
+        .project-company {
+            font-size: 11pt;
+            color: #2c3e50;
+            margin-bottom: 3px;
+            font-weight: 300;
+        }
+
+        /* Nombre del seguimiento con línea */
+        .tracking-section {
+            margin-bottom: 1.5cm;
+        }
+        .tracking-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #0f3854;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #0f3854;
+            margin-bottom: 1cm;
+        }
+
+        /* --- Tarjeta de Actividad --- */
+        .activity-card {
+            margin-bottom: 1.5cm;
             page-break-inside: avoid;
-            border: none;
-            border-radius: 8px;
-            background: #ffffff;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
+
+        /* Header de actividad con ícono */
         .activity-header {
-            background-color: #34495e;
-            color: white;
-            padding: 12px 20px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 8px 8px 0 0;
-        }
-        .activity-name {
-            font-size: 14pt;
-            font-weight: bold;
-        }
-        .activity-status {
-            padding: 5px 15px;
-            border-radius: 12px; /* Estilo "Pill" */
-            font-size: 9pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: white;
-        }
-        /* Colores de estado (igual que el original) */
-        .activity-status.completado { background-color: #27ae60; }
-        .activity-status.programado { background-color: #f39c12; }
-        .activity-status.pendiente { background-color: #c0392b; }
-
-        .activity-body {
-            padding: 20px;
-        }
-        
-        /* Detalles de la actividad */
-        .activity-details {
-            width: 100%;
-            margin-bottom: 20px; /* Espacio antes de la galería */
-        }
-        .detail-item {
-            margin-bottom: 14px;
-        }
-        .detail-item strong {
-            display: block;
-            font-size: 9pt;
-            color: #555; /* Más legible */
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .detail-item p {
-            margin: 0;
-            font-size: 10pt;
-            line-height: 1.5;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
 
-        /* Galería de Imágenes (Destacada) */
-        .activity-gallery {
-            width: 100%;
+        /* Ícono a la izquierda */
+        .activity-icon {
+            flex-shrink: 0;
+            width: 45px;
+            height: 45px;
+            margin-right: 15px;
+            position: relative;
         }
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .gallery-image-container {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            height: 320px; /* Imágenes más grandes */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .gallery-image {
+
+        /* SVG del ícono de herramientas/construcción */
+        .activity-icon svg {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Rellena el contenedor */
         }
-        .no-images-placeholder {
-            grid-column: span 2;
-            height: 320px; /* Coincide con el contenedor */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-            color: #bdc3c7;
-            border-radius: 8px;
-            border: 1px dashed #dee2e6;
+
+        /* Contenido de la actividad (título, badge, horas) */
+        .activity-content {
+            flex-grow: 1;
         }
-        
+
+        /* Badge de estado */
+        .activity-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 8pt;
+            font-weight: bold;
+            text-transform: capitalize;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .activity-status.completado { background-color: #2ecc71; }
+        .activity-status.programado { background-color: #f39c12; }
+        .activity-status.pendiente { background-color: #e74c3c; }
+
+        /* Título de la actividad */
+        .activity-name {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #0f3854;
+            margin-bottom: 5px;
+        }
+
+        /* Horario */
+        .activity-time {
+            font-size: 9pt;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        /* Descripción */
+        .activity-description {
+            font-size: 9.5pt;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Galería de Imágenes */
+        .activity-gallery {
+            margin-top: 20px;
+        }
+        .gallery-image-container {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .gallery-image {
+            max-width: 100%;
+            width: 570px;
+            height: auto;
+            object-fit: contain;
+        }
+
         .no-activities {
             text-align: center;
-            padding: 5cm 1cm;
-            font-size: 14pt;
+            padding: 3cm 1cm;
+            font-size: 12pt;
             color: #95a5a6;
         }
     </style>
 </head>
 <body>
-    <div class="cover-page">
-        <div class="cover-header">
-            </div>
-        <div class="cover-body">
-            <div class="cover-title">REPORTE DE SEGUIMIENTO DE ACTIVIDADES</div>
-            @if($project->uri)
-                <div class="cover-image-container">
-                    <img src="{{ $project->uri }}" alt="Imagen del Proyecto" class="cover-image">
-                </div>
-            @endif
-            <div class="cover-project-name">{{ strtoupper($project->name) }}</div>
-        </div>
-        <div class="cover-footer">
-            <div><strong>Seguimiento:</strong> {{ $tracking->title }}</div>
-            <div><strong>Fecha:</strong> {{ $formattedDate }}</div>
-            <div><strong>Semana:</strong> {{ $weekNumber }}</div>
-        </div>
-    </div>
-
-    <div class="page-break"></div>
-
     @if($activities->count() > 0)
-        @php
-            // Ajusta este número según cuánto espacio ocupe cada tarjeta.
-            // Con imágenes más grandes, 2 por página es seguro.
-            $activitiesPerPage = 2; 
-            $chunks = $activities->chunk($activitiesPerPage);
-        @endphp
+        @foreach($activities as $activityIndex => $activity)
+            @php
+                $imageUrls = $activity->image_urls ?? [];
+                $statusClass = strtolower($activity->status);
+                $isFirstPage = $activityIndex === 0;
+            @endphp
 
-        @foreach($chunks as $chunkIndex => $chunk)
             <div class="content-page">
+                <!-- Header superior derecho -->
                 <div class="page-header">
-                    <span>{{ $project->name }} | {{ $formattedDate }}</span>
+                    {{ $tracking->title }} | {{ $formattedDate }}
                 </div>
 
-                <h1 class="page-title">{{ strtoupper($tracking->title) }}</h1>
+                @if($isFirstPage)
+                    <!-- Título principal solo en la primera página -->
+                    <h1 class="main-title">REPORTE DIARIO</h1>
 
-                @foreach($chunk as $activity)
-                    @php
-                        $imageUrls = $activity->image_urls ?? [];
-                        $statusClass = strtolower($activity->status);
-                    @endphp
+                    <!-- Información del proyecto -->
+                    <div class="project-info">
+                        <div class="project-name">{{ $project->name }}</div>
+                        @if($project->location)
+                            <div class="project-location">{{ $project->location }}</div>
+                        @endif
+                        @if($project->company)
+                            <div class="project-company">{{ $project->company }}</div>
+                        @endif
+                    </div>
 
-                    <div class="activity-card">
-                        <div class="activity-header">
-                            <span class="activity-name">{{ $activity->name }}</span>
-                            <span class="activity-status {{ $statusClass }}">{{ $activity->status }}</span>
+                    <!-- Nombre del seguimiento con línea -->
+                    <div class="tracking-section">
+                        <div class="tracking-title">{{ $tracking->title }}</div>
+                    </div>
+                @else
+                    <!-- Solo el nombre del seguimiento en páginas subsecuentes -->
+                    <div class="tracking-section">
+                        <div class="tracking-title">{{ $tracking->title }}</div>
+                    </div>
+                @endif
+
+                <!-- Tarjeta de actividad -->
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <!-- Ícono de herramientas/construcción -->
+                        <div class="activity-icon">
+                            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="32" cy="32" r="30" fill="#0f3854" opacity="0.15"/>
+                                <path d="M24 20L28 24L24 28M32 20L36 24L32 28M40 20L44 24L40 28M20 32H44M20 40H44" stroke="#0f3854" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
                         </div>
-                        <div class="activity-body">
-                            <div class="activity-details">
-                                <div class="detail-item">
-                                    <strong>Descripción</strong>
-                                    <p>{{ $activity->description ?? 'Sin descripción.' }}</p>
-                                </div>
-                                @if($activity->location)
-                                <div class="detail-item">
-                                    <strong>Ubicación</strong>
-                                    <p>{{ $activity->location }}</p>
-                                </div>
-                                @endif
-                                @if($activity->comments)
-                                <div class="detail-item">
-                                    <strong>Comentarios</strong>
-                                    <p>{{ $activity->comments }}</p>
-                                </div>
-                                @endif
-                                <div class="detail-item">
-                                    <strong>Horas</strong>
-                                    <p>{{ $activity->horas ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                            
-                            <div class="activity-gallery">
-                                <div class="gallery-grid">
-                                    @if(count($imageUrls) > 0)
-                                        @foreach(array_slice($imageUrls, 0, 4) as $imageUrl)
-                                            <div class="gallery-image-container">
-                                                <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="no-images-placeholder">
-                                            <span>Sin Imágenes</span>
-                                        </div>
-                                    @endif
-                                </div>
+
+                        <!-- Contenido de la actividad -->
+                        <div class="activity-content">
+                            <!-- Badge de estado -->
+                            <div class="activity-status {{ $statusClass }}">{{ ucfirst($activity->status) }}</div>
+
+                            <!-- Título de la actividad -->
+                            <div class="activity-name">{{ $activity->name }}</div>
+
+                            <!-- Horario -->
+                            <div class="activity-time">{{ $activity->horas ?? 'N/A' }}</div>
+
+                            <!-- Descripción -->
+                            <div class="activity-description">
+                                {{ $activity->description ?? 'Sin descripción.' }}
                             </div>
                         </div>
                     </div>
-                @endforeach
 
-                <div class="page-footer">
-                    <span>Página {{ $loop->iteration }} de {{ $chunks->count() }}</span>
+                    <!-- Galería de imágenes -->
+                    @if(count($imageUrls) > 0)
+                        <div class="activity-gallery">
+                            @foreach($imageUrls as $imageUrl)
+                                <div class="gallery-image-container">
+                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -332,15 +263,32 @@
         @endforeach
     @else
         <div class="content-page">
+            <!-- Header superior derecho -->
             <div class="page-header">
-                <span>{{ $project->name }} | {{ $formattedDate }}</span>
+                {{ $tracking->title }} | {{ $formattedDate }}
             </div>
-            <h1 class="page-title">{{ strtoupper($tracking->title) }}</h1>
+
+            <!-- Título principal -->
+            <h1 class="main-title">REPORTE DIARIO</h1>
+
+            <!-- Información del proyecto -->
+            <div class="project-info">
+                <div class="project-name">{{ $project->name }}</div>
+                @if($project->location)
+                    <div class="project-location">{{ $project->location }}</div>
+                @endif
+                @if($project->company)
+                    <div class="project-company">{{ $project->company }}</div>
+                @endif
+            </div>
+
+            <!-- Nombre del seguimiento -->
+            <div class="tracking-section">
+                <div class="tracking-title">{{ $tracking->title }}</div>
+            </div>
+
             <div class="no-activities">
                 No hay actividades registradas para este día.
-            </div>
-            <div class="page-footer">
-                <span>Página 1 de 1</span>
             </div>
         </div>
     @endif
