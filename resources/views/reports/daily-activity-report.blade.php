@@ -155,30 +155,20 @@
         .activity-gallery {
             /* Eliminar espacio no deseado antes de la primera imagen */
             margin-top: 6px;
-            overflow: hidden;
-            page-break-inside: avoid;
         }
         .gallery-image-container {
-            /* 2 columnas usando float */
-            width: 48%;
-            float: left;
-            margin-right: 4%;
             margin-bottom: 10px;
-            box-sizing: border-box;
             text-align: center;
+            /* Evita cortes dentro de cada imagen y mejora salto de página */
             page-break-inside: avoid;
-        }
-        /* Eliminar margin-right de cada segunda imagen (columna derecha) */
-        .gallery-image-container:nth-child(2n) {
-            margin-right: 0;
         }
         .gallery-image {
             /* Mantener proporcionalidad sin distorsión y adaptarse al contenedor */
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            display: block;
-            border-radius: 4px;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: inline-block;
         }
 
         .no-activities {
