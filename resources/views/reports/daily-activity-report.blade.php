@@ -155,9 +155,12 @@
         .activity-gallery {
             /* Eliminar espacio no deseado antes de la primera imagen */
             margin-top: 6px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
         }
         .gallery-image-container {
-            margin-bottom: 10px;
             text-align: center;
             /* Evita cortes dentro de cada imagen y mejora salto de página */
             page-break-inside: avoid;
