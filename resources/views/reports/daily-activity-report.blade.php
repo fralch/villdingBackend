@@ -155,22 +155,23 @@
         .activity-gallery {
             /* Eliminar espacio no deseado antes de la primera imagen */
             margin-top: 6px;
-            /* Grid de 2 columnas con espacio entre imágenes */
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
             gap: 10px;
             page-break-inside: avoid;
         }
         .gallery-image-container {
+            /* 2 columnas con espacio: calc((100% - gap) / 2) */
+            width: calc(50% - 5px);
+            box-sizing: border-box;
             text-align: center;
-            /* Evita cortes dentro de cada imagen y mejora salto de página */
             page-break-inside: avoid;
         }
         .gallery-image {
             /* Mantener proporcionalidad sin distorsión y adaptarse al contenedor */
             width: 100%;
-            height: auto;
-            max-height: 200px;
+            height: 180px;
             object-fit: cover;
             display: block;
             border-radius: 4px;
