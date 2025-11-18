@@ -158,7 +158,9 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            width: 100%;
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
         }
         .gallery-image-container {
             text-align: center;
