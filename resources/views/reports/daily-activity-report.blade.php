@@ -118,7 +118,7 @@
             display: inline-block;
             padding: 4px 12px;
             border-radius: 12px;
-            font-size: 8pt;
+            font-size: 9pt;
             font-weight: bold;
             text-transform: capitalize;
             color: white;
@@ -130,7 +130,7 @@
 
         /* Título de la actividad */
         .activity-name {
-            font-size: 12pt;
+            font-size: 13pt;
             font-weight: bold;
             color: #0f3854;
             margin-bottom: 5px;
@@ -138,14 +138,14 @@
 
         /* Horario */
         .activity-time {
-            font-size: 9pt;
+            font-size: 10pt;
             color: #2c3e50;
             margin-bottom: 6px;
         }
 
         /* Descripción */
         .activity-description {
-            font-size: 9.5pt;
+            font-size: 10.5pt;
             color: #2c3e50;
             line-height: 1.6;
             margin-bottom: 8px;
@@ -254,7 +254,7 @@
                         <div class="activity-gallery">
                             @foreach($imageUrls as $imageUrl)
                                 <div class="gallery-image-container">
-                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image" style="margin: 5px;">
                                 </div>
                             @endforeach
                         </div>
