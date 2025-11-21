@@ -153,8 +153,8 @@
 
         /* Galería de Imágenes */
         .activity-gallery {
-            margin-top: 10px;
-            width: 100%;
+            margin: 10px auto; /* Centrar el contenedor horizontalmente */
+            width: 80%;
             font-size: 0; /* Eliminar espacio en blanco entre elementos inline-block */
             text-align: left;
         }
