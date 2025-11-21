@@ -314,11 +314,14 @@ class TrackingController extends Controller
             // Buscar el tracking
             $tracking = Tracking::findOrFail($id);
             
-            // Usar timestamp del request o now() por defecto
-            $deletedAt = $request->input('deleted_at', now());
-            
-            $tracking->deleted_at = $deletedAt;
-            $tracking->save();
+            // Si se proporciona una fecha específica, validarla o usarla
+            if ($request->has('deleted_at')) {
+                $tracking->deleted_at = $request->input('deleted_at');
+                $tracking->save();
+            } else {
+                // Si no, usar el método delete() estándar que usa now()
+                $tracking->delete();
+            }
             
             DB::commit();
     
@@ -372,7 +375,11 @@ class TrackingController extends Controller
             // Buscar el tracking (incluyendo eliminados)
             $tracking = Tracking::withTrashed()->findOrFail($id);
 
-            // Eliminar permanentemente
+            // Eliminar actividades asociadas primero para evitar errores de integridad referencial
+            // Como Activity no tiene SoftDeletes, esto las eliminará físicamente
+            $tracking->activities()->delete();
+
+            // Eliminar permanentemente el tracking
             $tracking->forceDelete();
 
             DB::commit();
