@@ -153,27 +153,27 @@
 
         /* Galería de Imágenes */
         .activity-gallery {
-            /* Eliminar espacio no deseado antes de la primera imagen */
-            margin-top: 6px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            width: 60%;
-            margin-left: auto;
-            margin-right: auto;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 0; /* Eliminar espacio en blanco entre elementos inline-block */
+            text-align: left;
         }
         .gallery-image-container {
-            text-align: center;
-            /* Evita cortes dentro de cada imagen y mejora salto de página */
+            display: inline-block;
+            width: 48%;
+            vertical-align: top;
+            margin-bottom: 15px;
+            font-size: 10pt; /* Restablecer tamaño de fuente */
             page-break-inside: avoid;
         }
+        .gallery-image-container:nth-child(odd) {
+            margin-right: 4%;
+        }
         .gallery-image {
-            /* Mantener proporcionalidad sin distorsión y adaptarse al contenedor */
-            max-width: 100%;
-            width: auto;
+            width: 100%;
             height: auto;
-            object-fit: contain;
-            display: inline-block;
+            display: block;
+            border-radius: 4px;
         }
 
         .no-activities {
@@ -254,7 +254,7 @@
                         <div class="activity-gallery">
                             @foreach($imageUrls as $imageUrl)
                                 <div class="gallery-image-container">
-                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image" style="margin: 5px;">
+                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
                                 </div>
                             @endforeach
                         </div>
