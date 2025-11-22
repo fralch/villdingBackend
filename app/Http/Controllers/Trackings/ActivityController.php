@@ -245,7 +245,7 @@ class ActivityController extends Controller
                 $this->deleteImageFromStorage($imageKey);
             }
 
-            $remainingSlots = max(0, 5 - count($finalImagePaths));
+            $remainingSlots = max(0, 10 - count($finalImagePaths));
             if ($remainingSlots > 0) {
                 $newImagePaths = $this->processImages($request, $remainingSlots);
                 if (!empty($newImagePaths)) {
@@ -254,7 +254,7 @@ class ActivityController extends Controller
                 }
             }
 
-            $finalImagePaths = array_slice($finalImagePaths, 0, 5);
+            $finalImagePaths = array_slice($finalImagePaths, 0, 10);
 
             $validatedData['image'] = !empty($finalImagePaths) ? $finalImagePaths : null;
 
