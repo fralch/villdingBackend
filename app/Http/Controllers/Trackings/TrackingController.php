@@ -416,8 +416,9 @@ class TrackingController extends Controller
 
             $reportDate = $validatedData['date'];
 
-            // Obtener el tracking con sus relaciones
-            $tracking = Tracking::with(['project.type', 'project.subtype'])
+            // Obtener el tracking con sus relaciones (incluyendo eliminados)
+            $tracking = Tracking::withTrashed()
+                ->with(['project.type', 'project.subtype'])
                 ->findOrFail($tracking_id);
 
             // Obtener las actividades del día específico
