@@ -185,50 +185,41 @@
     </style>
 </head>
 <body>
-    @if($activities->count() > 0)
-        @foreach($activities as $activityIndex => $activity)
-            @php
-                $imageUrls = $activity->image_urls ?? [];
-                $statusClass = strtolower($activity->status);
-                $isFirstPage = $activityIndex === 0;
-            @endphp
+    <div class="content-page">
+        <!-- Header superior derecho -->
+        <div class="page-header">
+            {{ $tracking->title }} | {{ $formattedDate }}
+        </div>
 
-            <div class="content-page">
-                <!-- Header superior derecho -->
-                <div class="page-header">
-                    {{ $tracking->title }} | {{ $formattedDate }}
-                </div>
+        <!-- Título principal -->
+        <h1 class="main-title">REPORTE DIARIO</h1>
 
-                @if($isFirstPage)
-                    <!-- Título principal solo en la primera página -->
-                    <h1 class="main-title">REPORTE DIARIO</h1>
+        <!-- Información del proyecto -->
+        <div class="project-info">
+            <div class="project-name">{{ $project->name }}</div>
+            @if($project->location)
+                <div class="project-location">{{ $project->location }}</div>
+            @endif
+            @if($project->company)
+                <div class="project-company">{{ $project->company }}</div>
+            @endif
+        </div>
 
-                    <!-- Información del proyecto -->
-                    <div class="project-info">
-                        <div class="project-name">{{ $project->name }}</div>
-                        @if($project->location)
-                            <div class="project-location">{{ $project->location }}</div>
-                        @endif
-                        @if($project->company)
-                            <div class="project-company">{{ $project->company }}</div>
-                        @endif
-                    </div>
+        <!-- Nombre del seguimiento con línea -->
+        <div class="tracking-section">
+            <div class="tracking-title">{{ $tracking->title }}</div>
+        </div>
 
-                    <!-- Nombre del seguimiento con línea -->
-                    <div class="tracking-section">
-                        <div class="tracking-title">{{ $tracking->title }}</div>
-                    </div>
-                @else
-                    <!-- Solo el nombre del seguimiento en páginas subsecuentes -->
-                    <div class="tracking-section">
-                        <div class="tracking-title">{{ $tracking->title }}</div>
-                    </div>
-                @endif
+        @if($activities->count() > 0)
+            @foreach($activities as $activity)
+                @php
+                    $imageUrls = $activity->image_urls ?? [];
+                    $statusClass = strtolower($activity->status);
+                @endphp
 
                 <!-- Tarjeta de actividad -->
                 <div class="activity-card">
                     <div class="activity-header">
-
                         <!-- Contenido de la actividad -->
                         <div class="activity-content">
                             <!-- Badge de estado -->
@@ -260,42 +251,12 @@
                         </div>
                     @endif
                 </div>
-            </div>
-
-            @if(!$loop->last)
-                <div class="page-break"></div>
-            @endif
-        @endforeach
-    @else
-        <div class="content-page">
-            <!-- Header superior derecho -->
-            <div class="page-header">
-                {{ $tracking->title }} | {{ $formattedDate }}
-            </div>
-
-            <!-- Título principal -->
-            <h1 class="main-title">REPORTE DIARIO</h1>
-
-            <!-- Información del proyecto -->
-            <div class="project-info">
-                <div class="project-name">{{ $project->name }}</div>
-                @if($project->location)
-                    <div class="project-location">{{ $project->location }}</div>
-                @endif
-                @if($project->company)
-                    <div class="project-company">{{ $project->company }}</div>
-                @endif
-            </div>
-
-            <!-- Nombre del seguimiento -->
-            <div class="tracking-section">
-                <div class="tracking-title">{{ $tracking->title }}</div>
-            </div>
-
+            @endforeach
+        @else
             <div class="no-activities">
                 No hay actividades registradas para este día.
             </div>
-        </div>
-    @endif
+        @endif
+    </div>
 </body>
 </html>
