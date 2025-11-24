@@ -51,19 +51,19 @@
 
         /* Información del proyecto */
         .project-info {
-            margin-bottom: 0.4cm;
+            margin-bottom: 0.2cm;
         }
         .project-name {
             font-size: 13pt;
             font-weight: bold;
             color: #0f3854;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
         .project-location,
         .project-company {
             font-size: 11pt;
             color: #2c3e50;
-            margin-bottom: 3px;
+            margin-bottom: 1px;
             font-weight: 300;
         }
 
@@ -76,21 +76,21 @@
             font-size: 12pt;
             font-weight: bold;
             color: #0f3854;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
             border-bottom: 2px solid #0f3854;
-            margin-bottom: 0.3cm;
+            margin-bottom: 0.2cm;
         }
 
         /* --- Tarjeta de Actividad --- */
         .activity-card {
-            margin-bottom: 0.6cm;
+            margin-bottom: 0.4cm;
         }
 
         /* Header de actividad con ícono */
         .activity-header {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         /* Ícono a la izquierda */
@@ -122,7 +122,7 @@
             font-weight: bold;
             text-transform: capitalize;
             color: white;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .activity-status.completado { background-color: #4ec291; }
         .activity-status.programado { background-color: transparent; border: 1.5px solid #f4c724; color: #f4c724; }
@@ -133,22 +133,22 @@
             font-size: 13pt;
             font-weight: bold;
             color: #0f3854;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         /* Horario */
         .activity-time {
             font-size: 10pt;
             color: #2c3e50;
-            margin-bottom: 6px;
+            margin-bottom: 2px;
         }
 
         /* Descripción */
         .activity-description {
             font-size: 10.5pt;
             color: #2c3e50;
-            line-height: 1.6;
-            margin-bottom: 8px;
+            line-height: 1.4;
+            margin-bottom: 4px;
         }
 
         /* Galería de Imágenes */
