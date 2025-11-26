@@ -51,26 +51,26 @@
 
         /* Información del proyecto */
         .project-info {
-            margin-bottom: 0.2cm;
+            margin-bottom: 0.4cm;
         }
         .project-name {
             font-size: 13pt;
             font-weight: bold;
             color: #0f3854;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
         .project-location,
         .project-company {
             font-size: 11pt;
             color: #2c3e50;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
             font-weight: 300;
         }
 
         /* Nombre del seguimiento con línea */
         .tracking-section {
             /* Reducido para eliminar espacio innecesario antes de la tarjeta */
-            margin-bottom: 0.2cm;
+            margin-bottom: 0.4cm;
         }
         .tracking-title {
             font-size: 12pt;
@@ -78,12 +78,12 @@
             color: #0f3854;
             padding-bottom: 4px;
             border-bottom: 2px solid #0f3854;
-            margin-bottom: 0.2cm;
+            margin-bottom: 0.3cm;
         }
 
         /* --- Tarjeta de Actividad --- */
         .activity-card {
-            margin-bottom: 0.4cm;
+            margin-bottom: 0.5cm;
         }
 
         /* Header de actividad con ícono */
@@ -133,14 +133,14 @@
             font-size: 13pt;
             font-weight: bold;
             color: #0f3854;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         /* Horario */
         .activity-time {
             font-size: 10pt;
             color: #2c3e50;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         /* Descripción */
@@ -148,7 +148,7 @@
             font-size: 10.5pt;
             color: #2c3e50;
             line-height: 1.4;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         /* Galería de Imágenes */
