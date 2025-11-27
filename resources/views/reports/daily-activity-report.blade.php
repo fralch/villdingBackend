@@ -84,6 +84,7 @@
         /* --- Tarjeta de Actividad --- */
         .activity-card {
             margin-bottom: 0.5cm;
+            page-break-inside: avoid;
         }
 
         /* Header de actividad con ícono */
@@ -133,14 +134,14 @@
             font-size: 13pt;
             font-weight: bold;
             color: #0f3854;
-            margin-bottom: 3px;
+            margin-bottom: 10px;
         }
 
         /* Horario */
         .activity-time {
             font-size: 10pt;
             color: #2c3e50;
-            margin-bottom: 3px;
+            margin-bottom: 10px;
         }
 
         /* Descripción */
@@ -148,7 +149,7 @@
             font-size: 10.5pt;
             color: #2c3e50;
             line-height: 1.4;
-            margin-bottom: 6px;
+            margin-bottom: 35px;
         }
 
         /* Galería de Imágenes */
