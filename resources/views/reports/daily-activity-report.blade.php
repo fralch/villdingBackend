@@ -236,7 +236,7 @@
 
                             <!-- Descripción -->
                             <div class="activity-description">
-                                {{ $activity->description ?? 'Sin descripción.' }}
+                                {!! nl2br(e($activity->description ?? 'Sin descripción.')) !!}
                             </div>
                         </div>
                     </div>
