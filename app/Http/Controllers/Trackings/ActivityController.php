@@ -570,26 +570,41 @@ class ActivityController extends Controller
 
                         // Verificar si existe en S3
                         if (Storage::disk('s3')->exists($imagePath)) {
-                            $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
-                            $newFileName = Str::uuid()->toString() . '.' . $extension;
-                            $newPath = 'activities/' . $newFileName;
+                            \Log::info('Imagen encontrada en S3: ' . $imagePath);
 
-                            // Copiar la imagen en S3
-                            $copySuccess = Storage::disk('s3')->copy($imagePath, $newPath);
+                            // Descargar el contenido de la imagen desde S3
+                            $imageContent = Storage::disk('s3')->get($imagePath);
 
-                            if ($copySuccess) {
-                                // Establecer visibilidad pública
-                                Storage::disk('s3')->setVisibility($newPath, 'public');
+                            if ($imageContent) {
+                                $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
+                                $newFileName = Str::uuid()->toString() . '.' . $extension;
+                                $newPath = 'activities/' . $newFileName;
 
-                                // Verificar que la copia existe
-                                if (Storage::disk('s3')->exists($newPath)) {
-                                    $newImagePaths[] = $newPath;
-                                    \Log::info('Imagen copiada exitosamente a: ' . $newPath);
+                                \Log::info('Contenido descargado, tamaño: ' . strlen($imageContent) . ' bytes');
+                                \Log::info('Subiendo imagen a: ' . $newPath);
+
+                                // Subir la imagen con el nuevo nombre (sin parámetro 'public')
+                                $uploadSuccess = Storage::disk('s3')->put($newPath, $imageContent);
+
+                                if ($uploadSuccess) {
+                                    \Log::info('Imagen subida exitosamente');
+
+                                    // Verificar que la nueva imagen existe
+                                    if (Storage::disk('s3')->exists($newPath)) {
+                                        $newImagePaths[] = $newPath;
+                                        \Log::info('✓ Imagen duplicada exitosamente a: ' . $newPath);
+
+                                        // Log de la URL para verificación
+                                        $url = Storage::disk('s3')->url($newPath);
+                                        \Log::info('URL de la nueva imagen: ' . $url);
+                                    } else {
+                                        \Log::error('La imagen se subió pero no existe en el destino: ' . $newPath);
+                                    }
                                 } else {
-                                    \Log::error('La imagen se copió pero no existe en el destino: ' . $newPath);
+                                    \Log::error('Error al subir imagen a S3: ' . $newPath);
                                 }
                             } else {
-                                \Log::error('Error al copiar imagen en S3 de ' . $imagePath . ' a ' . $newPath);
+                                \Log::error('No se pudo descargar el contenido de la imagen: ' . $imagePath);
                             }
                         } else {
                             \Log::warning('Imagen no encontrada en S3: ' . $imagePath);
@@ -604,9 +619,14 @@ class ActivityController extends Controller
                                 $newFileName = Str::uuid()->toString() . '.' . $extension;
                                 $newPath = 'activities/' . $newFileName;
 
-                                Storage::disk('s3')->put($newPath, $fileContent, 'public');
-                                $newImagePaths[] = $newPath;
-                                \Log::info('Imagen migrada de local a S3: ' . $newPath);
+                                $uploadSuccess = Storage::disk('s3')->put($newPath, $fileContent);
+
+                                if ($uploadSuccess && Storage::disk('s3')->exists($newPath)) {
+                                    $newImagePaths[] = $newPath;
+                                    \Log::info('✓ Imagen migrada de local a S3: ' . $newPath);
+                                } else {
+                                    \Log::error('Error al migrar imagen de local a S3: ' . $localPath);
+                                }
                             } else {
                                 \Log::warning('Imagen no encontrada en ningún almacenamiento: ' . $imagePath);
                             }
