@@ -560,6 +560,7 @@ class ActivityController extends Controller
                         $newPath = 'activities/' . $newFileName;
                         
                         Storage::disk('s3')->copy($imagePath, $newPath);
+                        Storage::disk('s3')->setVisibility($newPath, 'public');
                         $newImagePaths[] = $newPath;
                     } else {
                         // Check local storage as fallback
@@ -570,7 +571,7 @@ class ActivityController extends Controller
                              $newFileName = Str::uuid()->toString() . '.' . $extension;
                              $newPath = 'activities/' . $newFileName;
                              
-                             Storage::disk('s3')->put($newPath, $fileContent);
+                             Storage::disk('s3')->put($newPath, $fileContent, 'public');
                              $newImagePaths[] = $newPath;
                         }
                     }
