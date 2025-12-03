@@ -526,6 +526,97 @@ class ActivityController extends Controller
         }, $imagePaths)));
     }
 
+    public function duplicateActivity(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $validatedData = $request->validate([
+                'activity_id' => 'required|exists:activities,id',
+                'new_date' => 'required|date',
+            ]);
+
+            $sourceActivity = Activity::findOrFail($validatedData['activity_id']);
+            $newDate = $validatedData['new_date'];
+
+            // Determine status
+            date_default_timezone_set('America/Lima');
+            $activityDate = \Carbon\Carbon::parse($newDate)->startOfDay();
+            $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
+            
+            $status = 'pendiente';
+            if ($activityDate->gt($today)) {
+                $status = 'programado';
+            }
+
+            // Handle images
+            $sourceImages = json_decode($sourceActivity->getRawOriginal('image') ?? '[]', true) ?: [];
+            $newImagePaths = [];
+
+            foreach ($sourceImages as $imagePath) {
+                try {
+                    if (Storage::disk('s3')->exists($imagePath)) {
+                        $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
+                        $newFileName = Str::uuid()->toString() . '.' . $extension;
+                        $newPath = 'activities/' . $newFileName;
+                        
+                        Storage::disk('s3')->copy($imagePath, $newPath);
+                        $newImagePaths[] = $newPath;
+                    } else {
+                        // Check local storage as fallback
+                        $localPath = public_path('images/activities/' . basename($imagePath));
+                        if (file_exists($localPath)) {
+                             $fileContent = file_get_contents($localPath);
+                             $extension = pathinfo($localPath, PATHINFO_EXTENSION);
+                             $newFileName = Str::uuid()->toString() . '.' . $extension;
+                             $newPath = 'activities/' . $newFileName;
+                             
+                             Storage::disk('s3')->put($newPath, $fileContent);
+                             $newImagePaths[] = $newPath;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to copy image during activity duplication: ' . $e->getMessage());
+                    // Continue without this image
+                }
+            }
+
+            // Create new activity
+            $newActivityData = [
+                'project_id' => $sourceActivity->project_id,
+                'tracking_id' => $sourceActivity->tracking_id,
+                'name' => $sourceActivity->name,
+                'description' => $sourceActivity->description,
+                'location' => $sourceActivity->location,
+                'horas' => $sourceActivity->horas,
+                'status' => $status,
+                'icon' => $sourceActivity->icon,
+                'image' => !empty($newImagePaths) ? $newImagePaths : null,
+                'comments' => $sourceActivity->comments,
+                'fecha_creacion' => $newDate,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            $activity = Activity::create($newActivityData);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Actividad duplicada exitosamente.',
+                'activity' => $activity,
+                'image_paths' => $this->formatImageUrls($newImagePaths),
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al duplicar actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al duplicar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function deleteActivity($id)
     {
         DB::beginTransaction();

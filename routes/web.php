@@ -182,6 +182,7 @@ Route::get('/endpoint/activities/tracking/{tracking_id}', [ActivityController::c
 
 // Gestión de actividades
 Route::post('/endpoint/activities/create', [ActivityController::class, 'createActivity']);
+Route::post('/endpoint/activities/duplicate', [ActivityController::class, 'duplicateActivity']);
 Route::post('/endpoint/activities/{id}', [ActivityController::class, 'updateActivity']);
 Route::post('/endpoint/activities_imgs/{id}', [ActivityController::class, 'updateActivityWithImages']);
 Route::post('/endpoint/activities_complete', [ActivityController::class, 'completeActivity']);
