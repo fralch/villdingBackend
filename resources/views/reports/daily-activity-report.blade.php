@@ -149,13 +149,13 @@
             font-size: 10.5pt;
             color: #2c3e50;
             line-height: 1.4;
-            margin-bottom: 35px;
+            margin-bottom: 10px;
         }
 
         /* Galería de Imágenes */
         .activity-gallery {
             margin: 10px auto; /* Centrar el contenedor horizontalmente */
-            width: 80%;
+            width: 90%;
             font-size: 0; /* Eliminar espacio en blanco entre elementos inline-block */
             text-align: left;
         }
@@ -163,7 +163,7 @@
             display: inline-block;
             width: 48%;
             vertical-align: top;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-size: 10pt; /* Restablecer tamaño de fuente */
             page-break-inside: avoid;
         }
