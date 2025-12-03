@@ -538,48 +538,89 @@ class ActivityController extends Controller
             $sourceActivity = Activity::findOrFail($validatedData['activity_id']);
             $newDate = $validatedData['new_date'];
 
+            \Log::info('Iniciando duplicación de actividad ID: ' . $sourceActivity->id);
+
             // Determine status
             date_default_timezone_set('America/Lima');
             $activityDate = \Carbon\Carbon::parse($newDate)->startOfDay();
             $today = \Carbon\Carbon::now('America/Lima')->startOfDay();
-            
+
             $status = 'pendiente';
             if ($activityDate->gt($today)) {
                 $status = 'programado';
             }
 
-            // Handle images
-            $sourceImages = json_decode($sourceActivity->getRawOriginal('image') ?? '[]', true) ?: [];
+            // Handle images - usar el atributo 'image' directamente ya que tiene cast a array
+            $sourceImages = $sourceActivity->image ?? [];
+            \Log::info('Imágenes de la actividad fuente: ' . json_encode($sourceImages));
+
             $newImagePaths = [];
 
-            foreach ($sourceImages as $imagePath) {
-                try {
-                    if (Storage::disk('s3')->exists($imagePath)) {
-                        $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
-                        $newFileName = Str::uuid()->toString() . '.' . $extension;
-                        $newPath = 'activities/' . $newFileName;
-                        
-                        Storage::disk('s3')->copy($imagePath, $newPath);
-                        Storage::disk('s3')->setVisibility($newPath, 'public');
-                        $newImagePaths[] = $newPath;
-                    } else {
-                        // Check local storage as fallback
-                        $localPath = public_path('images/activities/' . basename($imagePath));
-                        if (file_exists($localPath)) {
-                             $fileContent = file_get_contents($localPath);
-                             $extension = pathinfo($localPath, PATHINFO_EXTENSION);
-                             $newFileName = Str::uuid()->toString() . '.' . $extension;
-                             $newPath = 'activities/' . $newFileName;
-                             
-                             Storage::disk('s3')->put($newPath, $fileContent, 'public');
-                             $newImagePaths[] = $newPath;
+            if (!empty($sourceImages) && is_array($sourceImages)) {
+                foreach ($sourceImages as $imagePath) {
+                    try {
+                        // Limpiar el path
+                        $imagePath = trim($imagePath);
+
+                        if (empty($imagePath)) {
+                            continue;
                         }
+
+                        \Log::info('Intentando copiar imagen: ' . $imagePath);
+
+                        // Verificar si existe en S3
+                        if (Storage::disk('s3')->exists($imagePath)) {
+                            $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
+                            $newFileName = Str::uuid()->toString() . '.' . $extension;
+                            $newPath = 'activities/' . $newFileName;
+
+                            // Copiar la imagen en S3
+                            $copySuccess = Storage::disk('s3')->copy($imagePath, $newPath);
+
+                            if ($copySuccess) {
+                                // Establecer visibilidad pública
+                                Storage::disk('s3')->setVisibility($newPath, 'public');
+
+                                // Verificar que la copia existe
+                                if (Storage::disk('s3')->exists($newPath)) {
+                                    $newImagePaths[] = $newPath;
+                                    \Log::info('Imagen copiada exitosamente a: ' . $newPath);
+                                } else {
+                                    \Log::error('La imagen se copió pero no existe en el destino: ' . $newPath);
+                                }
+                            } else {
+                                \Log::error('Error al copiar imagen en S3 de ' . $imagePath . ' a ' . $newPath);
+                            }
+                        } else {
+                            \Log::warning('Imagen no encontrada en S3: ' . $imagePath);
+
+                            // Check local storage as fallback
+                            $localPath = public_path('images/activities/' . basename($imagePath));
+                            if (file_exists($localPath)) {
+                                \Log::info('Imagen encontrada en almacenamiento local: ' . $localPath);
+
+                                $fileContent = file_get_contents($localPath);
+                                $extension = pathinfo($localPath, PATHINFO_EXTENSION);
+                                $newFileName = Str::uuid()->toString() . '.' . $extension;
+                                $newPath = 'activities/' . $newFileName;
+
+                                Storage::disk('s3')->put($newPath, $fileContent, 'public');
+                                $newImagePaths[] = $newPath;
+                                \Log::info('Imagen migrada de local a S3: ' . $newPath);
+                            } else {
+                                \Log::warning('Imagen no encontrada en ningún almacenamiento: ' . $imagePath);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Error al copiar imagen durante duplicación: ' . $e->getMessage());
+                        \Log::error('Path de imagen problemática: ' . $imagePath);
+                        // Continue without this image
                     }
-                } catch (\Exception $e) {
-                    \Log::warning('Failed to copy image during activity duplication: ' . $e->getMessage());
-                    // Continue without this image
                 }
             }
+
+            \Log::info('Total de imágenes copiadas: ' . count($newImagePaths));
+            \Log::info('Nuevas rutas de imágenes: ' . json_encode($newImagePaths));
 
             // Create new activity
             $newActivityData = [
@@ -600,17 +641,25 @@ class ActivityController extends Controller
 
             $activity = Activity::create($newActivityData);
 
+            // Refrescar la actividad para obtener todos los accessors y atributos
+            $activity->refresh();
+
+            \Log::info('Actividad duplicada creada con ID: ' . $activity->id);
+            \Log::info('Imágenes de la nueva actividad: ' . json_encode($activity->image));
+
             DB::commit();
 
             return response()->json([
                 'message' => 'Actividad duplicada exitosamente.',
                 'activity' => $activity,
                 'image_paths' => $this->formatImageUrls($newImagePaths),
+                'image_urls' => $activity->image_urls, // Incluir las URLs completas usando el accessor del modelo
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al duplicar actividad: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'message' => 'Error al duplicar actividad',
                 'error' => $e->getMessage()
