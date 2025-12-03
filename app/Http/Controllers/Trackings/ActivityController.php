@@ -694,23 +694,72 @@ class ActivityController extends Controller
             // Find the activity
             $activity = Activity::findOrFail($id);
 
-            // Delete associated images from storage
-            $storedImages = json_decode($activity->getRawOriginal('image') ?? '[]', true) ?: [];
-            foreach ($storedImages as $imagePath) {
-                $this->deleteImageFromStorage($imagePath);
-            }
-
-            // Delete the activity
+            // Delete the activity (soft delete)
             $activity->delete();
 
             DB::commit();
-            return response()->json(['message' => 'Actividad eliminada exitosamente.'], 200);
+            return response()->json(['message' => 'Actividad eliminada exitosamente (soft delete).'], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error al eliminar actividad: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Error al eliminar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function restoreActivity($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Find the activity
+            $activity = Activity::withTrashed()->findOrFail($id);
+
+            // Restore the activity
+            $activity->restore();
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Actividad restaurada exitosamente.',
+                'activity' => $activity
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al restaurar actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al restaurar actividad',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function forceDeleteActivity($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Find the activity
+            $activity = Activity::withTrashed()->findOrFail($id);
+
+            // Delete associated images from storage
+            $storedImages = json_decode($activity->getRawOriginal('image') ?? '[]', true) ?: [];
+            foreach ($storedImages as $imagePath) {
+                $this->deleteImageFromStorage($imagePath);
+            }
+
+            // Delete the activity permanently
+            $activity->forceDelete();
+
+            DB::commit();
+            return response()->json(['message' => 'Actividad eliminada permanentemente.'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al eliminar permanentemente actividad: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al eliminar permanentemente actividad',
                 'error' => $e->getMessage()
             ], 500);
         }

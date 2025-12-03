@@ -206,12 +206,78 @@ class ProjectController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (Soft Delete).
      */
     public function destroyProject(string $id)
     {
-          // Buscar el proyecto y eliminarlo
+          // Buscar el proyecto
           $project = Project::findOrFail($id);
+          
+          // Soft delete en cascada
+          foreach ($project->trackings as $tracking) {
+              $tracking->activities()->delete(); // Soft delete actividades
+              $tracking->delete(); // Soft delete tracking
+          }
+
+          $project->delete();
+
+          return response()->json(['message' => 'Proyecto eliminado correctamente (soft delete)']);
+    }
+
+    /**
+     * Restore a soft-deleted project.
+     */
+    public function restoreProject(string $id)
+    {
+        $project = Project::withTrashed()->findOrFail($id);
+
+        // Restore en cascada
+        $trackings = $project->trackings()->withTrashed()->get();
+        foreach($trackings as $tracking) {
+            // Restore activities individually
+            $activities = $tracking->activities()->withTrashed()->get();
+            foreach($activities as $activity) {
+                $activity->restore();
+            }
+            $tracking->restore();
+        }
+
+        $project->restore();
+
+        return response()->json(['message' => 'Proyecto restaurado correctamente']);
+    }
+
+    /**
+     * Permanently remove the project.
+     */
+    public function forceDeleteProject(string $id)
+    {
+          $project = Project::withTrashed()->findOrFail($id);
+
+          // Force delete en cascada
+          $trackings = $project->trackings()->withTrashed()->get();
+          foreach ($trackings as $tracking) {
+             // Force delete actividades individually
+             $activities = $tracking->activities()->withTrashed()->get();
+             foreach($activities as $activity) {
+                 // Delete images
+                 $storedImages = json_decode($activity->getRawOriginal('image') ?? '[]', true) ?: [];
+                 foreach ($storedImages as $imagePath) {
+                     if (Storage::disk('s3')->exists($imagePath)) {
+                         Storage::disk('s3')->delete($imagePath);
+                     } else {
+                         $localPath = public_path('images/activities/' . basename($imagePath));
+                         if (file_exists($localPath)) {
+                             unlink($localPath);
+                         }
+                     }
+                 }
+                 $activity->forceDelete();
+             }
+             $tracking->forceDelete();
+          }
+
+          // Eliminar imagen
           $previousImage = $project->getRawOriginal('uri');
           if ($previousImage && !Str::startsWith($previousImage, 'http')) {
               if (Storage::disk('s3')->exists($previousImage)) {
@@ -223,9 +289,10 @@ class ProjectController extends Controller
                   }
               }
           }
-          $project->delete();
 
-          return response()->json(['message' => 'Proyecto eliminado correctamente']);
+          $project->forceDelete();
+
+          return response()->json(['message' => 'Proyecto eliminado permanentemente']);
     }
 
 

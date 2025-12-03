@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Trackings;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Tracking;
 use App\Models\Project;
 use App\Models\User;
@@ -314,6 +315,9 @@ class TrackingController extends Controller
             // Buscar el tracking
             $tracking = Tracking::findOrFail($id);
             
+            // Soft delete activities
+            $tracking->activities()->delete();
+
             // Si se proporciona una fecha específica, validarla o usarla
             if ($request->has('deleted_at')) {
                 $tracking->deleted_at = $request->input('deleted_at');
@@ -346,10 +350,16 @@ class TrackingController extends Controller
         try {
             // Buscar el tracking eliminado
             $tracking = Tracking::onlyTrashed()->findOrFail($id);
-            
+
+            // Restaurar activities individually
+            $activities = $tracking->activities()->withTrashed()->get();
+            foreach($activities as $activity) {
+                $activity->restore();
+            }
+
             // Restaurar el tracking
             $tracking->restore();
-            
+
             DB::commit();
 
             return response()->json([
@@ -375,9 +385,23 @@ class TrackingController extends Controller
             // Buscar el tracking (incluyendo eliminados)
             $tracking = Tracking::withTrashed()->findOrFail($id);
 
-            // Eliminar actividades asociadas primero para evitar errores de integridad referencial
-            // Como Activity no tiene SoftDeletes, esto las eliminará físicamente
-            $tracking->activities()->delete();
+            // Eliminar actividades asociadas primero y sus imagenes
+            $activities = $tracking->activities()->withTrashed()->get();
+            foreach ($activities as $activity) {
+                 // Delete images
+                 $storedImages = json_decode($activity->getRawOriginal('image') ?? '[]', true) ?: [];
+                 foreach ($storedImages as $imagePath) {
+                      if (Storage::disk('s3')->exists($imagePath)) {
+                         Storage::disk('s3')->delete($imagePath);
+                     } else {
+                         $localPath = public_path('images/activities/' . basename($imagePath));
+                         if (file_exists($localPath)) {
+                             unlink($localPath);
+                         }
+                     }
+                 }
+                 $activity->forceDelete();
+            }
 
             // Eliminar permanentemente el tracking
             $tracking->forceDelete();
