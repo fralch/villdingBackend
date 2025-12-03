@@ -513,4 +513,102 @@ class TrackingController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Genera un reporte de múltiples trackings con sus fechas
+     */
+    public function generateMultiReport(Request $request)
+    {
+        $validatedData = $request->validate([
+            'report_data' => 'required|array',
+            'report_data.*.tracking_id' => 'required|exists:trackings,id',
+            'report_data.*.date' => 'required|date|date_format:Y-m-d',
+        ]);
+
+        try {
+            ini_set('max_execution_time', 300);
+            ini_set('memory_limit', '512M');
+
+            $reports = [];
+
+            foreach ($validatedData['report_data'] as $data) {
+                $trackingId = $data['tracking_id'];
+                $reportDate = $data['date'];
+
+                // Obtener el tracking con sus relaciones
+                $tracking = Tracking::withTrashed()
+                    ->with(['project.type', 'project.subtype'])
+                    ->findOrFail($trackingId);
+
+                // Obtener las actividades del día específico
+                $activities = Activity::where('tracking_id', $trackingId)
+                    ->whereDate('fecha_creacion', $reportDate)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+
+                // Formatear fecha
+                try {
+                    $formattedDate = \Carbon\Carbon::parse($reportDate)
+                        ->locale('es')
+                        ->isoFormat('dddd, D [de] MMMM [de] YYYY');
+                } catch (\Exception $e) {
+                    $months = [
+                        1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+                        5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+                        9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+                    ];
+                    $days = [
+                        0 => 'domingo', 1 => 'lunes', 2 => 'martes', 3 => 'miércoles',
+                        4 => 'jueves', 5 => 'viernes', 6 => 'sábado'
+                    ];
+                    $date = \Carbon\Carbon::parse($reportDate);
+                    $dayName = $days[$date->dayOfWeek];
+                    $day = $date->day;
+                    $monthName = $months[$date->month];
+                    $year = $date->year;
+                    $formattedDate = ucfirst($dayName) . ', ' . $day . ' de ' . $monthName . ' de ' . $year;
+                }
+
+                // Calcular el número de semana basado en date_start del tracking
+                $startDate = \Carbon\Carbon::parse($tracking->date_start);
+                $currentDate = \Carbon\Carbon::parse($reportDate);
+                $weekNumber = $startDate->diffInWeeks($currentDate) + 1;
+
+                $reports[] = [
+                    'tracking' => $tracking,
+                    'project' => $tracking->project,
+                    'activities' => $activities,
+                    'reportDate' => $reportDate,
+                    'formattedDate' => $formattedDate,
+                    'weekNumber' => str_pad($weekNumber, 3, '0', STR_PAD_LEFT),
+                ];
+            }
+
+            $pdf = Pdf::loadView('reports.multi-activity-report', ['reports' => $reports]);
+
+            $pdf->setPaper('a4', 'portrait');
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isRemoteEnabled', true);
+            $pdf->setOption('chroot', [storage_path('app/public'), public_path()]);
+            $pdf->setOption('enable_remote', true);
+            $pdf->setOption('defaultFont', 'Helvetica');
+            $pdf->setOption('httpContext', [
+                'http' => [
+                    'timeout' => 30,
+                    'ignore_errors' => true
+                ]
+            ]);
+
+            $fileName = 'reporte_multiple_' . now()->format('Y-m-d_H-i-s') . '.pdf';
+
+            return $pdf->download($fileName);
+
+        } catch (\Exception $e) {
+            \Log::error('Error al generar reporte múltiple: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al generar reporte múltiple',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

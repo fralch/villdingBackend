@@ -169,6 +169,7 @@ Route::get('/endpoint/days_project/{project_id}', [TrackingController::class, 'g
 
 // Reportes de tracking
 Route::post('/endpoint/tracking/report/daily/{tracking_id}', [TrackingController::class, 'generateDailyReport']);
+Route::post('/endpoint/tracking/report/multi', [TrackingController::class, 'generateMultiReport']);
 
 // ============================================================================
 // RUTAS DE ACTIVIDADES
