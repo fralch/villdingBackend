@@ -252,6 +252,9 @@
                         </div>
                     @endif
                 </div>
+                @if($loop->first && !$loop->last)
+                    <div class="page-break"></div>
+                @endif
             @endforeach
         @else
             <div class="no-activities">
