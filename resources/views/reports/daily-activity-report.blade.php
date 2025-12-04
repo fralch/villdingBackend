@@ -84,13 +84,13 @@
         /* --- Tarjeta de Actividad --- */
         .activity-card {
             margin-bottom: 0.5cm;
-            page-break-inside: avoid;
+            /* page-break-inside: avoid; eliminado para permitir flujo continuo */
         }
 
         /* Header de actividad con ícono */
         .activity-header {
-            display: flex;
-            align-items: flex-start;
+            /* display: flex; eliminado por problemas de compatibilidad */
+            /* align-items: flex-start; */
             margin-bottom: 10px;
         }
 
@@ -196,7 +196,7 @@
         <h1 class="main-title">REPORTE DIARIO</h1>
 
         <!-- Información del proyecto -->
-        <div class="project-info">
+        <div class="project-info" style="margin-bottom: 30px;">
             <div class="project-name">{{ $project->name }}</div>
             @if($project->location)
                 <div class="project-location">{{ $project->location }}</div>
