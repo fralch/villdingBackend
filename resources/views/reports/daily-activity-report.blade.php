@@ -84,7 +84,6 @@
         /* --- Tarjeta de Actividad --- */
         .activity-card {
             margin-bottom: 0.5cm;
-            page-break-inside: avoid;
         }
 
         /* Header de actividad con ícono */
