@@ -84,6 +84,7 @@
         /* --- Tarjeta de Actividad --- */
         .activity-card {
             margin-bottom: 0.5cm;
+            page-break-inside: avoid;
         }
 
         /* Header de actividad con ícono */
@@ -148,13 +149,13 @@
             font-size: 10.5pt;
             color: #2c3e50;
             line-height: 1.4;
-            margin-bottom: 10px;
+            margin-bottom: 35px;
         }
 
         /* Galería de Imágenes */
         .activity-gallery {
             margin: 10px auto; /* Centrar el contenedor horizontalmente */
-            width: 90%;
+            width: 80%;
             font-size: 0; /* Eliminar espacio en blanco entre elementos inline-block */
             text-align: left;
         }
@@ -162,7 +163,7 @@
             display: inline-block;
             width: 48%;
             vertical-align: top;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 10pt; /* Restablecer tamaño de fuente */
             page-break-inside: avoid;
         }
