@@ -220,35 +220,52 @@
                 @php
                     $imageUrls = $activity->image_urls ?? [];
                     $statusClass = strtolower($activity->status);
+                    $imageChunks = collect($imageUrls)->chunk(2);
+                    $firstRow = $imageChunks->shift();
                 @endphp
 
                 <!-- Tarjeta de actividad -->
                 <div class="activity-card">
-                    <div class="activity-header">
-                        <!-- Contenido de la actividad -->
-                        <div class="activity-content">
-                            <!-- Badge de estado -->
-                            <div class="activity-status {{ $statusClass }}">{{ ucfirst($activity->status) }}</div>
+                    <!-- Bloque inicial (Header + Primera Fila) - Indivisible -->
+                    <div style="page-break-inside: avoid;">
+                        <div class="activity-header">
+                            <!-- Contenido de la actividad -->
+                            <div class="activity-content">
+                                <!-- Badge de estado -->
+                                <div class="activity-status {{ $statusClass }}">{{ ucfirst($activity->status) }}</div>
 
-                            <!-- Título de la actividad -->
-                            <div class="activity-name">{{ $activity->name }}</div>
+                                <!-- Título de la actividad -->
+                                <div class="activity-name">{{ $activity->name }}</div>
 
-                            <!-- Horario -->
-                            @if($activity->horas != 0)
-                                <div class="activity-time">{{ $activity->horas }}</div>
-                            @endif
+                                <!-- Horario -->
+                                @if($activity->horas != 0)
+                                    <div class="activity-time">{{ $activity->horas }}</div>
+                                @endif
 
-                            <!-- Descripción -->
-                            <div class="activity-description">
-                                {!! nl2br(e($activity->description ?? 'Sin descripción.')) !!}
+                                <!-- Descripción -->
+                                <div class="activity-description">
+                                    {!! nl2br(e($activity->description ?? 'Sin descripción.')) !!}
+                                </div>
                             </div>
                         </div>
+
+                        @if($firstRow)
+                            <div class="activity-gallery" style="margin-bottom: 0;">
+                                <div class="gallery-row">
+                                    @foreach($firstRow as $imageUrl)
+                                        <div class="gallery-image-container">
+                                            <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Galería de imágenes -->
-                    @if(count($imageUrls) > 0)
-                        <div class="activity-gallery">
-                            @foreach(collect($imageUrls)->chunk(2) as $rowImages)
+                    <!-- Resto de filas -->
+                    @if($imageChunks->isNotEmpty())
+                        <div class="activity-gallery" style="margin-top: 0;">
+                            @foreach($imageChunks as $rowImages)
                                 <div class="gallery-row">
                                     @foreach($rowImages as $imageUrl)
                                         <div class="gallery-image-container">
