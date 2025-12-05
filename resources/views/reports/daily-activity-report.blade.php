@@ -157,18 +157,21 @@
         .activity-gallery {
             margin: 10px auto; /* Centrar el contenedor horizontalmente */
             width: 80%;
+        }
+        .gallery-row {
+            width: 100%;
+            margin-bottom: 15px;
             font-size: 0; /* Eliminar espacio en blanco entre elementos inline-block */
             text-align: left;
+            page-break-inside: avoid;
         }
         .gallery-image-container {
             display: inline-block;
             width: 48%;
             vertical-align: top;
-            margin-bottom: 15px;
             font-size: 10pt; /* Restablecer tamaño de fuente */
-            page-break-inside: avoid;
         }
-        .gallery-image-container:nth-child(odd) {
+        .gallery-image-container:first-child {
             margin-right: 4%;
         }
         .gallery-image {
@@ -245,9 +248,13 @@
                     <!-- Galería de imágenes -->
                     @if(count($imageUrls) > 0)
                         <div class="activity-gallery">
-                            @foreach($imageUrls as $imageUrl)
-                                <div class="gallery-image-container">
-                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                            @foreach(collect($imageUrls)->chunk(2) as $rowImages)
+                                <div class="gallery-row">
+                                    @foreach($rowImages as $imageUrl)
+                                        <div class="gallery-image-container">
+                                            <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                                        </div>
+                                    @endforeach
                                 </div>
                             @endforeach
                         </div>
