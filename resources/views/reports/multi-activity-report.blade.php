@@ -30,55 +30,33 @@
             box-sizing: border-box;
         }
 
-        /* Header superior derecho */
-        .page-header {
+        /* Header superior derecho: Empresa | Ubicación */
+        .top-right-header {
             text-align: right;
-            font-size: 8.5pt;
-            color: #95a5a6;
-            margin-bottom: 0.3cm;
-            font-weight: 300;
+            font-size: 10pt;
+            color: #7f8c8d;
+            margin-bottom: 0.5cm;
         }
 
-        /* Título principal "REPORTE DIARIO" */
-        .main-title {
-            text-align: center;
-            font-size: 24pt;
+        /* Título: PROYECTO | SEGUIMIENTO */
+        .project-tracking-title {
+            text-align: left;
+            font-size: 14pt;
             color: #0f3854;
             font-weight: bold;
+            text-transform: uppercase;
             margin-bottom: 0.3cm;
-            letter-spacing: 1px;
         }
 
-        /* Información del proyecto */
-        .project-info {
-            margin-bottom: 0.4cm;
-        }
-        .project-name {
-            font-size: 13pt;
-            font-weight: bold;
-            color: #0f3854;
-            margin-bottom: 4px;
-        }
-        .project-location,
-        .project-company {
-            font-size: 11pt;
-            color: #2c3e50;
-            margin-bottom: 2px;
-            font-weight: 300;
-        }
-
-        /* Nombre del seguimiento con línea */
-        .tracking-section {
-            /* Reducido para eliminar espacio innecesario antes de la tarjeta */
-            margin-bottom: 0.4cm;
-        }
-        .tracking-title {
+        /* Fecha con línea divisoria */
+        .report-date {
+            text-align: left;
             font-size: 12pt;
-            font-weight: bold;
             color: #0f3854;
-            padding-bottom: 4px;
-            border-bottom: 2px solid #0f3854;
-            margin-bottom: 0.3cm;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #95a5a6;
+            margin-bottom: 0.8cm;
         }
 
         /* --- Tarjeta de Actividad --- */
@@ -188,28 +166,23 @@
 <body>
     @foreach($reports as $report)
     <div class="content-page {{ !$loop->last ? 'page-break' : '' }}">
-        <!-- Header superior derecho -->
-        <div class="page-header">
-            {{ $report['tracking']->title }} | {{ $report['formattedDate'] }}
-        </div>
-
-        <!-- Título principal -->
-        <h1 class="main-title">REPORTE DIARIO</h1>
-
-        <!-- Información del proyecto -->
-        <div class="project-info">
-            <div class="project-name">{{ $report['project']->name }}</div>
-            @if($report['project']->location)
-                <div class="project-location">{{ $report['project']->location }}</div>
-            @endif
+        <!-- Header superior derecho: Empresa | Ubicación -->
+        <div class="top-right-header">
             @if($report['project']->company)
-                <div class="project-company">{{ $report['project']->company }}</div>
+                {{ $report['project']->company }}
+                @if($report['project']->location) | @endif
             @endif
+            {{ $report['project']->location ?? '' }}
         </div>
 
-        <!-- Nombre del seguimiento con línea -->
-        <div class="tracking-section">
-            <div class="tracking-title">{{ $report['tracking']->title }}</div>
+        <!-- Título principal: PROYECTO | SEGUIMIENTO -->
+        <div class="project-tracking-title">
+            {{ $report['project']->name }} | {{ $report['tracking']->title }}
+        </div>
+
+        <!-- Fecha con línea -->
+        <div class="report-date">
+            {{ $report['formattedDate'] }}
         </div>
 
         @if($report['activities']->count() > 0)
