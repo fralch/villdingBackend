@@ -177,7 +177,7 @@
 
         <!-- Título principal: PROYECTO | SEGUIMIENTO -->
         <div class="project-tracking-title">
-            {{ $report['project']->name }} | {{ $report['tracking']->title }}
+            {{ $report['project']->name }} <span style="font-weight: normal;">| {{ $report['tracking']->title }}</span>
         </div>
 
         <!-- Fecha con línea -->
