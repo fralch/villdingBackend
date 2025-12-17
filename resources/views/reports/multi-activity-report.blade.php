@@ -236,9 +236,11 @@
                             @endif
 
                             <!-- Descripción -->
-                            <div class="activity-description">
-                                {!! nl2br(e($activity->description ?? 'Sin descripción.')) !!}
-                            </div>
+                            @if(!empty($activity->description))
+                                <div class="activity-description">
+                                    {!! nl2br(e($activity->description)) !!}
+                                </div>
+                            @endif
                         </div>
                     </div>
 
