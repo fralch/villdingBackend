@@ -513,8 +513,8 @@ class TrackingController extends Controller
             ]);
 
             // Nombre del archivo (sanitizar nombre del proyecto)
-            $projectName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $tracking->project->name);
-            $fileName = 'reporte_diario_' . $projectName . '_' . $reportDate . '.pdf';
+            $projectName = preg_replace('/[^A-Za-z0-9_\-\s]/', '_', $tracking->project->name);
+            $fileName = 'Reporte_' . $projectName . '_' . $reportDate . '.pdf';
 
             // Retornar el PDF para descarga
             return $pdf->download($fileName);
