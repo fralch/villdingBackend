@@ -623,7 +623,12 @@ class TrackingController extends Controller
                 ]
             ]);
 
-            $fileName = 'reporte_multiple_' . now()->format('Y-m-d_H-i-s') . '.pdf';
+            // Nombre del archivo (sanitizar nombre del proyecto del primer reporte si existe)
+            $projectName = 'Multiple';
+            if (!empty($reports)) {
+                $projectName = preg_replace('/[^A-Za-z0-9_\-\s]/', '_', $reports[0]['project']->name);
+            }
+            $fileName = 'Reporte_' . $projectName . '_' . now()->format('Y-m-d') . '.pdf';
 
             return $pdf->download($fileName);
 
