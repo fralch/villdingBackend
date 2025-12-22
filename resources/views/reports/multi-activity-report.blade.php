@@ -62,7 +62,7 @@
         /* --- Tarjeta de Actividad --- */
         .activity-card {
             margin-bottom: 0.5cm;
-            page-break-inside: avoid;
+            page-break-inside: auto;
         }
 
         /* Header de actividad con ícono */
@@ -134,18 +134,21 @@
         .activity-gallery {
             margin: 10px auto; /* Centrar el contenedor horizontalmente */
             width: 90%;
+        }
+        .gallery-row {
+            width: 100%;
+            margin-bottom: 15px;
             font-size: 0; /* Eliminar espacio en blanco entre elementos inline-block */
             text-align: left;
+            page-break-inside: avoid;
         }
         .gallery-image-container {
             display: inline-block;
             width: 48%;
             vertical-align: top;
-            margin-bottom: 10px;
             font-size: 10pt; /* Restablecer tamaño de fuente */
-            page-break-inside: avoid;
         }
-        .gallery-image-container:nth-child(odd) {
+        .gallery-image-container:first-child {
             margin-right: 4%;
         }
         .gallery-image {
@@ -190,39 +193,60 @@
                 @php
                     $imageUrls = $activity->image_urls ?? [];
                     $statusClass = strtolower($activity->status);
+                    $imageChunks = collect($imageUrls)->chunk(2);
+                    $firstRow = $imageChunks->shift();
                 @endphp
 
                 <!-- Tarjeta de actividad -->
                 <div class="activity-card">
-                    <div class="activity-header">
-                        <!-- Contenido de la actividad -->
-                        <div class="activity-content">
-                            <!-- Badge de estado -->
-                            <div class="activity-status {{ $statusClass }}">{{ ucfirst($activity->status) }}</div>
+                    <!-- Bloque inicial (Header + Primera Fila) - Indivisible -->
+                    <div style="page-break-inside: avoid;">
+                        <div class="activity-header">
+                            <!-- Contenido de la actividad -->
+                            <div class="activity-content">
+                                <!-- Badge de estado -->
+                                <div class="activity-status {{ $statusClass }}">{{ ucfirst($activity->status) }}</div>
 
-                            <!-- Título de la actividad -->
-                            <div class="activity-name">{{ $activity->name }}</div>
+                                <!-- Título de la actividad -->
+                                <div class="activity-name">{{ $activity->name }}</div>
 
-                            <!-- Horario -->
-                            @if($activity->horas != 0)
-                                <div class="activity-time">{{ $activity->horas }}</div>
-                            @endif
+                                <!-- Horario -->
+                                @if($activity->horas != 0)
+                                    <div class="activity-time">{{ $activity->horas }}</div>
+                                @endif
 
-                            <!-- Descripción -->
-                            @if(!empty($activity->description))
-                                <div class="activity-description">
-                                    {!! nl2br(e($activity->description)) !!}
-                                </div>
-                            @endif
+                                <!-- Descripción -->
+                                @if(!empty($activity->description))
+                                    <div class="activity-description">
+                                        {!! nl2br(e($activity->description)) !!}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
+
+                        @if($firstRow)
+                            <div class="activity-gallery" style="margin-bottom: 0;">
+                                <div class="gallery-row">
+                                    @foreach($firstRow as $imageUrl)
+                                        <div class="gallery-image-container">
+                                            <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Galería de imágenes -->
-                    @if(count($imageUrls) > 0)
-                        <div class="activity-gallery">
-                            @foreach($imageUrls as $imageUrl)
-                                <div class="gallery-image-container">
-                                    <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                    <!-- Resto de filas -->
+                    @if($imageChunks->isNotEmpty())
+                        <div class="activity-gallery" style="margin-top: 0;">
+                            @foreach($imageChunks as $rowImages)
+                                <div class="gallery-row">
+                                    @foreach($rowImages as $imageUrl)
+                                        <div class="gallery-image-container">
+                                            <img src="{{ $imageUrl }}" alt="Imagen de Actividad" class="gallery-image">
+                                        </div>
+                                    @endforeach
                                 </div>
                             @endforeach
                         </div>
