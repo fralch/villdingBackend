@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\Tracking;
+use App\Models\Activity;
 use App\Models\ProjectType;
 use App\Models\ProjectSubtype;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -44,6 +45,10 @@ class TrackingDeletionTest extends TestCase
             'project_type_id' => $projectType->id,
             'project_subtype_id' => $projectSubtype->id,
             'location' => 'Test Location',
+            'company' => 'Test Company',
+            'code' => 'TEST-001',
+            'start_date' => now(),
+            'end_date' => now()->addDays(30),
             'status' => 'active'
         ]);
 
@@ -54,7 +59,7 @@ class TrackingDeletionTest extends TestCase
             'description' => 'Test Tracking Description',
             'date_start' => now(),
             'duration_days' => 7,
-            'status' => 'active'
+            'status' => true
         ]);
     }
 
@@ -296,5 +301,38 @@ class TrackingDeletionTest extends TestCase
         $found = collect($trackings)->firstWhere('id', $this->tracking->id);
 
         $this->assertNull($found);
+    }
+
+    /** @test */
+    public function test_soft_delete_preserves_activities()
+    {
+        // Crear actividad para el tracking
+        $activity = Activity::factory()->create([
+            'project_id' => $this->project->id,
+            'tracking_id' => $this->tracking->id,
+            'name' => 'Test Activity'
+        ]);
+
+        // Verificar que la actividad existe
+        $this->assertDatabaseHas('activities', [
+            'id' => $activity->id,
+            'deleted_at' => null
+        ]);
+
+        // Hacer soft delete del tracking
+        $response = $this->postJson("/endpoint/tracking/delete/{$this->tracking->id}");
+
+        $response->assertStatus(200);
+
+        // Verificar que el tracking fue soft deleted
+        $this->assertSoftDeleted('trackings', [
+            'id' => $this->tracking->id
+        ]);
+
+        // Verificar que la actividad NO fue soft deleted (ahora debe persistir)
+        $this->assertDatabaseHas('activities', [
+            'id' => $activity->id,
+            'deleted_at' => null
+        ]);
     }
 }

@@ -315,8 +315,8 @@ class TrackingController extends Controller
             // Buscar el tracking
             $tracking = Tracking::findOrFail($id);
             
-            // Soft delete activities
-            $tracking->activities()->delete();
+            // Soft delete activities - REMOVED as per requirement: activities should remain active
+            // $tracking->activities()->delete();
 
             // Si se proporciona una fecha específica, validarla o usarla
             if ($request->has('deleted_at')) {
